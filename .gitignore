@@ -1,0 +1,53 @@
+﻿# OS and editors
+.DS_Store
+Thumbs.db
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/shelf/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+
+# Rust
+backend/rust_ext/target/
+Cargo.lock
+
+# Kotlin / Gradle
+.gradle/
+**/build/
+local.properties
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Docker and logs
+*.log
+.tmp/
+tmp/
+
+Notes
+Notes/
+

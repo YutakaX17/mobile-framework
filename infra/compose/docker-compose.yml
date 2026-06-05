@@ -1,0 +1,32 @@
+﻿name: mobile-framework
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mobile_framework
+      POSTGRES_USER: mobile_framework
+      POSTGRES_PASSWORD: mobile_framework
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo 'backend not scaffolded yet' && sleep infinity"]
+    depends_on:
+      - postgres
+      - redis
+
+  frontend-admin:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo 'frontend-admin not scaffolded yet' && sleep infinity"]
+
+volumes:
+  postgres_data:

@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Implementation Notes
+    url: https://github.com/
+    about: Read the local implementation-notes folder before creating issues.
+
