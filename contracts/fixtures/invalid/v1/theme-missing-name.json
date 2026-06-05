@@ -1,0 +1,22 @@
+﻿{
+  "schema_version": "v1",
+  "theme_id": "field_ops",
+  "version": "0.1.0",
+  "tokens": {
+    "colors": {
+      "primary": { "main": "#0B5FFF", "contrast": "#FFFFFF" },
+      "secondary": { "main": "#168A55", "contrast": "#FFFFFF" },
+      "background": "#F6F8FB",
+      "surface": "#FFFFFF",
+      "text": "#172033",
+      "success": "#168A55",
+      "warning": "#B26A00",
+      "danger": "#B42318"
+    },
+    "typography": { "font_family": "Atkinson Hyperlegible", "scale": { "body": { "font_size": 16, "line_height": 24, "font_weight": 400 } } },
+    "spacing": { "md": 16 },
+    "radius": { "md": 10 },
+    "elevation": { "none": { "level": 0 } }
+  },
+  "modes": [{ "mode_id": "light", "label": "Light", "color_overrides": {} }]
+}

@@ -1,0 +1,289 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/theme.schema.json",
+  "title": "Theme",
+  "description": "Design token contract for admin previews and mobile runtime rendering.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "theme_id",
+    "name",
+    "version",
+    "tokens",
+    "modes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "theme_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "tokens": {
+      "$ref": "#/$defs/tokens"
+    },
+    "modes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/mode"
+      }
+    },
+    "assets": {
+      "$ref": "#/$defs/assets"
+    },
+    "accessibility": {
+      "$ref": "#/$defs/accessibility"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Explicit extension bag. Consumers may ignore unknown extension keys."
+    }
+  },
+  "$defs": {
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["colors", "typography", "spacing", "radius", "elevation"],
+      "properties": {
+        "colors": {
+          "$ref": "#/$defs/color_tokens"
+        },
+        "typography": {
+          "$ref": "#/$defs/typography_tokens"
+        },
+        "spacing": {
+          "$ref": "#/$defs/spacing_tokens"
+        },
+        "radius": {
+          "$ref": "#/$defs/radius_tokens"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevation_tokens"
+        },
+        "components": {
+          "$ref": "#/$defs/component_tokens"
+        }
+      }
+    },
+    "color_tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "secondary", "background", "surface", "text", "success", "warning", "danger"],
+      "properties": {
+        "primary": { "$ref": "#/$defs/color_scale" },
+        "secondary": { "$ref": "#/$defs/color_scale" },
+        "background": { "$ref": "#/$defs/color_value" },
+        "surface": { "$ref": "#/$defs/color_value" },
+        "text": { "$ref": "#/$defs/color_value" },
+        "success": { "$ref": "#/$defs/color_value" },
+        "warning": { "$ref": "#/$defs/color_value" },
+        "danger": { "$ref": "#/$defs/color_value" }
+      }
+    },
+    "color_scale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main", "contrast"],
+      "properties": {
+        "light": { "$ref": "#/$defs/color_value" },
+        "main": { "$ref": "#/$defs/color_value" },
+        "dark": { "$ref": "#/$defs/color_value" },
+        "contrast": { "$ref": "#/$defs/color_value" }
+      }
+    },
+    "color_value": {
+      "type": "string",
+      "pattern": "^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+    },
+    "typography_tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["font_family", "scale"],
+      "properties": {
+        "font_family": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "fallback_family": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "scale": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/type_style" },
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+          }
+        }
+      }
+    },
+    "type_style": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["font_size", "line_height", "font_weight"],
+      "properties": {
+        "font_size": { "$ref": "#/$defs/positive_number" },
+        "line_height": { "$ref": "#/$defs/positive_number" },
+        "font_weight": {
+          "type": "integer",
+          "enum": [100, 200, 300, 400, 500, 600, 700, 800, 900]
+        },
+        "letter_spacing": {
+          "type": "number",
+          "minimum": -5,
+          "maximum": 20
+        }
+      }
+    },
+    "spacing_tokens": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/non_negative_number" },
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+      }
+    },
+    "radius_tokens": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/non_negative_number" },
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+      }
+    },
+    "elevation_tokens": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/elevation_style" },
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+      }
+    },
+    "elevation_style": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "shadow": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "component_tokens": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/component_style" },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+      }
+    },
+    "component_style": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "background": { "$ref": "#/$defs/color_value" },
+        "text": { "$ref": "#/$defs/color_value" },
+        "border": { "$ref": "#/$defs/color_value" },
+        "radius": { "$ref": "#/$defs/non_negative_number" },
+        "padding": { "$ref": "#/$defs/non_negative_number" },
+        "elevation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        }
+      }
+    },
+    "mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode_id", "label", "color_overrides"],
+      "properties": {
+        "mode_id": {
+          "type": "string",
+          "enum": ["light", "dark"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "color_overrides": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/color_value" },
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "logo_asset_id": { "$ref": "#/$defs/asset_id" },
+        "icon_asset_id": { "$ref": "#/$defs/asset_id" }
+      }
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 100
+    },
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contrast_standard", "validated"],
+      "properties": {
+        "contrast_standard": {
+          "type": "string",
+          "enum": ["wcag_2_2_aa", "wcag_2_2_aaa"]
+        },
+        "validated": {
+          "type": "boolean"
+        },
+        "override_recorded": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "positive_number": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000
+    },
+    "non_negative_number": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    }
+  }
+}

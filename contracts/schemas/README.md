@@ -15,3 +15,4 @@ Do not add unversioned schema files.
 ## Current Schemas
 
 - `v1/module-manifest.schema.json`
+- `v1/theme.schema.json`
