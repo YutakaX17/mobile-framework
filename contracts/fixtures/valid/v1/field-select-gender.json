@@ -1,0 +1,14 @@
+﻿{
+  "field_id": "gender",
+  "field_type": "select",
+  "label": "Gender",
+  "binding": {
+    "data_path": "patient.gender",
+    "entity_type": "patient"
+  },
+  "options": [
+    { "value": "female", "label": "Female" },
+    { "value": "male", "label": "Male" },
+    { "value": "other", "label": "Other" }
+  ]
+}

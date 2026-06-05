@@ -1,0 +1,7 @@
+﻿{
+  "schema_version": "v1",
+  "form_id": "patient_intake",
+  "name": "Patient Intake",
+  "version": "0.1.0",
+  "mode": "standalone"
+}

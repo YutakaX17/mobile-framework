@@ -1,0 +1,17 @@
+﻿{
+  "schema_version": "v1",
+  "form_id": "patient_intake",
+  "name": "Patient Intake",
+  "version": "0.1.0",
+  "mode": "wizard",
+  "fields": [
+    {
+      "field_id": "full_name",
+      "field_type": "text",
+      "label": "Full name",
+      "binding": {
+        "data_path": "patient.full_name"
+      }
+    }
+  ]
+}

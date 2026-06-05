@@ -1,0 +1,8 @@
+﻿{
+  "field_id": "full_name",
+  "field_type": "script",
+  "label": "Full name",
+  "binding": {
+    "data_path": "patient.full_name"
+  }
+}

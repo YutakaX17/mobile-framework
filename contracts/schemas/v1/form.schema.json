@@ -1,0 +1,147 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/form.schema.json",
+  "title": "Form",
+  "description": "Dynamic form definition contract for backend validation, admin builder editing, and mobile rendering.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "form_id", "name", "version", "mode", "fields"],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "form_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["standalone", "embedded"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "reviewed", "published", "archived"],
+      "default": "draft"
+    },
+    "entity_type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "maxLength": 80
+    },
+    "layout": {
+      "$ref": "#/$defs/layout"
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "https://schemas.mobile-framework.local/v1/field.schema.json"
+      }
+    },
+    "submit_action": {
+      "$ref": "#/$defs/submit_action"
+    },
+    "offline": {
+      "$ref": "#/$defs/offline"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["single_column", "two_column", "sectioned"]
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/section"
+          },
+          "default": []
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["section_id", "label", "field_ids"],
+      "properties": {
+        "section_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "field_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+            "minLength": 2,
+            "maxLength": 80
+          }
+        }
+      }
+    },
+    "submit_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_type"],
+      "properties": {
+        "action_type": {
+          "type": "string",
+          "enum": ["create_submission", "update_entity", "start_workflow"]
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        }
+      }
+    },
+    "offline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "queue_submissions"],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "queue_submissions": {
+          "type": "boolean"
+        },
+        "conflict_policy": {
+          "type": "string",
+          "enum": ["server_wins", "client_wins", "manual_review"]
+        }
+      }
+    }
+  }
+}
