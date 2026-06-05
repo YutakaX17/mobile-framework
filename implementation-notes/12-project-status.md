@@ -20,7 +20,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` GitHub labels created.
 - `[x]` GitHub milestones created.
 - `[x]` Epic issues created: `#1` through `#14`.
-- `[ ]` Task issues created.
+- `[~]` Task issues created: initial batch `#15` through `#26`.
 - `[x]` GitHub Project board created: `Mobile Framework`.
 - `[x]` Epic issues added to GitHub Project board.
 
@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
-- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders, labels, milestones, epic issues, and GitHub Project board are created. Detailed task issue breakdown is still pending.
+- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders, labels, milestones, epic issues, Project board, and M0 task issues are created.
 
 ## Completed Work
 
@@ -65,10 +65,11 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Initial ADRs added under `docs/adr`.
 - `[x]` GitHub labels and milestones created.
 - `[x]` Epic issues `#1` through `#14` created and added to the `Mobile Framework` Project board.
+- `[x]` Initial task batch `#15` through `#26` created and added to the `Mobile Framework` Project board.
 
 ## Blockers
 
-- No active setup blocker. Detailed task issues are still pending and should be created from `implementation-notes/05-github-project-breakdown.md` when starting each epic or milestone.
+- No active setup blocker. Remaining detailed task issues should be created incrementally from `implementation-notes/05-github-project-breakdown.md` when starting each epic or milestone.
 
 ## Update Rules
 
