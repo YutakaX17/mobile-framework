@@ -1,0 +1,13 @@
+﻿{
+  "schema_version": "v1",
+  "module_id": "core",
+  "name": "Core",
+  "version": "latest",
+  "platform_min_version": "0.1.0",
+  "plugin_api_version": 0,
+  "surfaces": {
+    "backend": {
+      "django_app": "apps.core"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+﻿{
+  "schema_version": "v1",
+  "module_id": "core",
+  "name": "Core",
+  "description": "Core platform module for shared primitives.",
+  "version": "0.1.0",
+  "platform_min_version": "0.1.0",
+  "runtime_min_version": "0.1.0",
+  "runtime_max_version": "0.1.0",
+  "plugin_api_version": 0,
+  "dependencies": [],
+  "surfaces": {
+    "backend": {
+      "django_app": "apps.core",
+      "api_schema": "apps.core.schema",
+      "jobs": ["health_check"],
+      "events": ["core.started"]
+    },
+    "frontend_admin": {
+      "routes": [
+        {
+          "path": "/dashboard",
+          "component": "DashboardPage",
+          "permission": "core.view_dashboard"
+        }
+      ],
+      "menus": [
+        {
+          "label": "Dashboard",
+          "route": "/dashboard",
+          "permission": "core.view_dashboard"
+        }
+      ],
+      "translations": ["en"]
+    },
+    "mobile": {
+      "widgets": ["text", "button"],
+      "actions": ["navigate"],
+      "sync_handlers": ["default_outbox"]
+    }
+  },
+  "configuration_schemas": [
+    {
+      "name": "core_settings",
+      "schema_id": "https://schemas.mobile-framework.local/v1/core-settings.schema.json"
+    }
+  ],
+  "permissions": [
+    {
+      "code": "core.view_dashboard",
+      "label": "View dashboard"
+    }
+  ],
+  "extensions": {
+    "notes": "Example extension payload."
+  }
+}
