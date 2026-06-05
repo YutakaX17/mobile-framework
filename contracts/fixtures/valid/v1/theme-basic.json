@@ -1,0 +1,105 @@
+﻿{
+  "schema_version": "v1",
+  "theme_id": "field_ops",
+  "name": "Field Operations",
+  "description": "Accessible starter theme for mobile field work.",
+  "version": "0.1.0",
+  "tokens": {
+    "colors": {
+      "primary": {
+        "light": "#6EA8FF",
+        "main": "#0B5FFF",
+        "dark": "#003EA8",
+        "contrast": "#FFFFFF"
+      },
+      "secondary": {
+        "light": "#9BE7C2",
+        "main": "#168A55",
+        "dark": "#0B5C38",
+        "contrast": "#FFFFFF"
+      },
+      "background": "#F6F8FB",
+      "surface": "#FFFFFF",
+      "text": "#172033",
+      "success": "#168A55",
+      "warning": "#B26A00",
+      "danger": "#B42318"
+    },
+    "typography": {
+      "font_family": "Atkinson Hyperlegible",
+      "fallback_family": "sans-serif",
+      "scale": {
+        "body": {
+          "font_size": 16,
+          "line_height": 24,
+          "font_weight": 400
+        },
+        "heading": {
+          "font_size": 24,
+          "line_height": 32,
+          "font_weight": 700,
+          "letter_spacing": -0.2
+        }
+      }
+    },
+    "spacing": {
+      "xs": 4,
+      "sm": 8,
+      "md": 16,
+      "lg": 24,
+      "xl": 32
+    },
+    "radius": {
+      "sm": 4,
+      "md": 10,
+      "lg": 18
+    },
+    "elevation": {
+      "none": {
+        "level": 0
+      },
+      "card": {
+        "level": 2,
+        "shadow": "0 8px 24px rgba(23, 32, 51, 0.12)"
+      }
+    },
+    "components": {
+      "button_primary": {
+        "background": "#0B5FFF",
+        "text": "#FFFFFF",
+        "radius": 10,
+        "padding": 12,
+        "elevation": 1
+      }
+    }
+  },
+  "modes": [
+    {
+      "mode_id": "light",
+      "label": "Light",
+      "color_overrides": {
+        "background": "#F6F8FB",
+        "surface": "#FFFFFF",
+        "text": "#172033"
+      }
+    },
+    {
+      "mode_id": "dark",
+      "label": "Dark",
+      "color_overrides": {
+        "background": "#111827",
+        "surface": "#1F2937",
+        "text": "#F9FAFB"
+      }
+    }
+  ],
+  "assets": {
+    "logo_asset_id": "field_ops_logo",
+    "icon_asset_id": "field_ops_icon"
+  },
+  "accessibility": {
+    "contrast_standard": "wcag_2_2_aa",
+    "validated": true,
+    "override_recorded": false
+  }
+}
