@@ -1,0 +1,309 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/module-manifest.schema.json",
+  "title": "Module Manifest",
+  "description": "Declares a platform module and its backend, frontend, mobile, permission, dependency, and compatibility metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "module_id",
+    "name",
+    "version",
+    "platform_min_version",
+    "plugin_api_version",
+    "surfaces"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "module_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80,
+      "description": "Stable lower_snake_case module identifier."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$",
+      "description": "Semantic module version."
+    },
+    "platform_min_version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "platform_max_version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "runtime_min_version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "runtime_max_version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "plugin_api_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/backend_surface"
+        },
+        "frontend_admin": {
+          "$ref": "#/$defs/frontend_admin_surface"
+        },
+        "mobile": {
+          "$ref": "#/$defs/mobile_surface"
+        }
+      }
+    },
+    "configuration_schemas": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/schema_reference"
+      },
+      "default": []
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/permission"
+      },
+      "default": []
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Explicit extension bag. Consumers may ignore unknown extension keys."
+    }
+  },
+  "$defs": {
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module_id", "version_constraint"],
+      "properties": {
+        "module_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "version_constraint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Human-readable semver constraint until a formal constraint grammar is selected."
+        },
+        "optional": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "schema_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "schema_id"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "schema_id": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 300
+        }
+      }
+    },
+    "permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "backend_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "django_app": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_.]*$",
+          "maxLength": 200
+        },
+        "api_schema": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+            "maxLength": 80
+          },
+          "default": []
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+            "maxLength": 120
+          },
+          "default": []
+        }
+      }
+    },
+    "frontend_admin_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/route"
+          },
+          "default": []
+        },
+        "menus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/menu_entry"
+          },
+          "default": []
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+          },
+          "default": []
+        }
+      }
+    },
+    "mobile_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widgets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+            "maxLength": 80
+          },
+          "default": []
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+            "maxLength": 80
+          },
+          "default": []
+        },
+        "sync_handlers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+            "maxLength": 80
+          },
+          "default": []
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "component"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^/[a-z0-9_/-]*$",
+          "maxLength": 200
+        },
+        "component": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9]*$",
+          "maxLength": 120
+        },
+        "permission": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+          "maxLength": 120
+        }
+      }
+    },
+    "menu_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "route"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "route": {
+          "type": "string",
+          "pattern": "^/[a-z0-9_/-]*$",
+          "maxLength": 200
+        },
+        "permission": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+          "maxLength": 120
+        }
+      }
+    }
+  }
+}

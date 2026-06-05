@@ -11,3 +11,7 @@ contracts/schemas/v1/
 ```
 
 Do not add unversioned schema files.
+
+## Current Schemas
+
+- `v1/module-manifest.schema.json`

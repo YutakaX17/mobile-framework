@@ -9,6 +9,7 @@ Shared source of truth for schemas, API contracts, fixtures, and generated types
 - `openapi`: operational, mobile, and integration REST contracts.
 - `generated`: generated Python, TypeScript, and Kotlin types.
 - `fixtures`: valid and invalid sample packages/configuration for contract tests.
+- `tests`: unittest-based contract validation tests.
 
 Contracts should be implemented before Rust package helpers and before builder features depend on runtime package shapes.
 
@@ -16,3 +17,9 @@ Contracts should be implemented before Rust package helpers and before builder f
 
 - [Schema conventions](SCHEMA_CONVENTIONS.md)
 - [Compatibility matrix](COMPATIBILITY_MATRIX.md)
+
+## Test Command
+
+```powershell
+python -m unittest discover contracts/tests
+```
