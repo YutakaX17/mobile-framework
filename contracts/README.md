@@ -11,3 +11,8 @@ Shared source of truth for schemas, API contracts, fixtures, and generated types
 - `fixtures`: valid and invalid sample packages/configuration for contract tests.
 
 Contracts should be implemented before Rust package helpers and before builder features depend on runtime package shapes.
+
+## Contract Rules
+
+- [Schema conventions](SCHEMA_CONVENTIONS.md)
+- [Compatibility matrix](COMPATIBILITY_MATRIX.md)
