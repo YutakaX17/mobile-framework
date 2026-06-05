@@ -16,3 +16,5 @@ Do not add unversioned schema files.
 
 - `v1/module-manifest.schema.json`
 - `v1/theme.schema.json`
+- `v1/field.schema.json`
+- `v1/form.schema.json`

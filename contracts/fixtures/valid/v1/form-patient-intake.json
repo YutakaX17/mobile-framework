@@ -1,0 +1,73 @@
+﻿{
+  "schema_version": "v1",
+  "form_id": "patient_intake",
+  "name": "Patient Intake",
+  "description": "Basic offline-capable intake form.",
+  "version": "0.1.0",
+  "mode": "standalone",
+  "status": "draft",
+  "entity_type": "patient",
+  "layout": {
+    "type": "sectioned",
+    "sections": [
+      {
+        "section_id": "identity",
+        "label": "Identity",
+        "field_ids": ["full_name", "age", "gender"]
+      }
+    ]
+  },
+  "fields": [
+    {
+      "field_id": "full_name",
+      "field_type": "text",
+      "label": "Full name",
+      "required": true,
+      "binding": {
+        "data_path": "patient.full_name",
+        "entity_type": "patient"
+      },
+      "validation": {
+        "min_length": 2,
+        "max_length": 120,
+        "message": "Enter the patient's full name."
+      }
+    },
+    {
+      "field_id": "age",
+      "field_type": "number",
+      "label": "Age",
+      "binding": {
+        "data_path": "patient.age",
+        "entity_type": "patient"
+      },
+      "validation": {
+        "minimum": 0,
+        "maximum": 130
+      }
+    },
+    {
+      "field_id": "gender",
+      "field_type": "select",
+      "label": "Gender",
+      "binding": {
+        "data_path": "patient.gender",
+        "entity_type": "patient"
+      },
+      "options": [
+        { "value": "female", "label": "Female" },
+        { "value": "male", "label": "Male" },
+        { "value": "other", "label": "Other" }
+      ]
+    }
+  ],
+  "submit_action": {
+    "action_type": "create_submission",
+    "target": "patient_intake_submission"
+  },
+  "offline": {
+    "enabled": true,
+    "queue_submissions": true,
+    "conflict_policy": "manual_review"
+  }
+}

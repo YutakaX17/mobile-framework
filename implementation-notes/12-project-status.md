@@ -56,7 +56,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 - `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
 - `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders, labels, milestones, epic issues, Project board, and M0 task issues are created.
-- `[~]` EPIC-04 Shared Contracts: schema conventions, module manifest schema, and theme schema are documented; remaining schema implementation tasks are pending.
+- `[~]` EPIC-04 Shared Contracts: schema conventions, module manifest, theme, form, and field schemas are documented; remaining schema implementation tasks are pending.
 
 ## Completed Work
 
@@ -70,6 +70,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#21` completed: schema conventions and initial compatibility matrix documented.
 - `[x]` Task `#22` completed: module manifest schema, fixtures, and tests added.
 - `[x]` Task `#23` completed: theme schema, fixtures, and tests added.
+- `[x]` Task `#24` completed: form and field schemas, fixtures, and tests added.
 
 ## Blockers
 

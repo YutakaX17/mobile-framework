@@ -1,0 +1,8 @@
+﻿{
+  "field_id": "gender",
+  "field_type": "select",
+  "label": "Gender",
+  "binding": {
+    "data_path": "patient.gender"
+  }
+}

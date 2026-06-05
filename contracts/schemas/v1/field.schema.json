@@ -1,0 +1,235 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/field.schema.json",
+  "title": "Field",
+  "description": "Dynamic form field contract for builders, backend validation, and mobile rendering.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["field_id", "field_type", "label", "binding"],
+  "properties": {
+    "field_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "field_type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "number",
+        "date",
+        "time",
+        "boolean",
+        "select",
+        "multi_select",
+        "radio",
+        "checkbox",
+        "file",
+        "image",
+        "location",
+        "barcode_qr",
+        "signature",
+        "calculated",
+        "hidden",
+        "custom"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "help_text": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "read_only": {
+      "type": "boolean",
+      "default": false
+    },
+    "hidden": {
+      "type": "boolean",
+      "default": false
+    },
+    "binding": {
+      "$ref": "#/$defs/binding"
+    },
+    "validation": {
+      "$ref": "#/$defs/validation"
+    },
+    "visibility": {
+      "$ref": "#/$defs/rule"
+    },
+    "calculation": {
+      "$ref": "#/$defs/rule"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/option"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "custom_control": {
+      "$ref": "#/$defs/custom_control"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "field_type": {
+            "enum": ["select", "multi_select", "radio", "checkbox"]
+          }
+        },
+        "required": ["field_type"]
+      },
+      "then": {
+        "required": ["options"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "field_type": {
+            "const": "calculated"
+          }
+        },
+        "required": ["field_type"]
+      },
+      "then": {
+        "required": ["calculation"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "field_type": {
+            "const": "custom"
+          }
+        },
+        "required": ["field_type"]
+      },
+      "then": {
+        "required": ["custom_control"]
+      }
+    }
+  ],
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["data_path"],
+      "properties": {
+        "data_path": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)*$",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "entity_type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_length": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "max_length": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "pattern": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_type", "expression"],
+      "properties": {
+        "rule_type": {
+          "type": "string",
+          "enum": ["supported_expression", "server_evaluated"]
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "description": "Declarative expression only. It must not contain arbitrary executable code."
+        }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "label"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "custom_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control_id", "runtime_widget"],
+      "properties": {
+        "control_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "runtime_widget": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        }
+      }
+    }
+  }
+}
