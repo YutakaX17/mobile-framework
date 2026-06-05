@@ -28,7 +28,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 - `[~]` M0 Repository Foundation.
 - `[ ]` M1 Backend Kernel.
-- `[ ]` M2 Contracts And Rust Extension.
+- `[~]` M2 Contracts And Rust Extension.
 - `[ ]` M3 Admin Shell.
 - `[ ]` M4 Theme And Form Builder MVP.
 - `[ ]` M5 Mobile Runtime MVP.
@@ -41,7 +41,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[~]` EPIC-01 Repository And Tooling.
 - `[ ]` EPIC-02 Backend Core.
 - `[ ]` EPIC-03 Rust Extension.
-- `[ ]` EPIC-04 Shared Contracts.
+- `[~]` EPIC-04 Shared Contracts.
 - `[ ]` EPIC-05 Admin Frontend Shell.
 - `[ ]` EPIC-06 Theme Builder.
 - `[ ]` EPIC-07 Form Builder.
@@ -56,6 +56,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 - `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
 - `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders, labels, milestones, epic issues, Project board, and M0 task issues are created.
+- `[~]` EPIC-04 Shared Contracts: schema conventions and the initial compatibility matrix are documented; remaining schema implementation tasks are pending.
 
 ## Completed Work
 
@@ -66,6 +67,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` GitHub labels and milestones created.
 - `[x]` Epic issues `#1` through `#14` created and added to the `Mobile Framework` Project board.
 - `[x]` Initial task batch `#15` through `#26` created and added to the `Mobile Framework` Project board.
+- `[x]` Task `#21` completed: schema conventions and initial compatibility matrix documented.
 
 ## Blockers
 
