@@ -13,10 +13,10 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Repository And Tracking
 
-- `[ ]` GitHub repository created.
-- `[ ]` Local workspace initialized as git repository.
-- `[ ]` GitHub remote added.
-- `[ ]` Planning notes pushed to GitHub.
+- `[x]` GitHub repository created: `YutakaX17/mobile-framework`.
+- `[x]` Local workspace initialized as git repository.
+- `[x]` GitHub remote added: `https://github.com/YutakaX17/mobile-framework.git`.
+- `[x]` Planning notes pushed to GitHub.
 - `[ ]` GitHub labels created.
 - `[ ]` GitHub milestones created.
 - `[ ]` Epic issues created.
@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
-- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders and placeholder files have been created locally. GitHub repository creation is still blocked.
+- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders and placeholder files have been created locally. Repository is connected and pushed; GitHub backlog setup is next.
 
 ## Completed Work
 
@@ -66,7 +66,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Blockers
 
-- `[!]` A GitHub repository has not yet been created from this workspace because this environment has no installed GitHub CLI and the exposed GitHub connector tools do not include repository creation.
+- `[!]` GitHub backlog automation is blocked: the connector can read the repository but issue creation returned `403 Resource not accessible by integration`, and local GitHub CLI (`gh`) is not installed.
 
 ## Update Rules
 
@@ -76,9 +76,4 @@ When completing work:
 2. Add the related GitHub issue number when available.
 3. Keep this file high-level; detailed task discussion belongs in GitHub issues and PRs.
 4. Commit this update with the implementation PR.
-
-
-
-
-
 
