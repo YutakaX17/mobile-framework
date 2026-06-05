@@ -17,12 +17,12 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Local workspace initialized as git repository.
 - `[x]` GitHub remote added: `https://github.com/YutakaX17/mobile-framework.git`.
 - `[x]` Planning notes pushed to GitHub.
-- `[ ]` GitHub labels created.
-- `[ ]` GitHub milestones created.
-- `[ ]` Epic issues created.
+- `[x]` GitHub labels created.
+- `[x]` GitHub milestones created.
+- `[x]` Epic issues created: `#1` through `#14`.
 - `[ ]` Task issues created.
-- `[ ]` GitHub Project board created.
-- `[ ]` Issues added to GitHub Project board.
+- `[x]` GitHub Project board created: `Mobile Framework`.
+- `[x]` Epic issues added to GitHub Project board.
 
 ## Milestones
 
@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
-- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders and placeholder files have been created locally. Repository is connected and pushed; GitHub backlog setup is next.
+- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders, labels, milestones, epic issues, and GitHub Project board are created. Detailed task issue breakdown is still pending.
 
 ## Completed Work
 
@@ -63,10 +63,12 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` GitHub tracking notes and templates prepared locally.
 - `[x]` Initial monorepo foundation folders and placeholder docs created locally.
 - `[x]` Initial ADRs added under `docs/adr`.
+- `[x]` GitHub labels and milestones created.
+- `[x]` Epic issues `#1` through `#14` created and added to the `Mobile Framework` Project board.
 
 ## Blockers
 
-- `[!]` GitHub backlog automation is blocked: the connector can read the repository but issue creation returned `403 Resource not accessible by integration`, and local GitHub CLI (`gh`) is not installed.
+- No active setup blocker. Detailed task issues are still pending and should be created from `implementation-notes/05-github-project-breakdown.md` when starting each epic or milestone.
 
 ## Update Rules
 
