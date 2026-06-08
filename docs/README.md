@@ -5,7 +5,7 @@ Project documentation lives here after implementation begins. Planning notes rem
 ## Areas
 
 - `product`: MVP scope, product boundaries, and glossary.
-- `adr`: architecture decision records.
+- `adr`: architecture decision records and ADR review index.
 - `developer`: developer setup and module guides.
 - `admin`: administrator and builder user guides.
 - `mobile-runtime`: mobile runtime behavior, package compatibility, and sync.
