@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
-- `[~]` EPIC-01 Repository And Tooling: initial monorepo foundation folders, labels, milestones, epic issues, Project board, and M0 task issues are created.
+- `[~]` EPIC-01 Repository And Tooling: foundation CI is in place; remaining M0 repository/tooling tasks are pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -73,6 +73,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#24` completed: form and field schemas, fixtures, and tests added.
 - `[x]` Task `#25` completed: app, screen, action, and deployment package schema skeletons added.
 - `[x]` Task `#26` completed: contract validation runner added and wired into CI.
+- `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 
 ## Blockers
 

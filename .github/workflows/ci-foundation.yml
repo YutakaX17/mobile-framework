@@ -1,4 +1,4 @@
-﻿name: CI Placeholder
+﻿name: CI Foundation
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   validate-foundation:
+    name: Validate Foundation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,18 +22,8 @@ jobs:
       - name: Install contract dependencies
         run: python -m pip install -r contracts/requirements.txt
 
-      - name: Validate foundation files
-        shell: bash
-        run: |
-          test -f README.md
-          test -f CONTRIBUTING.md
-          test -f .editorconfig
-          test -f .gitignore
-          test -f docs/adr/ADR-0000-template.md
-          test -f infra/compose/docker-compose.yml
-          test -f implementation-notes/README.md
-          test -f contracts/validation_manifest.json
-          test -f contracts/validate_contracts.py
+      - name: Validate repository foundation
+        run: python tools/validate_foundation.py
 
       - name: Validate contracts
         run: python contracts/validate_contracts.py

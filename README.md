@@ -35,6 +35,15 @@ No application features are implemented yet. The first implementation target is 
 10. Workflow Builder.
 11. Deployment and production hardening.
 
+## Validation
+
+Run foundation and contract checks locally from the repository root:
+
+```powershell
+python tools/validate_foundation.py
+python contracts/validate_contracts.py
+```
+
 ## Development Rule
 
 Do not start by building many features. Build the platform kernel first, keep changes small, and update `implementation-notes/12-project-status.md` when project progress changes.
