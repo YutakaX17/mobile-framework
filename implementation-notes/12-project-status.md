@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-00 Product And Architecture: initial ADRs have been added under `docs/adr`.
+- `[~]` EPIC-00 Product And Architecture: MVP scope and glossary are documented; ADR review task `#16` remains pending.
 - `[~]` EPIC-01 Repository And Tooling: foundation CI is in place; remaining M0 repository/tooling tasks are pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
@@ -74,6 +74,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#25` completed: app, screen, action, and deployment package schema skeletons added.
 - `[x]` Task `#26` completed: contract validation runner added and wired into CI.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
+- `[x]` Task `#15` completed: MVP scope and glossary documented.
 
 ## Blockers
 
