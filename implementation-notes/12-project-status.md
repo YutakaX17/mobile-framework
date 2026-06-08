@@ -20,13 +20,13 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` GitHub labels created.
 - `[x]` GitHub milestones created.
 - `[x]` Epic issues created: `#1` through `#14`.
-- `[~]` Task issues created: initial batch `#15` through `#26`.
+- `[x]` Task issues created: initial batch `#15` through `#26`.
 - `[x]` GitHub Project board created: `Mobile Framework`.
 - `[x]` Epic issues added to GitHub Project board.
 
 ## Milestones
 
-- `[~]` M0 Repository Foundation.
+- `[x]` M0 Repository Foundation.
 - `[~]` M1 Backend Kernel.
 - `[~]` M2 Contracts And Rust Extension.
 - `[ ]` M3 Admin Shell.
@@ -38,7 +38,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Epics
 
 - `[x]` EPIC-00 Product And Architecture.
-- `[~]` EPIC-01 Repository And Tooling.
+- `[x]` EPIC-01 Repository And Tooling.
 - `[~]` EPIC-02 Backend Core.
 - `[ ]` EPIC-03 Rust Extension.
 - `[~]` EPIC-04 Shared Contracts.
@@ -54,7 +54,6 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-01 Repository And Tooling: foundation CI, local setup docs, and repository protection baseline are in place; license task `#17` is blocked pending owner decision.
 - `[~]` EPIC-02 Backend Core: Django project scaffold and tenant model baseline are in place; identity/RBAC, module registry, configuration registry, audit, and service lifecycle tasks remain pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
@@ -78,12 +77,12 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
 - `[x]` Task `#20` completed: local environment setup documentation added.
 - `[x]` Task `#18` completed: repository protection checklist documented and baseline settings applied.
+- `[x]` Task `#17` completed: Apache-2.0 license and owner-led contribution posture applied.
 - `[x]` Task `#41` completed: Django backend project scaffold, health endpoint, and backend validation added.
 - `[x]` Task `#43` completed: tenant model baseline, migration, and tests added.
 
 ## Blockers
 
-- Task `#17` is blocked pending owner choice of repository license and contribution posture.
 - Remaining detailed task issues should be created incrementally from `implementation-notes/05-github-project-breakdown.md` when starting each epic or milestone.
 
 ## Update Rules

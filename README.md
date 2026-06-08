@@ -47,3 +47,7 @@ python contracts/validate_contracts.py
 ## Development Rule
 
 Do not start by building many features. Build the platform kernel first, keep changes small, and update `implementation-notes/12-project-status.md` when project progress changes.
+
+## License
+
+Licensed under the Apache License 2.0. See [LICENSE.md](LICENSE.md).
