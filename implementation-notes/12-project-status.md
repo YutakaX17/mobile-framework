@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-01 Repository And Tooling: foundation CI and local setup docs are in place; license task `#17` is blocked pending owner decision, and repository protection task `#18` remains pending.
+- `[~]` EPIC-01 Repository And Tooling: foundation CI, local setup docs, and repository protection baseline are in place; license task `#17` is blocked pending owner decision.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -76,6 +76,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
 - `[x]` Task `#20` completed: local environment setup documentation added.
+- `[x]` Task `#18` completed: repository protection checklist documented and baseline settings applied.
 
 ## Blockers
 
