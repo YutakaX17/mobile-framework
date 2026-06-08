@@ -13,6 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install contract dependencies
+        run: python -m pip install -r contracts/requirements.txt
+
       - name: Validate foundation files
         shell: bash
         run: |
@@ -23,3 +31,8 @@ jobs:
           test -f docs/adr/ADR-0000-template.md
           test -f infra/compose/docker-compose.yml
           test -f implementation-notes/README.md
+          test -f contracts/validation_manifest.json
+          test -f contracts/validate_contracts.py
+
+      - name: Validate contracts
+        run: python contracts/validate_contracts.py

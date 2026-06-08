@@ -18,8 +18,22 @@ Contracts should be implemented before Rust package helpers and before builder f
 - [Schema conventions](SCHEMA_CONVENTIONS.md)
 - [Compatibility matrix](COMPATIBILITY_MATRIX.md)
 
-## Test Command
+## Validation Command
+
+Install dependencies if needed:
 
 ```powershell
-python -m unittest discover contracts/tests
+python -m pip install -r contracts/requirements.txt
+```
+
+Run the full contract validation suite from the repository root:
+
+```powershell
+python contracts/validate_contracts.py
+```
+
+For manifest-driven schema and fixture validation only:
+
+```powershell
+python contracts/validate_contracts.py --skip-unittest
 ```
