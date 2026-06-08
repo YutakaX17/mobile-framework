@@ -1,0 +1,52 @@
+﻿{
+  "schema_version": "v1",
+  "app_id": "field_ops_app",
+  "name": "Field Operations",
+  "description": "Mobile field operations starter app.",
+  "version": "0.1.0",
+  "theme_id": "field_ops",
+  "navigation": [
+    {
+      "label": "Intake",
+      "screen_id": "intake",
+      "icon": "form",
+      "permission": "forms.submit_patient_intake"
+    }
+  ],
+  "screens": [
+    {
+      "screen_id": "intake",
+      "name": "Patient Intake",
+      "screen_type": "form",
+      "route": "/intake",
+      "permission": "forms.submit_patient_intake",
+      "layout": {
+        "type": "single_column"
+      },
+      "components": [
+        {
+          "component_id": "intake_form",
+          "component_type": "form",
+          "label": "Patient Intake",
+          "binding": {
+            "form_id": "patient_intake"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "action_id": "submit_intake",
+          "action_type": "submit_form",
+          "label": "Submit",
+          "target": "patient_intake"
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "code": "forms.submit_patient_intake",
+      "label": "Submit patient intake"
+    }
+  ]
+}

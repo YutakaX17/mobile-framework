@@ -1,0 +1,28 @@
+﻿{
+  "screen_id": "intake",
+  "name": "Patient Intake",
+  "screen_type": "form",
+  "route": "/intake",
+  "permission": "forms.submit_patient_intake",
+  "layout": {
+    "type": "single_column"
+  },
+  "components": [
+    {
+      "component_id": "intake_form",
+      "component_type": "form",
+      "label": "Patient Intake",
+      "binding": {
+        "form_id": "patient_intake"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "submit_intake",
+      "action_type": "submit_form",
+      "label": "Submit",
+      "target": "patient_intake"
+    }
+  ]
+}

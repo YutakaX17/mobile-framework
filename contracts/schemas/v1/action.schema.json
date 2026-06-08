@@ -1,0 +1,84 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/action.schema.json",
+  "title": "Action",
+  "description": "Supported runtime action binding for screens, components, and forms.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action_id", "action_type"],
+  "properties": {
+    "action_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "action_type": {
+      "type": "string",
+      "enum": ["navigate", "submit_form", "open_url", "start_workflow", "sync_now", "logout"]
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "target": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    },
+    "permission": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+      "maxLength": 120
+    },
+    "confirm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "message"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "action_type": { "const": "navigate" } },
+        "required": ["action_type"]
+      },
+      "then": { "required": ["target"] }
+    },
+    {
+      "if": {
+        "properties": { "action_type": { "const": "submit_form" } },
+        "required": ["action_type"]
+      },
+      "then": { "required": ["target"] }
+    },
+    {
+      "if": {
+        "properties": { "action_type": { "const": "open_url" } },
+        "required": ["action_type"]
+      },
+      "then": { "required": ["target"] }
+    }
+  ]
+}
