@@ -14,6 +14,7 @@ The backend includes a minimal Django project:
 - `config/urls.py`: root URL configuration.
 - `apps/core`: initial core app with `GET /health/`.
 - `apps/tenants`: initial tenant model baseline.
+- `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 
 ## Local Validation
 
@@ -34,14 +35,14 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity --settings=config.settings.test
 ```
 
 ## Planned Areas
 
 - `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model.
 - `apps/tenants`: tenant model and isolation rules. Initial tenant model baseline exists.
-- `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks.
+- `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
 - `apps/modules`: module manifests, dependency checks, compatibility checks.
 - `apps/app_builder`: app definitions, navigation, screens, actions, publish states.
 - `apps/form_builder`: form definitions, fields, validation, submissions.
