@@ -10,4 +10,4 @@ Project documentation lives here after implementation begins. Planning notes rem
 - `admin`: administrator and builder user guides.
 - `mobile-runtime`: mobile runtime behavior, package compatibility, and sync.
 - `plugin-sdk`: module/plugin extension documentation.
-- `operations`: deployment, backup, restore, monitoring, logging, and incident response.
+- `operations`: repository protection, deployment, backup, restore, monitoring, logging, and incident response.
