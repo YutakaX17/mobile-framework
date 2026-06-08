@@ -1,0 +1,5 @@
+﻿{
+  "action_id": "run_script",
+  "action_type": "execute_javascript",
+  "label": "Run script"
+}

@@ -1,0 +1,22 @@
+﻿{
+  "schema_version": "v1",
+  "app_id": "field_ops_app",
+  "name": "Field Operations",
+  "version": "0.1.0",
+  "screens": [
+    {
+      "screen_id": "intake",
+      "name": "Patient Intake",
+      "screen_type": "form",
+      "components": [
+        {
+          "component_id": "intake_form",
+          "component_type": "form",
+          "binding": {
+            "form_id": "patient_intake"
+          }
+        }
+      ]
+    }
+  ]
+}

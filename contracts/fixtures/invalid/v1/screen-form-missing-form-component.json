@@ -1,0 +1,12 @@
+﻿{
+  "screen_id": "intake",
+  "name": "Patient Intake",
+  "screen_type": "form",
+  "components": [
+    {
+      "component_id": "intro_text",
+      "component_type": "text",
+      "label": "Welcome"
+    }
+  ]
+}

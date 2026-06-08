@@ -1,0 +1,7 @@
+﻿{
+  "action_id": "go_home",
+  "action_type": "navigate",
+  "label": "Home",
+  "target": "home",
+  "permission": "core.view_dashboard"
+}
