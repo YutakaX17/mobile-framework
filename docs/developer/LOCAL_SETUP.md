@@ -76,7 +76,7 @@ Expected result:
 
 - Foundation validation passes.
 - Contract validation reports the schema, fixture, and unit test counts.
-- Backend validation runs Django system checks, migration checks, the core health endpoint test, tenant model tests, and identity/RBAC model tests.
+- Backend validation runs Django system checks, migration checks, the core health endpoint test, tenant model tests, identity/RBAC model tests, and module registry tests.
 
 ## Repository Workflow
 
