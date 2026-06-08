@@ -16,7 +16,15 @@ def run(command: list[str]) -> None:
 def main() -> int:
     commands = [
         [sys.executable, "manage.py", "check"],
-        [sys.executable, "manage.py", "test", "apps.core", "--settings=config.settings.test"],
+        [sys.executable, "manage.py", "makemigrations", "--check", "--dry-run"],
+        [
+            sys.executable,
+            "manage.py",
+            "test",
+            "apps.core",
+            "apps.tenants",
+            "--settings=config.settings.test",
+        ],
     ]
     try:
         for command in commands:

@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[~]` EPIC-01 Repository And Tooling: foundation CI, local setup docs, and repository protection baseline are in place; license task `#17` is blocked pending owner decision.
-- `[~]` EPIC-02 Backend Core: Django project scaffold task `#41` is in progress.
+- `[~]` EPIC-02 Backend Core: Django project scaffold and tenant model baseline are in place; identity/RBAC, module registry, configuration registry, audit, and service lifecycle tasks remain pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -79,6 +79,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#20` completed: local environment setup documentation added.
 - `[x]` Task `#18` completed: repository protection checklist documented and baseline settings applied.
 - `[x]` Task `#41` completed: Django backend project scaffold, health endpoint, and backend validation added.
+- `[x]` Task `#43` completed: tenant model baseline, migration, and tests added.
 
 ## Blockers
 
