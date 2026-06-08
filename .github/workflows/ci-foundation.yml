@@ -22,8 +22,14 @@ jobs:
       - name: Install contract dependencies
         run: python -m pip install -r contracts/requirements.txt
 
+      - name: Install backend dependencies
+        run: python -m pip install -r backend/requirements.txt
+
       - name: Validate repository foundation
         run: python tools/validate_foundation.py
 
       - name: Validate contracts
         run: python contracts/validate_contracts.py
+
+      - name: Validate backend scaffold
+        run: python tools/validate_backend.py

@@ -1,6 +1,39 @@
-﻿# Backend
+# Backend
 
 Django control plane for tenants, identity, module registry, configuration registry, package publication, sync, and audit.
+
+## Current Scaffold
+
+The backend includes a minimal Django project:
+
+- `manage.py`: Django command entrypoint.
+- `config/settings/base.py`: shared settings.
+- `config/settings/dev.py`: local development settings.
+- `config/settings/test.py`: test settings.
+- `config/settings/prod.py`: production-like environment-driven settings.
+- `config/urls.py`: root URL configuration.
+- `apps/core`: initial core app with `GET /health/`.
+
+## Local Validation
+
+Install backend dependencies:
+
+```powershell
+python -m pip install -r backend/requirements.txt
+```
+
+Run backend validation from the repository root:
+
+```powershell
+python tools/validate_backend.py
+```
+
+Equivalent direct commands:
+
+```powershell
+python backend/manage.py check
+python backend/manage.py test apps.core --settings=config.settings.test
+```
 
 ## Planned Areas
 
@@ -16,5 +49,3 @@ Django control plane for tenants, identity, module registry, configuration regis
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
 - `apps/audit`: mutation logs, config revisions, admin and sync audit events.
 - `rust_ext`: bounded PyO3/maturin helpers once contracts are stable.
-
-No Django application code has been scaffolded yet.

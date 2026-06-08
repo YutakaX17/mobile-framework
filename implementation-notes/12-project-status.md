@@ -27,7 +27,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Milestones
 
 - `[~]` M0 Repository Foundation.
-- `[ ]` M1 Backend Kernel.
+- `[~]` M1 Backend Kernel.
 - `[~]` M2 Contracts And Rust Extension.
 - `[ ]` M3 Admin Shell.
 - `[ ]` M4 Theme And Form Builder MVP.
@@ -39,7 +39,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 - `[x]` EPIC-00 Product And Architecture.
 - `[~]` EPIC-01 Repository And Tooling.
-- `[ ]` EPIC-02 Backend Core.
+- `[~]` EPIC-02 Backend Core.
 - `[ ]` EPIC-03 Rust Extension.
 - `[~]` EPIC-04 Shared Contracts.
 - `[ ]` EPIC-05 Admin Frontend Shell.
@@ -55,6 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[~]` EPIC-01 Repository And Tooling: foundation CI, local setup docs, and repository protection baseline are in place; license task `#17` is blocked pending owner decision.
+- `[~]` EPIC-02 Backend Core: Django project scaffold task `#41` is in progress.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -77,6 +78,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
 - `[x]` Task `#20` completed: local environment setup documentation added.
 - `[x]` Task `#18` completed: repository protection checklist documented and baseline settings applied.
+- `[x]` Task `#41` completed: Django backend project scaffold, health endpoint, and backend validation added.
 
 ## Blockers
 

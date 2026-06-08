@@ -28,6 +28,15 @@ REQUIRED_FILES = [
     "contracts/validation_manifest.json",
     "contracts/validate_contracts.py",
     "contracts/requirements.txt",
+    "backend/manage.py",
+    "backend/config/settings/base.py",
+    "backend/config/settings/dev.py",
+    "backend/config/settings/test.py",
+    "backend/config/settings/prod.py",
+    "backend/apps/__init__.py",
+    "backend/apps/core/views.py",
+    "backend/requirements.txt",
+    "tools/validate_backend.py",
     "infra/compose/docker-compose.yml",
 ]
 
@@ -111,6 +120,7 @@ def validate_workflow_replaced_placeholder() -> None:
         "name: CI Foundation",
         "python tools/validate_foundation.py",
         "python contracts/validate_contracts.py",
+        "python tools/validate_backend.py",
     ]
     for snippet in required_snippets:
         if snippet not in workflow:
