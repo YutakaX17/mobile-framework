@@ -2,6 +2,14 @@
 
 Read `implementation-notes/README.md` before starting work.
 
+## Contribution Posture
+
+This repository is currently owner-led. External contributions may be accepted through GitHub pull requests after review.
+
+By submitting a contribution, you agree that your contribution is provided under the Apache License 2.0, the same license as this repository.
+
+No Contributor License Agreement is required at this stage. This can be revisited if the project gains regular external contributors or organization-level governance.
+
 ## Working Rules
 
 - Keep changes small and reviewable.
