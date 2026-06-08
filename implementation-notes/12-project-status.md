@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-02 Backend Core: Django project scaffold, tenant model baseline, and identity/RBAC model baseline are in place; module registry, configuration registry, audit, and service lifecycle tasks remain pending.
+- `[~]` EPIC-02 Backend Core: Django project scaffold, tenant model baseline, identity/RBAC model baseline, and module registry baseline are in place; configuration registry, audit, and service lifecycle tasks remain pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -81,6 +81,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#41` completed: Django backend project scaffold, health endpoint, and backend validation added.
 - `[x]` Task `#43` completed: tenant model baseline, migration, and tests added.
 - `[x]` Task `#46` completed: identity/RBAC model baseline, migration, and tests added.
+- `[x]` Task `#48` completed: module registry baseline, manifest validation service, migration, and tests added.
 
 ## Blockers
 
