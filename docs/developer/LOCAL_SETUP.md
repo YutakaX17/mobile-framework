@@ -10,7 +10,7 @@ Install these before working on the current repository:
 
 - Git for source control.
 - GitHub CLI for issue, pull request, and project-board operations.
-- Python 3 with `jsonschema` available for contract validation.
+- Python 3 with `jsonschema` and Django backend dependencies available for validation.
 - A code editor or IDE that can handle Markdown, Python, JSON Schema, TypeScript, Rust, Kotlin, and Docker files.
 
 Recommended IDE:
@@ -58,17 +58,25 @@ Install the contract validation dependency if needed:
 python -m pip install jsonschema
 ```
 
+Install backend dependencies if needed:
+
+```powershell
+python -m pip install -r backend/requirements.txt
+```
+
 Run the current foundation checks from the repository root:
 
 ```powershell
 python tools/validate_foundation.py
 python contracts/validate_contracts.py
+python tools/validate_backend.py
 ```
 
 Expected result:
 
 - Foundation validation passes.
 - Contract validation reports the schema, fixture, and unit test counts.
+- Backend validation runs Django system checks and the core health endpoint test.
 
 ## Repository Workflow
 
@@ -85,6 +93,7 @@ Before committing:
 ```powershell
 python tools/validate_foundation.py
 python contracts/validate_contracts.py
+python tools/validate_backend.py
 git diff --check
 git status --short
 ```
@@ -126,10 +135,11 @@ Run these before every PR until more surface-specific checks are added:
 ```powershell
 python tools/validate_foundation.py
 python contracts/validate_contracts.py
+python tools/validate_backend.py
 git diff --check
 ```
 
-When backend, frontend, mobile, and Rust scaffolds are added, their setup and test commands should be documented here before or with the first related implementation PR.
+When frontend, mobile, and Rust scaffolds are added, their setup and test commands should be documented here before or with the first related implementation PR.
 
 ## Environment Notes
 
