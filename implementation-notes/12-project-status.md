@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-02 Backend Core: Django project scaffold, tenant model baseline, identity/RBAC model baseline, module registry baseline, configuration registry baseline, audit event baseline, service lifecycle baseline, and event bus baseline are in place; API error model, PostgreSQL-specific settings, and background worker setup remain pending.
+- `[~]` EPIC-02 Backend Core: Django project scaffold, tenant model baseline, identity/RBAC model baseline, module registry baseline, configuration registry baseline, audit event baseline, service lifecycle baseline, event bus baseline, and API error model baseline are in place; PostgreSQL-specific settings and background worker setup remain pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -86,6 +86,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#52` completed: audit event model baseline, migration, and tests added.
 - `[x]` Task `#54` completed: service lifecycle baseline and tests added.
 - `[x]` Task `#56` completed: in-process event bus baseline and tests added.
+- `[x]` Task `#58` completed: API error model baseline and tests added.
 
 ## Blockers
 
