@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 from django.urls import reverse
 
+from apps.core.events import DomainEvent, EventBus
 from apps.core.services import BaseService, ServiceContext, ServiceResult
 
 
@@ -71,3 +72,84 @@ class ServiceLifecycleTests(SimpleTestCase):
     def test_context_metadata_must_be_dictionary(self):
         with self.assertRaises(ValidationError):
             ServiceContext(metadata=["invalid"])
+
+
+class EventBusTests(SimpleTestCase):
+    def test_handlers_receive_matching_events_in_registration_order(self):
+        bus = EventBus()
+        calls = []
+
+        bus.subscribe("configuration.published", lambda event: calls.append(("first", event.payload["id"])))
+        bus.subscribe("configuration.published", lambda event: calls.append(("second", event.payload["id"])))
+
+        results = bus.dispatch(DomainEvent(name="configuration.published", payload={"id": "cfg-1"}))
+
+        self.assertEqual(calls, [("first", "cfg-1"), ("second", "cfg-1")])
+        self.assertEqual(results, [None, None])
+
+    def test_dispatch_returns_handler_results(self):
+        bus = EventBus()
+
+        bus.subscribe("module.registered", lambda event: event.payload["module_id"])
+        bus.subscribe("module.registered", lambda event: event.metadata["source"])
+
+        results = bus.dispatch(
+            DomainEvent(
+                name="module.registered",
+                payload={"module_id": "core"},
+                metadata={"source": "test"},
+            )
+        )
+
+        self.assertEqual(results, ["core", "test"])
+
+    def test_dispatch_without_handlers_returns_empty_list(self):
+        bus = EventBus()
+
+        results = bus.dispatch(DomainEvent(name="unused.event"))
+
+        self.assertEqual(results, [])
+
+    def test_unsubscribe_removes_handler(self):
+        bus = EventBus()
+        calls = []
+
+        def handler(event):
+            calls.append(event.name)
+
+        unsubscribe = bus.subscribe("identity.role-assigned", handler)
+        unsubscribe()
+
+        bus.dispatch(DomainEvent(name="identity.role-assigned"))
+
+        self.assertEqual(calls, [])
+
+    def test_reset_removes_all_handlers(self):
+        bus = EventBus()
+        calls = []
+
+        bus.subscribe("security.login-failed", lambda event: calls.append(event.name))
+        bus.reset()
+
+        bus.dispatch(DomainEvent(name="security.login-failed"))
+
+        self.assertEqual(calls, [])
+
+    def test_event_payload_and_metadata_must_be_dictionaries(self):
+        with self.assertRaises(ValidationError):
+            DomainEvent(name="bad.payload", payload=["invalid"])
+
+        with self.assertRaises(ValidationError):
+            DomainEvent(name="bad.metadata", metadata=["invalid"])
+
+    def test_event_name_and_handler_are_required(self):
+        bus = EventBus()
+
+        with self.assertRaises(ValidationError):
+            DomainEvent(name="")
+
+        with self.assertRaises(ValidationError):
+            bus.subscribe("", lambda event: None)
+
+        with self.assertRaises(ValidationError):
+            bus.subscribe("valid.event", None)
