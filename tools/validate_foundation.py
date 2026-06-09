@@ -34,6 +34,7 @@ REQUIRED_FILES = [
     "backend/config/settings/test.py",
     "backend/config/settings/prod.py",
     "backend/apps/__init__.py",
+    "backend/apps/core/services.py",
     "backend/apps/core/views.py",
     "backend/apps/tenants/models.py",
     "backend/apps/tenants/migrations/0001_initial.py",
