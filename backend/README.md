@@ -16,6 +16,7 @@ The backend includes a minimal Django project:
 - `apps/tenants`: initial tenant model baseline.
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry and manifest validation baseline.
+- `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
 
 ## Local Validation
 
@@ -36,7 +37,7 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants apps.identity apps.modules --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations --settings=config.settings.test
 ```
 
 ## Planned Areas
@@ -45,6 +46,7 @@ python backend/manage.py test apps.core apps.tenants apps.identity apps.modules 
 - `apps/tenants`: tenant model and isolation rules. Initial tenant model baseline exists.
 - `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
 - `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry baseline exists.
+- `apps/configurations`: tenant-scoped definitions, revisions, status workflow, and schema validation. Initial configuration registry baseline exists.
 - `apps/app_builder`: app definitions, navigation, screens, actions, publish states.
 - `apps/form_builder`: form definitions, fields, validation, submissions.
 - `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation.
