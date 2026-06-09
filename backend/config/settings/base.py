@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "apps.tenants",
     "apps.identity",
     "apps.modules",
+    "apps.configurations",
 ]
 
 MIDDLEWARE = [
