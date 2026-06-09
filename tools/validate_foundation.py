@@ -45,6 +45,8 @@ REQUIRED_FILES = [
     "backend/apps/configurations/models.py",
     "backend/apps/configurations/services.py",
     "backend/apps/configurations/migrations/0001_initial.py",
+    "backend/apps/audit/models.py",
+    "backend/apps/audit/migrations/0001_initial.py",
     "backend/requirements.txt",
     "tools/validate_backend.py",
     "infra/compose/docker-compose.yml",

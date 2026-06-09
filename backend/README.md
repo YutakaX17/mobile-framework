@@ -17,6 +17,7 @@ The backend includes a minimal Django project:
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry and manifest validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
+- `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 
 ## Local Validation
 
@@ -37,7 +38,7 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.audit --settings=config.settings.test
 ```
 
 ## Planned Areas
@@ -53,5 +54,5 @@ python backend/manage.py test apps.core apps.tenants apps.identity apps.modules 
 - `apps/theme_builder`: design tokens, theme validation, preview, publishing.
 - `apps/deployments`: immutable package compilation, signing, channels, rollback.
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
-- `apps/audit`: mutation logs, config revisions, admin and sync audit events.
+- `apps/audit`: mutation logs, config revisions, admin and sync audit events. Initial audit event model baseline exists.
 - `rust_ext`: bounded PyO3/maturin helpers once contracts are stable.
