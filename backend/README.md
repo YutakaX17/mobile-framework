@@ -12,7 +12,7 @@ The backend includes a minimal Django project:
 - `config/settings/test.py`: test settings.
 - `config/settings/prod.py`: production-like environment-driven settings.
 - `config/urls.py`: root URL configuration.
-- `apps/core`: initial core app with `GET /health/`, reusable service lifecycle baseline, and in-process event bus baseline.
+- `apps/core`: initial core app with `GET /health/`, reusable service lifecycle baseline, in-process event bus baseline, and API error model baseline.
 - `apps/tenants`: initial tenant model baseline.
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry and manifest validation baseline.
@@ -43,7 +43,7 @@ python backend/manage.py test apps.core apps.tenants apps.identity apps.modules 
 
 ## Planned Areas
 
-- `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model. Initial service lifecycle and event bus baselines exist.
+- `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model. Initial service lifecycle, event bus, and API error model baselines exist.
 - `apps/tenants`: tenant model and isolation rules. Initial tenant model baseline exists.
 - `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
 - `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry baseline exists.

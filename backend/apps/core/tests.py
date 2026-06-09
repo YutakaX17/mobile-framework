@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 from django.urls import reverse
 
+from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 from apps.core.events import DomainEvent, EventBus
 from apps.core.services import BaseService, ServiceContext, ServiceResult
 
@@ -153,3 +154,75 @@ class EventBusTests(SimpleTestCase):
 
         with self.assertRaises(ValidationError):
             bus.subscribe("valid.event", None)
+
+
+class ApiErrorModelTests(SimpleTestCase):
+    def test_api_error_serializes_stable_shape(self):
+        error = ApiError(
+            code=ApiErrorCode.VALIDATION_ERROR,
+            message="Validation failed.",
+            status_code=400,
+            details=[
+                ApiErrorDetail(field="name", message="Name is required."),
+            ],
+            request_id="req-1",
+            correlation_id="corr-1",
+        )
+
+        self.assertEqual(
+            error.to_dict(),
+            {
+                "error": {
+                    "code": "validation_error",
+                    "message": "Validation failed.",
+                    "status_code": 400,
+                    "details": [
+                        {
+                            "code": "validation_error",
+                            "message": "Name is required.",
+                            "field": "name",
+                        }
+                    ],
+                    "request_id": "req-1",
+                    "correlation_id": "corr-1",
+                }
+            },
+        )
+
+    def test_error_detail_without_field_omits_field_key(self):
+        detail = ApiErrorDetail(code="custom", message="General problem.")
+
+        self.assertEqual(detail.to_dict(), {"code": "custom", "message": "General problem."})
+
+    def test_api_error_response_uses_error_status_and_body(self):
+        error = ApiError(code=ApiErrorCode.NOT_FOUND, message="Object not found.", status_code=404)
+
+        response = api_error_response(error)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.content.decode(),
+            '{"error": {"code": "not_found", "message": "Object not found.", "status_code": 404, "details": []}}',
+        )
+
+    def test_api_error_rejects_invalid_status_code(self):
+        with self.assertRaises(ValidationError):
+            ApiError(code=ApiErrorCode.INTERNAL_ERROR, message="Nope.", status_code=200)
+
+    def test_api_error_requires_code_and_message(self):
+        with self.assertRaises(ValidationError):
+            ApiError(code="", message="Missing code.")
+
+        with self.assertRaises(ValidationError):
+            ApiError(code=ApiErrorCode.CONFLICT, message="")
+
+    def test_api_error_details_must_be_detail_objects(self):
+        with self.assertRaises(ValidationError):
+            ApiError(code=ApiErrorCode.VALIDATION_ERROR, message="Invalid.", details=[{"field": "name"}])
+
+    def test_api_error_detail_requires_code_and_message(self):
+        with self.assertRaises(ValidationError):
+            ApiErrorDetail(code="", message="Missing code.")
+
+        with self.assertRaises(ValidationError):
+            ApiErrorDetail(code=ApiErrorCode.VALIDATION_ERROR, message="")
