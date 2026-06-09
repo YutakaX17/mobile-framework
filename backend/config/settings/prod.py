@@ -2,6 +2,7 @@
 
 import os
 
+from .database import build_postgres_database_config
 from .base import *  # noqa: F403
 
 
@@ -14,12 +15,5 @@ ALLOWED_HOSTS = [
 ]
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["POSTGRES_DB"],
-        "USER": os.environ["POSTGRES_USER"],
-        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-    }
+    "default": build_postgres_database_config(env=os.environ, required=True),
 }

@@ -8,6 +8,7 @@ The backend includes a minimal Django project:
 
 - `manage.py`: Django command entrypoint.
 - `config/settings/base.py`: shared settings.
+- `config/settings/database.py`: shared PostgreSQL database configuration helper.
 - `config/settings/dev.py`: local development settings.
 - `config/settings/test.py`: test settings.
 - `config/settings/prod.py`: production-like environment-driven settings.
@@ -40,6 +41,15 @@ python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
 python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.audit --settings=config.settings.test
 ```
+
+Local development uses SQLite by default. To point development settings at the Compose PostgreSQL service, start the service and set:
+
+```powershell
+$env:DJANGO_DATABASE_ENGINE = "postgres"
+python backend/manage.py check
+```
+
+The local PostgreSQL defaults match `infra/compose/docker-compose.yml`: database, user, and password all use `mobile_framework`.
 
 ## Planned Areas
 

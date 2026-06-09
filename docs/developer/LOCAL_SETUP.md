@@ -76,7 +76,27 @@ Expected result:
 
 - Foundation validation passes.
 - Contract validation reports the schema, fixture, and unit test counts.
-- Backend validation runs Django system checks, migration checks, core health endpoint, service lifecycle, event bus, and API error model tests, tenant model tests, identity/RBAC model tests, module registry tests, configuration registry tests, and audit event model tests.
+- Backend validation runs Django system checks, migration checks, PostgreSQL settings tests, core health endpoint, service lifecycle, event bus, and API error model tests, tenant model tests, identity/RBAC model tests, module registry tests, configuration registry tests, and audit event model tests.
+
+## Local PostgreSQL
+
+The backend defaults to SQLite for quick local validation. To use the Compose PostgreSQL service instead:
+
+```powershell
+docker compose -f infra/compose/docker-compose.yml up -d postgres
+$env:DJANGO_DATABASE_ENGINE = "postgres"
+python backend/manage.py check
+```
+
+The development defaults match Compose:
+
+- `POSTGRES_DB=mobile_framework`
+- `POSTGRES_USER=mobile_framework`
+- `POSTGRES_PASSWORD=mobile_framework`
+- `POSTGRES_HOST=localhost`
+- `POSTGRES_PORT=5432`
+
+Production-like settings require explicit `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `DJANGO_SECRET_KEY`. Optional PostgreSQL settings include `POSTGRES_CONN_MAX_AGE` and `POSTGRES_SSLMODE`.
 
 ## Repository Workflow
 
