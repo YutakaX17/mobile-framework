@@ -26,6 +26,7 @@ def main() -> int:
             "apps.identity",
             "apps.modules",
             "apps.configurations",
+            "apps.audit",
             "--settings=config.settings.test",
         ],
     ]
