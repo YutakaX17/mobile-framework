@@ -9,11 +9,12 @@ The backend includes a minimal Django project:
 - `manage.py`: Django command entrypoint.
 - `config/settings/base.py`: shared settings.
 - `config/settings/database.py`: shared PostgreSQL database configuration helper.
+- `config/settings/worker.py`: shared background worker configuration helper.
 - `config/settings/dev.py`: local development settings.
 - `config/settings/test.py`: test settings.
 - `config/settings/prod.py`: production-like environment-driven settings.
 - `config/urls.py`: root URL configuration.
-- `apps/core`: initial core app with `GET /health/`, reusable service lifecycle baseline, in-process event bus baseline, and API error model baseline.
+- `apps/core`: initial core app with `GET /health/`, reusable service lifecycle baseline, in-process event bus baseline, API error model baseline, and background job registry baseline.
 - `apps/tenants`: initial tenant model baseline.
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry and manifest validation baseline.
@@ -51,9 +52,16 @@ python backend/manage.py check
 
 The local PostgreSQL defaults match `infra/compose/docker-compose.yml`: database, user, and password all use `mobile_framework`.
 
+Worker settings default to synchronous in-process execution for local validation. Future persistent queue integrations can opt into Redis-compatible settings with:
+
+```powershell
+$env:WORKER_BACKEND = "redis"
+$env:WORKER_BROKER_URL = "redis://localhost:6379/0"
+```
+
 ## Planned Areas
 
-- `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model. Initial service lifecycle, event bus, and API error model baselines exist.
+- `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model, background job primitives. Initial service lifecycle, event bus, API error model, and job registry baselines exist.
 - `apps/tenants`: tenant model and isolation rules. Initial tenant model baseline exists.
 - `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
 - `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry baseline exists.

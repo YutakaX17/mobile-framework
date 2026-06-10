@@ -2,6 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
 from config.settings.database import build_postgres_database_config
+from config.settings.worker import build_worker_config
 
 
 class PostgresDatabaseSettingsTests(SimpleTestCase):
@@ -45,3 +46,46 @@ class PostgresDatabaseSettingsTests(SimpleTestCase):
     def test_invalid_connection_max_age_is_rejected(self):
         with self.assertRaises(ImproperlyConfigured):
             build_postgres_database_config(env={"POSTGRES_CONN_MAX_AGE": "not-a-number"}, required=False)
+
+
+class WorkerSettingsTests(SimpleTestCase):
+    def test_worker_defaults_are_safe_for_local_development(self):
+        config = build_worker_config(env={})
+
+        self.assertEqual(config["BACKEND"], "sync")
+        self.assertEqual(config["BROKER_URL"], "redis://localhost:6379/0")
+        self.assertEqual(config["QUEUES"], ["default"])
+        self.assertEqual(config["CONCURRENCY"], 1)
+        self.assertEqual(config["POLL_INTERVAL_SECONDS"], 5)
+
+    def test_worker_environment_overrides_are_supported(self):
+        config = build_worker_config(
+            env={
+                "WORKER_BACKEND": "redis",
+                "WORKER_BROKER_URL": "redis://redis:6379/1",
+                "WORKER_QUEUES": "default,packages,sync",
+                "WORKER_CONCURRENCY": "4",
+                "WORKER_POLL_INTERVAL_SECONDS": "10",
+            }
+        )
+
+        self.assertEqual(config["BACKEND"], "redis")
+        self.assertEqual(config["BROKER_URL"], "redis://redis:6379/1")
+        self.assertEqual(config["QUEUES"], ["default", "packages", "sync"])
+        self.assertEqual(config["CONCURRENCY"], 4)
+        self.assertEqual(config["POLL_INTERVAL_SECONDS"], 10)
+
+    def test_worker_settings_reject_invalid_backend(self):
+        with self.assertRaises(ImproperlyConfigured):
+            build_worker_config(env={"WORKER_BACKEND": "unknown"})
+
+    def test_worker_settings_reject_invalid_numeric_values(self):
+        with self.assertRaises(ImproperlyConfigured):
+            build_worker_config(env={"WORKER_CONCURRENCY": "0"})
+
+        with self.assertRaises(ImproperlyConfigured):
+            build_worker_config(env={"WORKER_POLL_INTERVAL_SECONDS": "not-a-number"})
+
+    def test_worker_settings_require_at_least_one_queue(self):
+        with self.assertRaises(ImproperlyConfigured):
+            build_worker_config(env={"WORKER_QUEUES": " , "})

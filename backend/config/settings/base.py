@@ -1,6 +1,9 @@
 """Base Django settings shared by all backend environments."""
 
+import os
 from pathlib import Path
+
+from .worker import build_worker_config
 
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -51,3 +54,5 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+WORKER = build_worker_config(env=os.environ)
