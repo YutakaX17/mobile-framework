@@ -17,7 +17,7 @@ The backend includes a minimal Django project:
 - `apps/core`: initial core app with `GET /health/`, reusable service lifecycle baseline, in-process event bus baseline, API error model baseline, and background job registry baseline.
 - `apps/tenants`: initial tenant model baseline.
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
-- `apps/modules`: initial module registry and manifest validation baseline.
+- `apps/modules`: initial module registry, manifest validation, and dependency validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 
@@ -64,7 +64,7 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model, background job primitives. Initial service lifecycle, event bus, API error model, and job registry baselines exist.
 - `apps/tenants`: tenant model and isolation rules. Initial tenant model baseline exists.
 - `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
-- `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry baseline exists.
+- `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry and dependency validation baselines exist.
 - `apps/configurations`: tenant-scoped definitions, revisions, status workflow, and schema validation. Initial configuration registry baseline exists.
 - `apps/app_builder`: app definitions, navigation, screens, actions, publish states.
 - `apps/form_builder`: form definitions, fields, validation, submissions.

@@ -60,3 +60,99 @@ class ModuleRegistrationTests(TestCase):
 
         with self.assertRaises(ValidationError):
             ModuleRegistration.from_manifest(manifest).save()
+
+    def test_required_dependency_can_be_satisfied_by_registered_module(self):
+        dependency_manifest = load_valid_manifest()
+        ModuleRegistration.from_manifest(dependency_manifest).save()
+        manifest = load_valid_manifest()
+        manifest["module_id"] = "reports"
+        manifest["name"] = "Reports"
+        manifest["dependencies"] = [
+            {
+                "module_id": "core",
+                "version_constraint": ">=0.1.0,<1.0.0",
+            }
+        ]
+
+        registration = ModuleRegistration.from_manifest(manifest)
+        registration.save()
+
+        self.assertEqual(registration.module_id, "reports")
+
+    def test_missing_required_dependency_is_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["module_id"] = "reports"
+        manifest["name"] = "Reports"
+        manifest["dependencies"] = [
+            {
+                "module_id": "core",
+                "version_constraint": ">=0.1.0",
+            }
+        ]
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()
+
+    def test_missing_optional_dependency_does_not_block_registration(self):
+        manifest = load_valid_manifest()
+        manifest["module_id"] = "reports"
+        manifest["name"] = "Reports"
+        manifest["dependencies"] = [
+            {
+                "module_id": "analytics",
+                "version_constraint": ">=0.1.0",
+                "optional": True,
+            }
+        ]
+
+        registration = ModuleRegistration.from_manifest(manifest)
+        registration.save()
+
+        self.assertEqual(registration.module_id, "reports")
+
+    def test_installed_optional_dependency_must_satisfy_constraint(self):
+        dependency_manifest = load_valid_manifest()
+        ModuleRegistration.from_manifest(dependency_manifest).save()
+        manifest = load_valid_manifest()
+        manifest["module_id"] = "reports"
+        manifest["name"] = "Reports"
+        manifest["dependencies"] = [
+            {
+                "module_id": "core",
+                "version_constraint": ">=1.0.0",
+                "optional": True,
+            }
+        ]
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()
+
+    def test_self_dependency_is_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["dependencies"] = [
+            {
+                "module_id": "core",
+                "version_constraint": ">=0.1.0",
+            }
+        ]
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()
+
+    def test_duplicate_dependency_module_ids_are_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["module_id"] = "reports"
+        manifest["name"] = "Reports"
+        manifest["dependencies"] = [
+            {
+                "module_id": "core",
+                "version_constraint": ">=0.1.0",
+            },
+            {
+                "module_id": "core",
+                "version_constraint": "<1.0.0",
+            },
+        ]
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()

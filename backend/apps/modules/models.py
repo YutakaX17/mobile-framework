@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from .services import validate_module_manifest
+from .services import validate_module_dependencies, validate_module_manifest
 
 
 class ModuleRegistrationStatus(models.TextChoices):
@@ -66,6 +66,7 @@ class ModuleRegistration(models.Model):
                 raise ValidationError({key: f"Must match manifest field `{key}`."})
         if self.platform_max_version and self.manifest.get("platform_max_version") != self.platform_max_version:
             raise ValidationError({"platform_max_version": "Must match manifest field `platform_max_version`."})
+        validate_module_dependencies(self, type(self).objects)
 
     def save(self, *args, **kwargs):
         self.full_clean()
