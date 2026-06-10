@@ -30,6 +30,7 @@ REQUIRED_FILES = [
     "contracts/requirements.txt",
     "backend/manage.py",
     "backend/config/settings/base.py",
+    "backend/config/settings/database.py",
     "backend/config/settings/dev.py",
     "backend/config/settings/test.py",
     "backend/config/settings/prod.py",

@@ -21,6 +21,7 @@ def main() -> int:
             sys.executable,
             "manage.py",
             "test",
+            "config",
             "apps.core",
             "apps.tenants",
             "apps.identity",
