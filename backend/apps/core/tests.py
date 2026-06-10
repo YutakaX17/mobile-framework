@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 from apps.core.events import DomainEvent, EventBus
+from apps.core.jobs import BackgroundJob, BackgroundJobRegistry, BackgroundJobResult, BackgroundJobStatus
 from apps.core.services import BaseService, ServiceContext, ServiceResult
 
 
@@ -226,3 +227,72 @@ class ApiErrorModelTests(SimpleTestCase):
 
         with self.assertRaises(ValidationError):
             ApiErrorDetail(code=ApiErrorCode.VALIDATION_ERROR, message="")
+
+
+class BackgroundJobRegistryTests(SimpleTestCase):
+    def test_registry_runs_registered_handler(self):
+        registry = BackgroundJobRegistry()
+        registry.register("package.compile", lambda job: {"package_id": job.payload["package_id"]})
+
+        result = registry.run(BackgroundJob(name="package.compile", payload={"package_id": "pkg-1"}))
+
+        self.assertEqual(result.status, BackgroundJobStatus.SUCCEEDED)
+        self.assertEqual(result.value, {"package_id": "pkg-1"})
+
+    def test_registry_returns_failed_result_when_handler_raises(self):
+        registry = BackgroundJobRegistry()
+
+        def handler(_job):
+            raise RuntimeError("compile failed")
+
+        registry.register("package.compile", handler)
+
+        result = registry.run(BackgroundJob(name="package.compile"))
+
+        self.assertEqual(result.status, BackgroundJobStatus.FAILED)
+        self.assertEqual(result.error, "compile failed")
+
+    def test_registry_rejects_missing_handler(self):
+        registry = BackgroundJobRegistry()
+
+        with self.assertRaises(ValidationError):
+            registry.run(BackgroundJob(name="missing.job"))
+
+    def test_unregister_and_reset_remove_handlers(self):
+        registry = BackgroundJobRegistry()
+        registry.register("first.job", lambda job: "first")
+        registry.register("second.job", lambda job: "second")
+
+        registry.unregister("first.job")
+        registry.reset()
+
+        with self.assertRaises(ValidationError):
+            registry.run(BackgroundJob(name="second.job"))
+
+    def test_job_validates_required_shape(self):
+        with self.assertRaises(ValidationError):
+            BackgroundJob(name="")
+
+        with self.assertRaises(ValidationError):
+            BackgroundJob(name="bad.payload", payload=["invalid"])
+
+        with self.assertRaises(ValidationError):
+            BackgroundJob(name="bad.metadata", metadata=["invalid"])
+
+    def test_registry_rejects_invalid_registration(self):
+        registry = BackgroundJobRegistry()
+
+        with self.assertRaises(ValidationError):
+            registry.register("", lambda job: None)
+
+        with self.assertRaises(ValidationError):
+            registry.register("valid.job", None)
+
+    def test_job_result_validates_status_and_metadata(self):
+        job = BackgroundJob(name="test.job")
+
+        with self.assertRaises(ValidationError):
+            BackgroundJobResult(job=job, status="unknown")
+
+        with self.assertRaises(ValidationError):
+            BackgroundJobResult(job=job, status=BackgroundJobStatus.SUCCEEDED, metadata=["invalid"])

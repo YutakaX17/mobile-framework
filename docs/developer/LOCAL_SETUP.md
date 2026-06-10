@@ -76,7 +76,7 @@ Expected result:
 
 - Foundation validation passes.
 - Contract validation reports the schema, fixture, and unit test counts.
-- Backend validation runs Django system checks, migration checks, PostgreSQL settings tests, core health endpoint, service lifecycle, event bus, and API error model tests, tenant model tests, identity/RBAC model tests, module registry tests, configuration registry tests, and audit event model tests.
+- Backend validation runs Django system checks, migration checks, PostgreSQL and worker settings tests, core health endpoint, service lifecycle, event bus, API error model, and background job registry tests, tenant model tests, identity/RBAC model tests, module registry tests, configuration registry tests, and audit event model tests.
 
 ## Local PostgreSQL
 
@@ -97,6 +97,24 @@ The development defaults match Compose:
 - `POSTGRES_PORT=5432`
 
 Production-like settings require explicit `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `DJANGO_SECRET_KEY`. Optional PostgreSQL settings include `POSTGRES_CONN_MAX_AGE` and `POSTGRES_SSLMODE`.
+
+## Worker Settings
+
+Background worker settings are dependency-free for the current baseline. Defaults are safe for local validation:
+
+- `WORKER_BACKEND=sync`
+- `WORKER_BROKER_URL=redis://localhost:6379/0`
+- `WORKER_QUEUES=default`
+- `WORKER_CONCURRENCY=1`
+- `WORKER_POLL_INTERVAL_SECONDS=5`
+
+Redis-backed settings can be configured later without changing application code:
+
+```powershell
+$env:WORKER_BACKEND = "redis"
+$env:WORKER_BROKER_URL = "redis://localhost:6379/0"
+$env:WORKER_QUEUES = "default,packages,sync"
+```
 
 ## Repository Workflow
 
