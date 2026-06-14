@@ -13,6 +13,7 @@ from jsonschema.exceptions import ValidationError as JsonSchemaValidationError
 
 ROOT = Path(__file__).resolve().parents[3]
 MODULE_MANIFEST_SCHEMA = ROOT / "contracts" / "schemas" / "v1" / "module-manifest.schema.json"
+CURRENT_PLATFORM_VERSION = "0.1.0"
 SEMVER_RE = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:[-+][0-9A-Za-z.-]+)?$")
 CONSTRAINT_RE = re.compile(r"^(<=|>=|<|>|=)?\s*(.+)$")
 ACTIVE_DEPENDENCY_STATUSES = {"registered", "enabled"}
@@ -65,6 +66,29 @@ def version_satisfies(version: str, constraint: str) -> bool:
         if operator == "<=" and version_value > expected_value:
             return False
     return True
+
+
+def validate_module_compatibility(registration, platform_version: str = CURRENT_PLATFORM_VERSION) -> None:
+    platform_value = parse_semver(platform_version)
+    minimum_value = parse_semver(registration.platform_min_version)
+    maximum_value = parse_semver(registration.platform_max_version) if registration.platform_max_version else None
+    errors = []
+
+    if maximum_value and minimum_value > maximum_value:
+        errors.append("Platform minimum version cannot be greater than platform maximum version.")
+    if minimum_value > platform_value:
+        errors.append(
+            f"Module `{registration.module_id}` requires platform version "
+            f"{registration.platform_min_version} or newer; current platform version is {platform_version}."
+        )
+    if maximum_value and maximum_value < platform_value:
+        errors.append(
+            f"Module `{registration.module_id}` supports platform versions up to "
+            f"{registration.platform_max_version}; current platform version is {platform_version}."
+        )
+
+    if errors:
+        raise ValidationError({"platform_min_version": errors})
 
 
 def validate_module_dependencies(registration, registrations) -> None:

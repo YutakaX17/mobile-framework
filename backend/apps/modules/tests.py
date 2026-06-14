@@ -61,6 +61,64 @@ class ModuleRegistrationTests(TestCase):
         with self.assertRaises(ValidationError):
             ModuleRegistration.from_manifest(manifest).save()
 
+    def test_platform_compatible_module_can_be_registered(self):
+        manifest = load_valid_manifest()
+        manifest["platform_max_version"] = "0.1.0"
+
+        registration = ModuleRegistration.from_manifest(manifest)
+        registration.save()
+
+        self.assertEqual(registration.platform_min_version, "0.1.0")
+        self.assertEqual(registration.platform_max_version, "0.1.0")
+
+    def test_missing_platform_max_version_does_not_block_registration(self):
+        manifest = load_valid_manifest()
+        manifest.pop("platform_max_version", None)
+
+        registration = ModuleRegistration.from_manifest(manifest)
+        registration.save()
+
+        self.assertEqual(registration.platform_max_version, "")
+
+    def test_invalid_platform_min_version_is_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["platform_min_version"] = "latest"
+
+        registration = ModuleRegistration(
+            module_id=manifest["module_id"],
+            name=manifest["name"],
+            version=manifest["version"],
+            schema_version=manifest["schema_version"],
+            plugin_api_version=manifest["plugin_api_version"],
+            platform_min_version=manifest["platform_min_version"],
+            manifest=manifest,
+        )
+
+        with self.assertRaises(ValidationError):
+            registration.full_clean()
+
+    def test_newer_platform_min_version_is_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["platform_min_version"] = "0.2.0"
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()
+
+    def test_older_platform_max_version_is_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["platform_max_version"] = "0.0.9"
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()
+
+    def test_inconsistent_platform_range_is_rejected(self):
+        manifest = load_valid_manifest()
+        manifest["platform_min_version"] = "0.2.0"
+        manifest["platform_max_version"] = "0.1.0"
+
+        with self.assertRaises(ValidationError):
+            ModuleRegistration.from_manifest(manifest).save()
+
     def test_required_dependency_can_be_satisfied_by_registered_module(self):
         dependency_manifest = load_valid_manifest()
         ModuleRegistration.from_manifest(dependency_manifest).save()
