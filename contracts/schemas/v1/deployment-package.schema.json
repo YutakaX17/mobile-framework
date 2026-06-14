@@ -54,7 +54,7 @@
     },
     "sync_rules": {
       "type": "array",
-      "items": { "type": "object", "additionalProperties": true },
+      "items": { "$ref": "https://schemas.mobile-framework.local/v1/sync-rule.schema.json" },
       "default": []
     },
     "created_at": {

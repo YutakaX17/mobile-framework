@@ -23,4 +23,5 @@ Do not add unversioned schema files.
 - `v1/screen.schema.json`
 - `v1/app.schema.json`
 - `v1/workflow.schema.json`
+- `v1/sync-rule.schema.json`
 - `v1/deployment-package.schema.json`

@@ -65,7 +65,7 @@ public data class DeploymentPackage(
     val app: AppDefinition,
     val forms: List<Form>,
     val assets: List<DeploymentPackageAsset>? = null,
-    val sync_rules: List<JsonObject>? = null,
+    val sync_rules: List<SyncRule>? = null,
     val created_at: String,
     val created_by: String,
     val hash: String,
@@ -245,6 +245,66 @@ public data class Screen(
     val components: List<Component>,
     val actions: List<Action>? = null,
     val extensions: JsonObject? = null
+)
+
+public data class SyncRule(
+    val schema_version: String,
+    val sync_rule_id: SyncRuleId,
+    val name: String,
+    val description: String? = null,
+    val entity_type: String,
+    val direction: String,
+    val enabled: Boolean? = null,
+    val priority: Int? = null,
+    val pull: SyncRulePull? = null,
+    val push: SyncRulePush? = null,
+    val conflict_policy: String,
+    val conflict: SyncRuleConflict? = null,
+    val retry_policy: SyncRuleRetryPolicy? = null,
+    val audit: SyncRuleAudit? = null,
+    val extensions: JsonObject? = null
+)
+
+public data class SyncRuleAudit(
+    val log_success: Boolean? = null,
+    val log_rejections: Boolean? = null,
+    val log_conflicts: Boolean? = null
+)
+
+public data class SyncRuleConflict(
+    val detect_with: List<SyncRuleFieldPath>? = null,
+    val manual_review_queue: String? = null,
+    val stale_after_seconds: Int? = null
+)
+
+public typealias SyncRuleFieldPath = String
+
+public data class SyncRuleFilter(
+    val field: SyncRuleFieldPath,
+    val operator: String,
+    val value: JsonValue
+)
+
+public typealias SyncRuleId = String
+
+public data class SyncRulePull(
+    val strategy: String,
+    val cursor_field: SyncRuleFieldPath? = null,
+    val include_deleted: Boolean? = null,
+    val page_size: Int? = null,
+    val filters: List<SyncRuleFilter>? = null
+)
+
+public data class SyncRulePush(
+    val operations: List<String>,
+    val batch_size: Int? = null,
+    val idempotency_key_fields: List<SyncRuleFieldPath>? = null,
+    val requires_network: Boolean? = null
+)
+
+public data class SyncRuleRetryPolicy(
+    val max_attempts: Int? = null,
+    val backoff_seconds: Int? = null
 )
 
 public data class Theme(

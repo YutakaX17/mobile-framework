@@ -73,7 +73,7 @@ export interface DeploymentPackage {
   app: AppDefinition;
   forms: Form[];
   assets?: DeploymentPackageAsset[];
-  sync_rules?: Record<string, JsonValue>[];
+  sync_rules?: SyncRule[];
   created_at: string;
   created_by: string;
   hash: string;
@@ -259,6 +259,66 @@ export interface Screen {
   components: Component[];
   actions?: Action[];
   extensions?: Record<string, JsonValue>;
+}
+
+export interface SyncRule {
+  schema_version: "v1";
+  sync_rule_id: SyncRuleId;
+  name: string;
+  description?: string;
+  entity_type: string;
+  direction: "pull" | "push" | "bidirectional";
+  enabled?: boolean;
+  priority?: number;
+  pull?: SyncRulePull;
+  push?: SyncRulePush;
+  conflict_policy: "server_wins" | "client_wins" | "manual_review" | "reject";
+  conflict?: SyncRuleConflict;
+  retry_policy?: SyncRuleRetryPolicy;
+  audit?: SyncRuleAudit;
+  extensions?: Record<string, JsonValue>;
+}
+
+export interface SyncRuleAudit {
+  log_success?: boolean;
+  log_rejections?: boolean;
+  log_conflicts?: boolean;
+}
+
+export interface SyncRuleConflict {
+  detect_with?: SyncRuleFieldPath[];
+  manual_review_queue?: string;
+  stale_after_seconds?: number;
+}
+
+export type SyncRuleFieldPath = string;
+
+export interface SyncRuleFilter {
+  field: SyncRuleFieldPath;
+  operator: "eq" | "neq" | "in" | "not_in" | "gt" | "gte" | "lt" | "lte";
+  value: string | number | boolean | JsonValue[] | null;
+}
+
+export type SyncRuleId = string;
+
+export interface SyncRulePull {
+  strategy: "full_snapshot" | "incremental_cursor";
+  cursor_field?: SyncRuleFieldPath;
+  include_deleted?: boolean;
+  page_size?: number;
+  filters?: SyncRuleFilter[];
+}
+
+export interface SyncRulePush {
+  operations: "create" | "update" | "delete" | "submit"[];
+  batch_size?: number;
+  idempotency_key_fields?: SyncRuleFieldPath[];
+  requires_network?: boolean;
+}
+
+export interface SyncRuleRetryPolicy {
+  max_attempts?: number;
+  backoff_seconds?: number;
 }
 
 export interface Theme {

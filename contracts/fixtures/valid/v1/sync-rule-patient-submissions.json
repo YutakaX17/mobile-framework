@@ -1,0 +1,44 @@
+{
+  "schema_version": "v1",
+  "sync_rule_id": "patient_submissions",
+  "name": "Patient submissions",
+  "description": "Pull patient records by cursor and push offline form submissions from the mobile outbox.",
+  "entity_type": "patient",
+  "direction": "bidirectional",
+  "enabled": true,
+  "priority": 100,
+  "pull": {
+    "strategy": "incremental_cursor",
+    "cursor_field": "changed_at",
+    "include_deleted": true,
+    "page_size": 100,
+    "filters": [
+      {
+        "field": "status",
+        "operator": "in",
+        "value": ["active", "pending_review"]
+      }
+    ]
+  },
+  "push": {
+    "operations": ["submit", "update"],
+    "batch_size": 50,
+    "idempotency_key_fields": ["device_id", "local_id"],
+    "requires_network": true
+  },
+  "conflict_policy": "manual_review",
+  "conflict": {
+    "detect_with": ["version", "changed_at"],
+    "manual_review_queue": "sync_conflicts",
+    "stale_after_seconds": 86400
+  },
+  "retry_policy": {
+    "max_attempts": 5,
+    "backoff_seconds": 30
+  },
+  "audit": {
+    "log_success": false,
+    "log_rejections": true,
+    "log_conflicts": true
+  }
+}
