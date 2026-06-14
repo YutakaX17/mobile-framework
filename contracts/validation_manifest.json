@@ -11,6 +11,14 @@
       "valid": ["fixtures/valid/v1/app-field-ops.json"],
       "invalid": ["fixtures/invalid/v1/app-missing-navigation.json"]
     },
+    "component": {
+      "schema": "schemas/v1/component.schema.json",
+      "valid": ["fixtures/valid/v1/component-card-with-action.json"],
+      "invalid": [
+        "fixtures/invalid/v1/component-missing-component-id.json",
+        "fixtures/invalid/v1/component-unknown-type.json"
+      ]
+    },
     "deployment_package": {
       "schema": "schemas/v1/deployment-package.schema.json",
       "valid": ["fixtures/valid/v1/deployment-package-field-ops.json"],

@@ -17,6 +17,7 @@ SCHEMA_NAMES = [
     "field.schema.json",
     "form.schema.json",
     "action.schema.json",
+    "component.schema.json",
     "screen.schema.json",
     "app.schema.json",
     "deployment-package.schema.json",
@@ -24,6 +25,7 @@ SCHEMA_NAMES = [
 
 VALID_FIXTURES = {
     "action.schema.json": FIXTURES / "valid" / "v1" / "action-navigate-home.json",
+    "component.schema.json": FIXTURES / "valid" / "v1" / "component-card-with-action.json",
     "screen.schema.json": FIXTURES / "valid" / "v1" / "screen-intake.json",
     "app.schema.json": FIXTURES / "valid" / "v1" / "app-field-ops.json",
     "deployment-package.schema.json": FIXTURES / "valid" / "v1" / "deployment-package-field-ops.json",
@@ -31,6 +33,10 @@ VALID_FIXTURES = {
 
 INVALID_FIXTURES = {
     "action.schema.json": [FIXTURES / "invalid" / "v1" / "action-unknown-type.json"],
+    "component.schema.json": [
+        FIXTURES / "invalid" / "v1" / "component-missing-component-id.json",
+        FIXTURES / "invalid" / "v1" / "component-unknown-type.json",
+    ],
     "screen.schema.json": [FIXTURES / "invalid" / "v1" / "screen-form-missing-form-component.json"],
     "app.schema.json": [FIXTURES / "invalid" / "v1" / "app-missing-navigation.json"],
     "deployment-package.schema.json": [FIXTURES / "invalid" / "v1" / "deployment-package-invalid-hash.json"],

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/component.schema.json",
+  "title": "Component",
+  "description": "Reusable screen component definition for builders, backend validation, and mobile rendering.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["component_id", "component_type"],
+  "properties": {
+    "component_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "component_type": {
+      "type": "string",
+      "enum": ["text", "button", "form", "list", "card", "image", "spacer", "custom"]
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data_path": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)*$",
+          "maxLength": 200
+        },
+        "form_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        },
+        "action_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        }
+      }
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    },
+    "children": {
+      "type": "array",
+      "items": { "$ref": "https://schemas.mobile-framework.local/v1/component.schema.json" },
+      "default": []
+    }
+  }
+}

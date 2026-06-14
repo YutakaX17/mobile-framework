@@ -41,6 +41,15 @@ public data class AppDefinitionPermission(
     val label: String
 )
 
+public data class Component(
+    val component_id: String,
+    val component_type: String,
+    val label: String? = null,
+    val binding: JsonObject? = null,
+    val properties: Map<String, JsonValue>? = null,
+    val children: List<Component>? = null
+)
+
 public data class DeploymentPackage(
     val schema_version: String,
     val package_id: DeploymentPackageId,
@@ -233,18 +242,9 @@ public data class Screen(
     val route: String? = null,
     val permission: String? = null,
     val layout: JsonObject? = null,
-    val components: List<ScreenComponent>,
+    val components: List<Component>,
     val actions: List<Action>? = null,
     val extensions: JsonObject? = null
-)
-
-public data class ScreenComponent(
-    val component_id: String,
-    val component_type: String,
-    val label: String? = null,
-    val binding: JsonObject? = null,
-    val properties: Map<String, JsonValue>? = null,
-    val children: List<ScreenComponent>? = null
 )
 
 public data class Theme(

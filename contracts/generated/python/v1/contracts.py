@@ -41,6 +41,14 @@ class AppDefinitionPermission(TypedDict):
     code: str
     label: str
 
+class Component(TypedDict):
+    component_id: str
+    component_type: Literal['text', 'button', 'form', 'list', 'card', 'image', 'spacer', 'custom']
+    label: NotRequired[str]
+    binding: NotRequired[dict[str, JsonValue]]
+    properties: NotRequired[dict[str, str | int | float | bool | None]]
+    children: NotRequired[list[Component]]
+
 class DeploymentPackage(TypedDict):
     schema_version: Literal['v1']
     package_id: DeploymentPackageId
@@ -211,17 +219,9 @@ class Screen(TypedDict):
     route: NotRequired[str]
     permission: NotRequired[str]
     layout: NotRequired[dict[str, JsonValue]]
-    components: list[ScreenComponent]
+    components: list[Component]
     actions: NotRequired[list[Action]]
     extensions: NotRequired[dict[str, JsonValue]]
-
-class ScreenComponent(TypedDict):
-    component_id: str
-    component_type: Literal['text', 'button', 'form', 'list', 'card', 'image', 'spacer', 'custom']
-    label: NotRequired[str]
-    binding: NotRequired[dict[str, JsonValue]]
-    properties: NotRequired[dict[str, str | int | float | bool | None]]
-    children: NotRequired[list[ScreenComponent]]
 
 class Theme(TypedDict):
     schema_version: Literal['v1']
