@@ -32,6 +32,12 @@ Run the full contract validation suite from the repository root:
 python contracts/validate_contracts.py
 ```
 
+Regenerate TypeScript declarations from the v1 schemas:
+
+```powershell
+python contracts/generate_types.py
+```
+
 For manifest-driven schema and fixture validation only:
 
 ```powershell
