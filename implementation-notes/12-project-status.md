@@ -40,8 +40,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-00 Product And Architecture.
 - `[x]` EPIC-01 Repository And Tooling.
 - `[x]` EPIC-02 Backend Core.
-- `[ ]` EPIC-03 Rust Extension.
-- `[~]` EPIC-04 Shared Contracts.
+- `[~]` EPIC-03 Rust Extension.
+- `[x]` EPIC-04 Shared Contracts.
 - `[ ]` EPIC-05 Admin Frontend Shell.
 - `[ ]` EPIC-06 Theme Builder.
 - `[ ]` EPIC-07 Form Builder.
@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-04 Shared Contracts: core schema/fixture coverage, standalone component schema, workflow schema, sync rule schema, validation runner, and generated TypeScript/Python/Kotlin declarations are complete.
+- `[~]` EPIC-03 Rust Extension: M2 shared contract work is complete; Rust extension setup and bounded helper tasks remain pending.
 
 ## Completed Work
 
@@ -77,6 +77,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#76` completed: standalone component schema, fixtures, tests, and generated types added.
 - `[x]` Task `#78` completed: workflow schema, fixtures, tests, and generated types added.
 - `[x]` Task `#80` completed: sync rule schema, fixtures, tests, and generated types added.
+- `[x]` EPIC-04 Shared Contracts completed: schema fixtures, validation, contract workflow, and generated TypeScript/Python/Kotlin outputs are in place.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
