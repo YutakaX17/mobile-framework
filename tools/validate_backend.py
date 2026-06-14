@@ -28,6 +28,7 @@ def main() -> int:
             "apps.modules",
             "apps.configurations",
             "apps.audit",
+            "tests",
             "--settings=config.settings.test",
         ],
     ]

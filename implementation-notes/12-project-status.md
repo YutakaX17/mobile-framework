@@ -27,7 +27,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Milestones
 
 - `[x]` M0 Repository Foundation.
-- `[~]` M1 Backend Kernel.
+- `[x]` M1 Backend Kernel.
 - `[~]` M2 Contracts And Rust Extension.
 - `[ ]` M3 Admin Shell.
 - `[ ]` M4 Theme And Form Builder MVP.
@@ -39,7 +39,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 - `[x]` EPIC-00 Product And Architecture.
 - `[x]` EPIC-01 Repository And Tooling.
-- `[~]` EPIC-02 Backend Core.
+- `[x]` EPIC-02 Backend Core.
 - `[ ]` EPIC-03 Rust Extension.
 - `[~]` EPIC-04 Shared Contracts.
 - `[ ]` EPIC-05 Admin Frontend Shell.
@@ -54,7 +54,6 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-02 Backend Core: Django project scaffold, PostgreSQL settings baseline, tenant model baseline, identity/RBAC model baseline, module registry baseline, module dependency validation, module compatibility validation, configuration registry baseline, audit event baseline, service lifecycle baseline, event bus baseline, API error model baseline, and background worker setup baseline are in place; deeper backend integration tests remain pending.
 - `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch is complete; generated types and future schema expansion remain pending.
 
 ## Completed Work
@@ -91,6 +90,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#62` completed: background worker settings helper, job registry baseline, and tests added.
 - `[x]` Task `#64` completed: module dependency validation service and tests added.
 - `[x]` Task `#66` completed: module compatibility validation service and tests added.
+- `[x]` Task `#68` completed: initial backend integration tests added and wired into validation.
+- `[x]` EPIC-02 Backend Core completed: Django backend kernel baseline is in place with validation coverage.
 
 ## Blockers
 

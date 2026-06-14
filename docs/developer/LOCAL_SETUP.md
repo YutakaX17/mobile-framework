@@ -76,7 +76,7 @@ Expected result:
 
 - Foundation validation passes.
 - Contract validation reports the schema, fixture, and unit test counts.
-- Backend validation runs Django system checks, migration checks, PostgreSQL and worker settings tests, core health endpoint, service lifecycle, event bus, API error model, and background job registry tests, tenant model tests, identity/RBAC model tests, module registry, dependency validation, and compatibility validation tests, configuration registry tests, and audit event model tests.
+- Backend validation runs Django system checks, migration checks, PostgreSQL and worker settings tests, core health endpoint, service lifecycle, event bus, API error model, and background job registry tests, tenant model tests, identity/RBAC model tests, module registry, dependency validation, and compatibility validation tests, configuration registry tests, audit event model tests, and backend integration tests.
 
 ## Local PostgreSQL
 
