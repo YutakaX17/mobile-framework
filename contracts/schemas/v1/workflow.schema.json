@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mobile-framework.local/v1/workflow.schema.json",
+  "title": "Workflow",
+  "description": "State-machine workflow definition for approvals, task assignment, triggers, actions, and simulation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "name", "version", "initial_state", "states", "triggers"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "v1"
+    },
+    "workflow_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$",
+      "maxLength": 80
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "archived"],
+      "default": "draft"
+    },
+    "initial_state": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "maxLength": 80
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/state" }
+    },
+    "transitions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/transition" },
+      "default": []
+    },
+    "triggers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/trigger" }
+    },
+    "variables": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/variable" }
+    },
+    "simulation_inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_type"],
+      "properties": {
+        "assignment_type": {
+          "type": "string",
+          "enum": ["role", "user", "expression"]
+        },
+        "role": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)*$",
+          "maxLength": 120
+        },
+        "user_id": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "expression": { "$ref": "#/$defs/expression" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "assignment_type": { "const": "role" } },
+            "required": ["assignment_type"]
+          },
+          "then": { "required": ["role"] }
+        },
+        {
+          "if": {
+            "properties": { "assignment_type": { "const": "user" } },
+            "required": ["assignment_type"]
+          },
+          "then": { "required": ["user_id"] }
+        },
+        {
+          "if": {
+            "properties": { "assignment_type": { "const": "expression" } },
+            "required": ["assignment_type"]
+          },
+          "then": { "required": ["expression"] }
+        }
+      ]
+    },
+    "expression": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_id", "label", "state_type"],
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "state_type": {
+          "type": "string",
+          "enum": ["start", "task", "approval", "automated", "end"]
+        },
+        "assignment": { "$ref": "#/$defs/assignment" },
+        "entry_actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/action" },
+          "default": []
+        },
+        "exit_actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/action" },
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transition_id", "from_state", "to_state", "trigger"],
+      "properties": {
+        "transition_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "from_state": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        },
+        "to_state": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        },
+        "trigger": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        },
+        "guard": { "$ref": "#/$defs/expression" },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/action" },
+          "default": []
+        }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trigger_id", "trigger_type"],
+      "properties": {
+        "trigger_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "trigger_type": {
+          "type": "string",
+          "enum": [
+            "form_submitted",
+            "entity_created",
+            "entity_updated",
+            "scheduled",
+            "manual",
+            "integration_webhook"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "schedule": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        }
+      }
+    },
+    "variable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value_type"],
+      "properties": {
+        "value_type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "date", "datetime", "object", "array"]
+        },
+        "default": {
+          "type": ["string", "number", "boolean", "object", "array", "null"]
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "action_type"],
+      "properties": {
+        "action_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "action_type": {
+          "type": "string",
+          "enum": ["create_task", "send_notification", "update_entity", "call_integration", "change_state"]
+        },
+        "target": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        }
+      }
+    }
+  }
+}

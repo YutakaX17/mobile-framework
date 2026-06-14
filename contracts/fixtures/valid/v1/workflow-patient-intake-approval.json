@@ -1,0 +1,102 @@
+{
+  "schema_version": "v1",
+  "workflow_id": "patient_intake_approval",
+  "name": "Patient intake approval",
+  "description": "Routes submitted patient intake forms to the triage role for review.",
+  "version": "1.0.0",
+  "status": "draft",
+  "initial_state": "submitted",
+  "states": [
+    {
+      "state_id": "submitted",
+      "label": "Submitted",
+      "state_type": "start",
+      "entry_actions": [
+        {
+          "action_id": "notify_triage",
+          "action_type": "send_notification",
+          "target": "role:clinical.triage",
+          "parameters": {
+            "channel": "in_app",
+            "template": "patient_intake_submitted"
+          }
+        }
+      ]
+    },
+    {
+      "state_id": "triage_review",
+      "label": "Triage review",
+      "state_type": "approval",
+      "assignment": {
+        "assignment_type": "role",
+        "role": "clinical.triage"
+      }
+    },
+    {
+      "state_id": "approved",
+      "label": "Approved",
+      "state_type": "end",
+      "entry_actions": [
+        {
+          "action_id": "update_patient_status",
+          "action_type": "update_entity",
+          "target": "patient.status",
+          "parameters": {
+            "value": "approved"
+          }
+        }
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "transition_id": "submit_for_review",
+      "label": "Submit for review",
+      "from_state": "submitted",
+      "to_state": "triage_review",
+      "trigger": "intake_submitted",
+      "actions": [
+        {
+          "action_id": "create_triage_task",
+          "action_type": "create_task",
+          "target": "clinical.triage",
+          "parameters": {
+            "title": "Review patient intake",
+            "priority": "normal"
+          }
+        }
+      ]
+    },
+    {
+      "transition_id": "approve_intake",
+      "label": "Approve intake",
+      "from_state": "triage_review",
+      "to_state": "approved",
+      "trigger": "manual_approval",
+      "guard": "approval.decision == 'approved'"
+    }
+  ],
+  "triggers": [
+    {
+      "trigger_id": "intake_submitted",
+      "trigger_type": "form_submitted",
+      "source": "patient_intake"
+    },
+    {
+      "trigger_id": "manual_approval",
+      "trigger_type": "manual",
+      "source": "triage_review"
+    }
+  ],
+  "variables": {
+    "priority": {
+      "value_type": "string",
+      "default": "normal",
+      "description": "Task priority assigned during intake review."
+    }
+  },
+  "simulation_inputs": {
+    "patient_id": "patient_123",
+    "priority": "normal"
+  }
+}

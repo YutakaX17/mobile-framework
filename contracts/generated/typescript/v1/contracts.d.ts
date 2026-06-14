@@ -360,3 +360,69 @@ export interface ThemeTypographyTokens {
   fallback_family?: string;
   scale: Record<string, ThemeTypeStyle>;
 }
+
+export interface Workflow {
+  schema_version: "v1";
+  workflow_id: string;
+  name: string;
+  description?: string;
+  version: string;
+  status?: "draft" | "active" | "archived";
+  initial_state: string;
+  states: WorkflowState[];
+  transitions?: WorkflowTransition[];
+  triggers: WorkflowTrigger[];
+  variables?: Record<string, WorkflowVariable>;
+  simulation_inputs?: Record<string, string | number | boolean | null>;
+  extensions?: Record<string, JsonValue>;
+}
+
+export interface WorkflowAction {
+  action_id: string;
+  action_type: "create_task" | "send_notification" | "update_entity" | "call_integration" | "change_state";
+  target?: string;
+  parameters?: Record<string, string | number | boolean | null>;
+}
+
+export interface WorkflowAssignment {
+  assignment_type: "role" | "user" | "expression";
+  role?: string;
+  user_id?: string;
+  expression?: WorkflowExpression;
+}
+
+export type WorkflowExpression = string;
+
+export interface WorkflowState {
+  state_id: string;
+  label: string;
+  state_type: "start" | "task" | "approval" | "automated" | "end";
+  assignment?: WorkflowAssignment;
+  entry_actions?: WorkflowAction[];
+  exit_actions?: WorkflowAction[];
+  metadata?: Record<string, string | number | boolean | null>;
+}
+
+export interface WorkflowTransition {
+  transition_id: string;
+  label?: string;
+  from_state: string;
+  to_state: string;
+  trigger: string;
+  guard?: WorkflowExpression;
+  actions?: WorkflowAction[];
+}
+
+export interface WorkflowTrigger {
+  trigger_id: string;
+  trigger_type: "form_submitted" | "entity_created" | "entity_updated" | "scheduled" | "manual" | "integration_webhook";
+  source?: string;
+  schedule?: string;
+  parameters?: Record<string, string | number | boolean | null>;
+}
+
+export interface WorkflowVariable {
+  value_type: "string" | "number" | "boolean" | "date" | "datetime" | "object" | "array";
+  default?: string | number | boolean | {} | JsonValue[] | null;
+  description?: string;
+}

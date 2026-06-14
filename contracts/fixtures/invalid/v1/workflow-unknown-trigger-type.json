@@ -1,0 +1,21 @@
+{
+  "schema_version": "v1",
+  "workflow_id": "patient_intake_approval",
+  "name": "Patient intake approval",
+  "version": "1.0.0",
+  "initial_state": "submitted",
+  "states": [
+    {
+      "state_id": "submitted",
+      "label": "Submitted",
+      "state_type": "start"
+    }
+  ],
+  "triggers": [
+    {
+      "trigger_id": "intake_submitted",
+      "trigger_type": "email_received",
+      "source": "patient_intake"
+    }
+  ]
+}

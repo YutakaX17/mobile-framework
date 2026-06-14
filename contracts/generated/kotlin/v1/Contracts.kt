@@ -346,3 +346,69 @@ public data class ThemeTypographyTokens(
     val fallback_family: String? = null,
     val scale: Map<String, ThemeTypeStyle>
 )
+
+public data class Workflow(
+    val schema_version: String,
+    val workflow_id: String,
+    val name: String,
+    val description: String? = null,
+    val version: String,
+    val status: String? = null,
+    val initial_state: String,
+    val states: List<WorkflowState>,
+    val transitions: List<WorkflowTransition>? = null,
+    val triggers: List<WorkflowTrigger>,
+    val variables: Map<String, WorkflowVariable>? = null,
+    val simulation_inputs: Map<String, JsonValue>? = null,
+    val extensions: JsonObject? = null
+)
+
+public data class WorkflowAction(
+    val action_id: String,
+    val action_type: String,
+    val target: String? = null,
+    val parameters: Map<String, JsonValue>? = null
+)
+
+public data class WorkflowAssignment(
+    val assignment_type: String,
+    val role: String? = null,
+    val user_id: String? = null,
+    val expression: WorkflowExpression? = null
+)
+
+public typealias WorkflowExpression = String
+
+public data class WorkflowState(
+    val state_id: String,
+    val label: String,
+    val state_type: String,
+    val assignment: WorkflowAssignment? = null,
+    val entry_actions: List<WorkflowAction>? = null,
+    val exit_actions: List<WorkflowAction>? = null,
+    val metadata: Map<String, JsonValue>? = null
+)
+
+public data class WorkflowTransition(
+    val transition_id: String,
+    val label: String? = null,
+    val from_state: String,
+    val to_state: String,
+    val trigger: String,
+    val guard: WorkflowExpression? = null,
+    val actions: List<WorkflowAction>? = null
+)
+
+public data class WorkflowTrigger(
+    val trigger_id: String,
+    val trigger_type: String,
+    val source: String? = null,
+    val schedule: String? = null,
+    val parameters: Map<String, JsonValue>? = null
+)
+
+public data class WorkflowVariable(
+    val value_type: String,
+    val default: JsonValue? = null,
+    val description: String? = null
+)
