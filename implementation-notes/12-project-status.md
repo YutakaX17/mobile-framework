@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-03 Rust Extension: M2 shared contract work is complete; Rust extension setup and bounded helper tasks remain pending.
+- `[~]` EPIC-03 Rust Extension: initial Rust extension scaffold is complete; bounded helper implementations remain pending.
 
 ## Completed Work
 
@@ -78,6 +78,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#78` completed: workflow schema, fixtures, tests, and generated types added.
 - `[x]` Task `#80` completed: sync rule schema, fixtures, tests, and generated types added.
 - `[x]` EPIC-04 Shared Contracts completed: schema fixtures, validation, contract workflow, and generated TypeScript/Python/Kotlin outputs are in place.
+- `[x]` Task `#83` completed: initial PyO3/maturin Rust extension scaffold added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
