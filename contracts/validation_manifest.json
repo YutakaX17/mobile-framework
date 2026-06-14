@@ -62,6 +62,14 @@
         "fixtures/invalid/v1/theme-missing-name.json",
         "fixtures/invalid/v1/theme-unknown-mode.json"
       ]
+    },
+    "workflow": {
+      "schema": "schemas/v1/workflow.schema.json",
+      "valid": ["fixtures/valid/v1/workflow-patient-intake-approval.json"],
+      "invalid": [
+        "fixtures/invalid/v1/workflow-missing-initial-state.json",
+        "fixtures/invalid/v1/workflow-unknown-trigger-type.json"
+      ]
     }
   }
 }

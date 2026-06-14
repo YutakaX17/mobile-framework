@@ -311,3 +311,62 @@ class ThemeTypographyTokens(TypedDict):
     font_family: str
     fallback_family: NotRequired[str]
     scale: dict[str, ThemeTypeStyle]
+
+class Workflow(TypedDict):
+    schema_version: Literal['v1']
+    workflow_id: str
+    name: str
+    description: NotRequired[str]
+    version: str
+    status: NotRequired[Literal['draft', 'active', 'archived']]
+    initial_state: str
+    states: list[WorkflowState]
+    transitions: NotRequired[list[WorkflowTransition]]
+    triggers: list[WorkflowTrigger]
+    variables: NotRequired[dict[str, WorkflowVariable]]
+    simulation_inputs: NotRequired[dict[str, str | int | float | bool | None]]
+    extensions: NotRequired[dict[str, JsonValue]]
+
+class WorkflowAction(TypedDict):
+    action_id: str
+    action_type: Literal['create_task', 'send_notification', 'update_entity', 'call_integration', 'change_state']
+    target: NotRequired[str]
+    parameters: NotRequired[dict[str, str | int | float | bool | None]]
+
+class WorkflowAssignment(TypedDict):
+    assignment_type: Literal['role', 'user', 'expression']
+    role: NotRequired[str]
+    user_id: NotRequired[str]
+    expression: NotRequired[WorkflowExpression]
+
+WorkflowExpression: TypeAlias = str
+
+class WorkflowState(TypedDict):
+    state_id: str
+    label: str
+    state_type: Literal['start', 'task', 'approval', 'automated', 'end']
+    assignment: NotRequired[WorkflowAssignment]
+    entry_actions: NotRequired[list[WorkflowAction]]
+    exit_actions: NotRequired[list[WorkflowAction]]
+    metadata: NotRequired[dict[str, str | int | float | bool | None]]
+
+class WorkflowTransition(TypedDict):
+    transition_id: str
+    label: NotRequired[str]
+    from_state: str
+    to_state: str
+    trigger: str
+    guard: NotRequired[WorkflowExpression]
+    actions: NotRequired[list[WorkflowAction]]
+
+class WorkflowTrigger(TypedDict):
+    trigger_id: str
+    trigger_type: Literal['form_submitted', 'entity_created', 'entity_updated', 'scheduled', 'manual', 'integration_webhook']
+    source: NotRequired[str]
+    schedule: NotRequired[str]
+    parameters: NotRequired[dict[str, str | int | float | bool | None]]
+
+class WorkflowVariable(TypedDict):
+    value_type: Literal['string', 'number', 'boolean', 'date', 'datetime', 'object', 'array']
+    default: NotRequired[str | int | float | bool | dict[str, JsonValue] | list[JsonValue] | None]
+    description: NotRequired[str]
