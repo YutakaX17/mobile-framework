@@ -45,6 +45,19 @@ export interface AppDefinitionPermission {
   label: string;
 }
 
+export interface Component {
+  component_id: string;
+  component_type: "text" | "button" | "form" | "list" | "card" | "image" | "spacer" | "custom";
+  label?: string;
+  binding?: {
+    data_path?: string;
+    form_id?: string;
+    action_id?: string;
+  };
+  properties?: Record<string, string | number | boolean | null>;
+  children?: Component[];
+}
+
 export interface DeploymentPackage {
   schema_version: "v1";
   package_id: DeploymentPackageId;
@@ -243,22 +256,9 @@ export interface Screen {
   layout?: {
     type?: "single_column" | "two_column" | "list" | "card_grid";
   };
-  components: ScreenComponent[];
+  components: Component[];
   actions?: Action[];
   extensions?: Record<string, JsonValue>;
-}
-
-export interface ScreenComponent {
-  component_id: string;
-  component_type: "text" | "button" | "form" | "list" | "card" | "image" | "spacer" | "custom";
-  label?: string;
-  binding?: {
-    data_path?: string;
-    form_id?: string;
-    action_id?: string;
-  };
-  properties?: Record<string, string | number | boolean | null>;
-  children?: ScreenComponent[];
 }
 
 export interface Theme {

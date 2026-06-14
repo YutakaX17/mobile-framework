@@ -1,0 +1,24 @@
+{
+  "component_id": "summary_card",
+  "component_type": "card",
+  "label": "Summary",
+  "binding": {
+    "data_path": "patient.summary",
+    "action_id": "open_summary"
+  },
+  "properties": {
+    "compact": true,
+    "priority": 1,
+    "accent": "primary"
+  },
+  "children": [
+    {
+      "component_id": "summary_title",
+      "component_type": "text",
+      "label": "Patient summary",
+      "binding": {
+        "data_path": "patient.name"
+      }
+    }
+  ]
+}

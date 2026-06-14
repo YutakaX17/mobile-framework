@@ -19,6 +19,7 @@ Do not add unversioned schema files.
 - `v1/field.schema.json`
 - `v1/form.schema.json`
 - `v1/action.schema.json`
+- `v1/component.schema.json`
 - `v1/screen.schema.json`
 - `v1/app.schema.json`
 - `v1/deployment-package.schema.json`
