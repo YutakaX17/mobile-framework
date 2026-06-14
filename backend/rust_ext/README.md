@@ -1,3 +1,29 @@
-﻿# Rust Extension
+# Rust Extension
 
-PyO3/maturin helpers will be added here after shared contracts are stable. Keep Rust APIs narrow and performance-focused.
+Bounded PyO3/maturin helpers for backend package and configuration operations.
+
+Rust code in this directory must stay narrow and independently tested. Keep ordinary Django CRUD, admin workflows, and business logic in Python unless measurement or implementation complexity justifies a Rust helper.
+
+## Layout
+
+- `Cargo.toml`: Rust crate metadata.
+- `pyproject.toml`: maturin build metadata.
+- `src/lib.rs`: native extension entry point.
+- `python/mobile_framework_rust`: Python wrapper package.
+
+## Local Checks
+
+Run Rust tests from the repository root:
+
+```powershell
+cargo test --manifest-path backend/rust_ext/Cargo.toml
+```
+
+Build the Python extension for local development after installing maturin:
+
+```powershell
+python -m pip install maturin
+python -m maturin develop --manifest-path backend/rust_ext/Cargo.toml
+```
+
+The scaffold exposes only `health_check()` and `extension_version()`. Package hashing, JSON canonicalization, app diffing, and sync merge helpers should be added in separate tracked tasks.

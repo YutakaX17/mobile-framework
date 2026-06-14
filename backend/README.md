@@ -20,6 +20,7 @@ The backend includes a minimal Django project:
 - `apps/modules`: initial module registry, manifest validation, dependency validation, and compatibility validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
+- `rust_ext`: initial PyO3/maturin scaffold for bounded native helpers.
 
 ## Local Validation
 
@@ -73,4 +74,4 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/deployments`: immutable package compilation, signing, channels, rollback.
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
 - `apps/audit`: mutation logs, config revisions, admin and sync audit events. Initial audit event model baseline exists.
-- `rust_ext`: bounded PyO3/maturin helpers once contracts are stable.
+- `rust_ext`: bounded PyO3/maturin helpers. Initial scaffold exists; helper implementations remain pending.
