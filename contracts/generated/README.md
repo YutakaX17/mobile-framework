@@ -2,9 +2,9 @@
 
 Generated Python, TypeScript, and Kotlin types live here. Generated output should be reproducible in CI.
 
-## Python And TypeScript
+## Kotlin, Python, And TypeScript
 
-The current Python and TypeScript declarations are generated from the v1 JSON Schemas:
+The current Kotlin, Python, and TypeScript declarations are generated from the v1 JSON Schemas:
 
 ```powershell
 python contracts/generate_types.py
@@ -14,6 +14,7 @@ Target a single language when needed:
 
 ```powershell
 python contracts/generate_types.py --target python
+python contracts/generate_types.py --target kotlin
 python contracts/generate_types.py --target typescript
 ```
 

@@ -32,7 +32,7 @@ Run the full contract validation suite from the repository root:
 python contracts/validate_contracts.py
 ```
 
-Regenerate Python and TypeScript declarations from the v1 schemas:
+Regenerate Kotlin, Python, and TypeScript declarations from the v1 schemas:
 
 ```powershell
 python contracts/generate_types.py

@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch and generated TypeScript/Python declarations are complete; generated Kotlin types and future schema expansion remain pending.
+- `[~]` EPIC-04 Shared Contracts: initial schema/fixture/validation-runner batch and generated TypeScript/Python/Kotlin declarations are complete; future schema expansion remains pending.
 
 ## Completed Work
 
@@ -73,6 +73,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#26` completed: contract validation runner added and wired into CI.
 - `[x]` Task `#70` completed: generated TypeScript contract declarations and freshness check added.
 - `[x]` Task `#72` completed: generated Python contract declarations and freshness check added.
+- `[x]` Task `#74` completed: generated Kotlin contract declarations and freshness check added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
