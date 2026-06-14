@@ -164,6 +164,12 @@ def main() -> int:
     args = parse_args()
     try:
         result = validate_contracts(args.manifest)
+        try:
+            from .generate_types import DEFAULT_TYPESCRIPT_OUTPUT, check_typescript
+        except ImportError:  # pragma: no cover - used when executed as a direct script.
+            from generate_types import DEFAULT_TYPESCRIPT_OUTPUT, check_typescript
+
+        check_typescript(DEFAULT_TYPESCRIPT_OUTPUT, args.manifest)
         print(
             "Validated "
             f"{result.checked_schemas} schemas, "
