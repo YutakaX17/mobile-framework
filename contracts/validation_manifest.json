@@ -54,6 +54,14 @@
       "valid": ["fixtures/valid/v1/screen-intake.json"],
       "invalid": ["fixtures/invalid/v1/screen-form-missing-form-component.json"]
     },
+    "sync_rule": {
+      "schema": "schemas/v1/sync-rule.schema.json",
+      "valid": ["fixtures/valid/v1/sync-rule-patient-submissions.json"],
+      "invalid": [
+        "fixtures/invalid/v1/sync-rule-missing-entity-type.json",
+        "fixtures/invalid/v1/sync-rule-unknown-conflict-policy.json"
+      ]
+    },
     "theme": {
       "schema": "schemas/v1/theme.schema.json",
       "valid": ["fixtures/valid/v1/theme-basic.json"],

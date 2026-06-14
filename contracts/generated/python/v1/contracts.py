@@ -64,7 +64,7 @@ class DeploymentPackage(TypedDict):
     app: AppDefinition
     forms: list[Form]
     assets: NotRequired[list[DeploymentPackageAsset]]
-    sync_rules: NotRequired[list[dict[str, JsonValue]]]
+    sync_rules: NotRequired[list[SyncRule]]
     created_at: str
     created_by: str
     hash: str
@@ -222,6 +222,59 @@ class Screen(TypedDict):
     components: list[Component]
     actions: NotRequired[list[Action]]
     extensions: NotRequired[dict[str, JsonValue]]
+
+class SyncRule(TypedDict):
+    schema_version: Literal['v1']
+    sync_rule_id: SyncRuleId
+    name: str
+    description: NotRequired[str]
+    entity_type: str
+    direction: Literal['pull', 'push', 'bidirectional']
+    enabled: NotRequired[bool]
+    priority: NotRequired[int]
+    pull: NotRequired[SyncRulePull]
+    push: NotRequired[SyncRulePush]
+    conflict_policy: Literal['server_wins', 'client_wins', 'manual_review', 'reject']
+    conflict: NotRequired[SyncRuleConflict]
+    retry_policy: NotRequired[SyncRuleRetryPolicy]
+    audit: NotRequired[SyncRuleAudit]
+    extensions: NotRequired[dict[str, JsonValue]]
+
+class SyncRuleAudit(TypedDict):
+    log_success: NotRequired[bool]
+    log_rejections: NotRequired[bool]
+    log_conflicts: NotRequired[bool]
+
+class SyncRuleConflict(TypedDict):
+    detect_with: NotRequired[list[SyncRuleFieldPath]]
+    manual_review_queue: NotRequired[str]
+    stale_after_seconds: NotRequired[int]
+
+SyncRuleFieldPath: TypeAlias = str
+
+class SyncRuleFilter(TypedDict):
+    field: SyncRuleFieldPath
+    operator: Literal['eq', 'neq', 'in', 'not_in', 'gt', 'gte', 'lt', 'lte']
+    value: str | int | float | bool | list[JsonValue] | None
+
+SyncRuleId: TypeAlias = str
+
+class SyncRulePull(TypedDict):
+    strategy: Literal['full_snapshot', 'incremental_cursor']
+    cursor_field: NotRequired[SyncRuleFieldPath]
+    include_deleted: NotRequired[bool]
+    page_size: NotRequired[int]
+    filters: NotRequired[list[SyncRuleFilter]]
+
+class SyncRulePush(TypedDict):
+    operations: list[Literal['create', 'update', 'delete', 'submit']]
+    batch_size: NotRequired[int]
+    idempotency_key_fields: NotRequired[list[SyncRuleFieldPath]]
+    requires_network: NotRequired[bool]
+
+class SyncRuleRetryPolicy(TypedDict):
+    max_attempts: NotRequired[int]
+    backoff_seconds: NotRequired[int]
 
 class Theme(TypedDict):
     schema_version: Literal['v1']

@@ -1,0 +1,12 @@
+{
+  "schema_version": "v1",
+  "sync_rule_id": "patient_submissions",
+  "name": "Patient submissions",
+  "entity_type": "patient",
+  "direction": "push",
+  "push": {
+    "operations": ["submit"],
+    "batch_size": 50
+  },
+  "conflict_policy": "merge_later"
+}
