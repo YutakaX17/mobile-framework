@@ -3,6 +3,7 @@
 try:
     from ._native import (
         canonicalize_json,
+        diff_app_json,
         extension_version,
         hash_config_json,
         hash_package_json,
@@ -16,6 +17,7 @@ except ImportError as exc:  # pragma: no cover - exercised once the extension is
 
 __all__ = [
     "canonicalize_json",
+    "diff_app_json",
     "extension_version",
     "hash_config_json",
     "hash_package_json",

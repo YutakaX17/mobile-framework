@@ -1,6 +1,8 @@
+use std::collections::BTreeSet;
+
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use serde_json::Value;
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
 const EXTENSION_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -22,6 +24,12 @@ fn canonicalize_json(input: &str) -> PyResult<String> {
 }
 
 #[pyfunction]
+fn diff_app_json(old_input: &str, new_input: &str) -> PyResult<String> {
+    diff_app_json_str(old_input, new_input)
+        .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
+}
+
+#[pyfunction]
 fn hash_config_json(input: &str) -> PyResult<String> {
     hash_config_json_str(input)
         .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
@@ -36,6 +44,86 @@ fn hash_package_json(input: &str) -> PyResult<String> {
 fn canonicalize_json_str(input: &str) -> Result<String, serde_json::Error> {
     let value: Value = serde_json::from_str(input)?;
     serde_json::to_string(&value)
+}
+
+fn diff_app_json_str(old_input: &str, new_input: &str) -> Result<String, serde_json::Error> {
+    let old_value: Value = serde_json::from_str(old_input)?;
+    let new_value: Value = serde_json::from_str(new_input)?;
+    let mut changes = Vec::new();
+    diff_values("$", &old_value, &new_value, &mut changes);
+    serde_json::to_string(&changes)
+}
+
+fn diff_values(path: &str, old_value: &Value, new_value: &Value, changes: &mut Vec<Value>) {
+    if old_value == new_value {
+        return;
+    }
+
+    match (old_value, new_value) {
+        (Value::Object(old_map), Value::Object(new_map)) => {
+            let keys: BTreeSet<_> = old_map.keys().chain(new_map.keys()).collect();
+            for key in keys {
+                let child_path = object_path(path, key);
+                match (old_map.get(key), new_map.get(key)) {
+                    (Some(old_child), Some(new_child)) => {
+                        diff_values(&child_path, old_child, new_child, changes);
+                    }
+                    (Some(old_child), None) => {
+                        changes.push(json!({
+                            "change_type": "removed",
+                            "path": child_path,
+                            "old": old_child
+                        }));
+                    }
+                    (None, Some(new_child)) => {
+                        changes.push(json!({
+                            "change_type": "added",
+                            "path": child_path,
+                            "new": new_child
+                        }));
+                    }
+                    (None, None) => {}
+                }
+            }
+        }
+        (Value::Array(old_items), Value::Array(new_items)) => {
+            let shared_len = old_items.len().min(new_items.len());
+            for index in 0..shared_len {
+                let child_path = array_path(path, index);
+                diff_values(&child_path, &old_items[index], &new_items[index], changes);
+            }
+            for (index, old_child) in old_items.iter().enumerate().skip(shared_len) {
+                changes.push(json!({
+                    "change_type": "removed",
+                    "path": array_path(path, index),
+                    "old": old_child
+                }));
+            }
+            for (index, new_child) in new_items.iter().enumerate().skip(shared_len) {
+                changes.push(json!({
+                    "change_type": "added",
+                    "path": array_path(path, index),
+                    "new": new_child
+                }));
+            }
+        }
+        _ => {
+            changes.push(json!({
+                "change_type": "changed",
+                "path": path,
+                "old": old_value,
+                "new": new_value
+            }));
+        }
+    }
+}
+
+fn object_path(parent: &str, key: &str) -> String {
+    format!("{parent}.{key}")
+}
+
+fn array_path(parent: &str, index: usize) -> String {
+    format!("{parent}[{index}]")
 }
 
 fn hash_config_json_str(input: &str) -> Result<String, serde_json::Error> {
@@ -65,6 +153,7 @@ fn to_lower_hex(bytes: &[u8]) -> String {
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(canonicalize_json, m)?)?;
+    m.add_function(wrap_pyfunction!(diff_app_json, m)?)?;
     m.add_function(wrap_pyfunction!(extension_version, m)?)?;
     m.add_function(wrap_pyfunction!(hash_config_json, m)?)?;
     m.add_function(wrap_pyfunction!(hash_package_json, m)?)?;
@@ -112,6 +201,74 @@ mod tests {
     #[test]
     fn canonicalize_json_rejects_invalid_input() {
         assert!(canonicalize_json_str(r#"{"missing": "brace""#).is_err());
+    }
+
+    #[test]
+    fn diff_app_json_returns_empty_array_for_unchanged_input() {
+        let diff =
+            diff_app_json_str(r#"{"app_id":"field_ops"}"#, r#"{"app_id":"field_ops"}"#).unwrap();
+        assert_eq!(serde_json::from_str::<Value>(&diff).unwrap(), json!([]));
+    }
+
+    #[test]
+    fn diff_app_json_reports_added_removed_and_changed_paths() {
+        let diff = diff_app_json_str(
+            r#"{"app_id":"field_ops","name":"Old","theme_id":"legacy"}"#,
+            r#"{"app_id":"field_ops","name":"New","version":"1.0.0"}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&diff).unwrap(),
+            json!([
+                {
+                    "change_type": "changed",
+                    "path": "$.name",
+                    "old": "Old",
+                    "new": "New"
+                },
+                {
+                    "change_type": "removed",
+                    "path": "$.theme_id",
+                    "old": "legacy"
+                },
+                {
+                    "change_type": "added",
+                    "path": "$.version",
+                    "new": "1.0.0"
+                }
+            ])
+        );
+    }
+
+    #[test]
+    fn diff_app_json_reports_nested_array_paths() {
+        let diff = diff_app_json_str(
+            r#"{"screens":[{"screen_id":"home","name":"Home"}]}"#,
+            r#"{"screens":[{"screen_id":"home","name":"Start"},{"screen_id":"settings"}]}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&diff).unwrap(),
+            json!([
+                {
+                    "change_type": "changed",
+                    "path": "$.screens[0].name",
+                    "old": "Home",
+                    "new": "Start"
+                },
+                {
+                    "change_type": "added",
+                    "path": "$.screens[1]",
+                    "new": {"screen_id": "settings"}
+                }
+            ])
+        );
+    }
+
+    #[test]
+    fn diff_app_json_rejects_invalid_input() {
+        assert!(diff_app_json_str(r#"{"missing": "brace""#, r#"{"ok":true}"#).is_err());
+        assert!(diff_app_json_str(r#"{"ok":true}"#, r#"{"missing": "brace""#).is_err());
     }
 
     #[test]
