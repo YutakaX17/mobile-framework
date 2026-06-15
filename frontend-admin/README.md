@@ -21,6 +21,10 @@ The initial typed API client lives in `src/api/adminApiClient.ts`. It defaults t
 
 The initial auth shell lives in `src/auth` and protects admin routes behind a development login view. It is intentionally local state only until backend auth endpoints are added.
 
+## Module Registry
+
+Admin navigation and workspace metadata are sourced from `src/modules/moduleRegistry.ts`, which provides the first typed contribution registry for future frontend modules.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -41,7 +45,7 @@ npm run validate
 - `src/app`: application shell, routing, auth, permissions, global layout. Initial shell, route foundation, and login view exist.
 - `src/api`: typed API client foundation and request/error primitives.
 - `src/auth`: local auth session model, provider, and guard helpers.
-- `src/modules`: frontend module contribution registry.
+- `src/modules`: typed frontend module contribution registry.
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
 - `src/design-system`: tokens, components, accessibility helpers, previews.
 - `src/generated`: generated contract/API types.

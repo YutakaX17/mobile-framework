@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
+import { findAdminModuleByRoute, getOrderedAdminModules } from "../modules/moduleRegistry";
 import { DashboardView } from "./views/DashboardView";
 import { PlaceholderView } from "./views/PlaceholderView";
 
@@ -10,47 +11,26 @@ export type AdminRoute = {
   summary: string;
 };
 
-export const adminRoutes: AdminRoute[] = [
-  {
-    path: "/dashboard",
-    label: "Dashboard",
-    section: "Admin dashboard",
-    summary: "Operational control surface"
-  },
-  {
-    path: "/apps",
-    label: "Apps",
-    section: "App builder",
-    summary: "App composition workspace"
-  },
-  {
-    path: "/forms",
-    label: "Forms",
-    section: "Form builder",
-    summary: "Form definition workspace"
-  },
-  {
-    path: "/themes",
-    label: "Themes",
-    section: "Theme builder",
-    summary: "Design token workspace"
-  },
-  {
-    path: "/workflows",
-    label: "Workflows",
-    section: "Workflow builder",
-    summary: "Approval and automation workspace"
-  },
-  {
-    path: "/deployments",
-    label: "Deployments",
-    section: "Deployment manager",
-    summary: "Package release workspace"
-  }
-];
+export const adminRoutes: AdminRoute[] = getOrderedAdminModules().map((module) => ({
+  label: module.label,
+  path: module.routePath,
+  section: module.section,
+  summary: module.summary
+}));
 
 export function findAdminRoute(pathname: string): AdminRoute | undefined {
-  return adminRoutes.find((route) => route.path === pathname);
+  const module = findAdminModuleByRoute(pathname);
+
+  if (!module) {
+    return undefined;
+  }
+
+  return {
+    label: module.label,
+    path: module.routePath,
+    section: module.section,
+    summary: module.summary
+  };
 }
 
 export function useCurrentRoute(): AdminRoute | undefined {
