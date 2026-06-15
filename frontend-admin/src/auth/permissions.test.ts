@@ -1,20 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { adminModuleContributions } from "../modules/moduleRegistry";
+import { createTestUser } from "../tests/testFixtures";
 import { canAccessModule, getCapabilitiesForRoles, hasCapability } from "./permissions";
-import type { AdminAuthUser } from "./authSession";
 
-const builderUser: AdminAuthUser = {
-  displayName: "Builder",
-  email: "builder@example.test",
-  roles: ["builder"]
-};
-
-const platformAdmin: AdminAuthUser = {
-  displayName: "Admin",
-  email: "admin@example.test",
-  roles: ["platform-admin"]
-};
+const builderUser = createTestUser({ displayName: "Builder", email: "builder@example.test", roles: ["builder"] });
+const platformAdmin = createTestUser({ displayName: "Admin", email: "admin@example.test" });
 
 describe("permissions", () => {
   it("expands role capabilities in stable order", () => {
