@@ -12,3 +12,4 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 pyo3 = { version = "0.25", features = ["extension-module"] }
+serde_json = "1"
