@@ -21,6 +21,12 @@ python tools/validate_rust_ext.py
 
 The validation script runs `cargo fmt --check` and `cargo test` against this crate.
 
+To also build the Python package and run wrapper tests:
+
+```powershell
+python tools/validate_rust_ext.py --include-python-wrapper
+```
+
 Build the Python extension for local development after installing maturin:
 
 ```powershell
