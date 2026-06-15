@@ -37,6 +37,10 @@ describe("admin shell model", () => {
 
   it("defines shell actions and user menu labels", () => {
     expect(shellActions.map((action) => action.id)).toEqual(["validate", "publish-review"]);
+    expect(shellActions.map((action) => action.notification.title)).toEqual([
+      "Validation queued",
+      "Publish review pending"
+    ]);
     expect(getShellActionClassName(shellActions[1])).toBe("primary-action");
     expect(getUserRoleLabel(["platform-admin", "builder"])).toBe("platform-admin, builder");
     expect(getUserRoleLabel([])).toBe("No roles assigned");
