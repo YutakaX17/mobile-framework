@@ -29,7 +29,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` M0 Repository Foundation.
 - `[x]` M1 Backend Kernel.
 - `[x]` M2 Contracts And Rust Extension.
-- `[~]` M3 Admin Shell.
+- `[x]` M3 Admin Shell.
 - `[ ]` M4 Theme And Form Builder MVP.
 - `[ ]` M5 Mobile Runtime MVP.
 - `[ ]` M6 Workflow And Deployment MVP.
@@ -42,7 +42,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-02 Backend Core.
 - `[x]` EPIC-03 Rust Extension.
 - `[x]` EPIC-04 Shared Contracts.
-- `[~]` EPIC-05 Admin Frontend Shell.
+- `[x]` EPIC-05 Admin Frontend Shell.
 - `[ ]` EPIC-06 Theme Builder.
 - `[ ]` EPIC-07 Form Builder.
 - `[ ]` EPIC-08 App And Screen Builder.
@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-05 Admin Frontend Shell: initial Vite React TypeScript scaffold, routing foundation, API client foundation, auth shell, module registry, design system foundation, icon system, shell layout, permissions guard, error boundary, notifications, testing setup, and Playwright smoke test are complete; epic wrap-up remains pending.
+- `[~]` EPIC-06 Theme Builder: next planned epic after completing the admin frontend shell foundation.
 
 ## Completed Work
 
@@ -100,6 +100,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#120` completed: admin frontend notification system added.
 - `[x]` Task `#122` completed: admin frontend testing setup added.
 - `[x]` Task `#124` completed: admin frontend Playwright smoke test added.
+- `[x]` EPIC-05 Admin Frontend Shell completed: Vite React TypeScript scaffold, routing, API client, auth shell, module registry, design system, icons, shell layout, permissions guard, error boundary, notifications, testing setup, Playwright smoke test, documentation, and CI validation are in place.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
