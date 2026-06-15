@@ -181,6 +181,23 @@ button:focus-visible,
   min-width: 0;
 }
 
+.empty-state {
+  background: #ffffff;
+  border: 1px solid #cfdbd5;
+  border-radius: 8px;
+  max-width: 760px;
+  padding: 24px;
+}
+
+.empty-state h2 {
+  margin: 0 0 8px;
+}
+
+.empty-state p:last-child {
+  color: #51625b;
+  margin-bottom: 0;
+}
+
 .section-heading {
   align-items: end;
   display: flex;
