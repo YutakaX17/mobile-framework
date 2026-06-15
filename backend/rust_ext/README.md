@@ -16,8 +16,10 @@ Rust code in this directory must stay narrow and independently tested. Keep ordi
 Run Rust tests from the repository root:
 
 ```powershell
-cargo test --manifest-path backend/rust_ext/Cargo.toml
+python tools/validate_rust_ext.py
 ```
+
+The validation script runs `cargo fmt --check` and `cargo test` against this crate.
 
 Build the Python extension for local development after installing maturin:
 
