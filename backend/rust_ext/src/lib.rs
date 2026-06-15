@@ -1,6 +1,7 @@
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use serde_json::Value;
+use sha2::{Digest, Sha256};
 
 const EXTENSION_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -20,15 +21,38 @@ fn canonicalize_json(input: &str) -> PyResult<String> {
         .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
 }
 
+#[pyfunction]
+fn hash_config_json(input: &str) -> PyResult<String> {
+    hash_config_json_str(input)
+        .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
+}
+
 fn canonicalize_json_str(input: &str) -> Result<String, serde_json::Error> {
     let value: Value = serde_json::from_str(input)?;
     serde_json::to_string(&value)
+}
+
+fn hash_config_json_str(input: &str) -> Result<String, serde_json::Error> {
+    let canonical = canonicalize_json_str(input)?;
+    let digest = Sha256::digest(canonical.as_bytes());
+    Ok(format!("sha256:{}", to_lower_hex(&digest)))
+}
+
+fn to_lower_hex(bytes: &[u8]) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut output = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        output.push(HEX[(byte >> 4) as usize] as char);
+        output.push(HEX[(byte & 0x0f) as usize] as char);
+    }
+    output
 }
 
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(canonicalize_json, m)?)?;
     m.add_function(wrap_pyfunction!(extension_version, m)?)?;
+    m.add_function(wrap_pyfunction!(hash_config_json, m)?)?;
     m.add_function(wrap_pyfunction!(health_check, m)?)?;
     Ok(())
 }
@@ -73,5 +97,33 @@ mod tests {
     #[test]
     fn canonicalize_json_rejects_invalid_input() {
         assert!(canonicalize_json_str(r#"{"missing": "brace""#).is_err());
+    }
+
+    #[test]
+    fn hash_config_json_is_stable_for_equivalent_object_ordering() {
+        let first = hash_config_json_str(r#"{"z":3,"a":{"b":2,"a":1}}"#).unwrap();
+        let second = hash_config_json_str(r#"{"a":{"a":1,"b":2},"z":3}"#).unwrap();
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn hash_config_json_is_sensitive_to_array_order() {
+        let first = hash_config_json_str(r#"{"items":[1,2,3]}"#).unwrap();
+        let second = hash_config_json_str(r#"{"items":[3,2,1]}"#).unwrap();
+        assert_ne!(first, second);
+    }
+
+    #[test]
+    fn hash_config_json_returns_sha256_digest() {
+        let digest = hash_config_json_str(r#"{"a":1}"#).unwrap();
+        assert_eq!(
+            digest,
+            "sha256:015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862"
+        );
+    }
+
+    #[test]
+    fn hash_config_json_rejects_invalid_input() {
+        assert!(hash_config_json_str(r#"{"missing": "brace""#).is_err());
     }
 }
