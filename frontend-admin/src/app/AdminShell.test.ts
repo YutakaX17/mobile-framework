@@ -31,6 +31,7 @@ describe("admin shell model", () => {
       "/deployments"
     ]);
     expect(findAdminRoute("/forms")?.label).toBe("Forms");
+    expect(findAdminRoute("/forms")?.capabilities).toEqual(["forms:manage"]);
     expect(findAdminRoute("/unknown")).toBeUndefined();
   });
 

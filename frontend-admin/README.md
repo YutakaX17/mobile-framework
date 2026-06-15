@@ -37,6 +37,10 @@ Admin shell icons are registered in `src/design-system/icons.tsx` and rendered t
 
 The shell layout keeps sidebar navigation, topbar actions, workspace content, skip navigation, and the authenticated user menu in `src/app/AdminShell.tsx`. Topbar action metadata lives in `src/app/shellLayoutModel.ts`.
 
+## Permissions
+
+The initial permissions guard lives in `src/auth/permissions.ts`. Admin routes compare authenticated user roles against module contribution capabilities before rendering protected workspaces.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -56,7 +60,7 @@ npm run validate
 
 - `src/app`: application shell, routing, auth, permissions, global layout. Initial shell layout, route foundation, and login view exist.
 - `src/api`: typed API client foundation and request/error primitives.
-- `src/auth`: local auth session model, provider, and guard helpers.
+- `src/auth`: local auth session model, provider, permission helpers, and guard helpers.
 - `src/modules`: typed frontend module contribution registry.
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
 - `src/design-system`: typed tokens, icons, components, accessibility helpers, previews. Initial token and icon foundations exist.
