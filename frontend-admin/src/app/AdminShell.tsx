@@ -1,13 +1,19 @@
 import { NavLink } from "react-router-dom";
 
 import { useAuthSession } from "../auth/AuthProvider";
+import { canAccessModule } from "../auth/permissions";
 import { AdminIcon } from "../design-system";
+import { findAdminModuleByRoute } from "../modules/moduleRegistry";
 import { AdminRoutes, adminRoutes, useCurrentRoute } from "./routes";
 import { getShellActionClassName, getUserRoleLabel, shellActions } from "./shellLayoutModel";
 
 export function AdminShell() {
   const currentRoute = useCurrentRoute();
   const { signOut, state } = useAuthSession();
+  const visibleRoutes = adminRoutes.filter((route) => {
+    const module = findAdminModuleByRoute(route.path);
+    return module ? canAccessModule(state.user, module) : false;
+  });
 
   return (
     <main className="admin-shell">
@@ -22,7 +28,7 @@ export function AdminShell() {
           <span className="brand-name">Mobile Framework</span>
         </div>
         <nav className="nav-list">
-          {adminRoutes.map((route) => (
+          {visibleRoutes.map((route) => (
             <NavLink
               className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
               key={route.path}
