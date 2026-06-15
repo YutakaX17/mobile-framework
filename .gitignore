@@ -27,6 +27,8 @@ dist/
 build/
 coverage/
 .vite/
+playwright-report/
+test-results/
 
 # Rust
 backend/rust_ext/target/
