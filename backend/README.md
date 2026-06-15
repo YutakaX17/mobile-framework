@@ -19,6 +19,7 @@ The backend includes a minimal Django project:
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry, manifest validation, dependency validation, and compatibility validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
+- `apps/themes`: initial tenant-scoped theme model and revision baseline backed by shared theme schema validation.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 - `rust_ext`: initial PyO3/maturin scaffold for bounded native helpers.
 
@@ -47,7 +48,7 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.audit tests --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.audit tests --settings=config.settings.test
 ```
 
 Local development uses SQLite by default. To point development settings at the Compose PostgreSQL service, start the service and set:
@@ -76,7 +77,7 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/app_builder`: app definitions, navigation, screens, actions, publish states.
 - `apps/form_builder`: form definitions, fields, validation, submissions.
 - `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation.
-- `apps/theme_builder`: design tokens, theme validation, preview, publishing.
+- `apps/themes`: design tokens, theme validation, preview, publishing. Initial theme model and revision baseline exists.
 - `apps/deployments`: immutable package compilation, signing, channels, rollback.
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
 - `apps/audit`: mutation logs, config revisions, admin and sync audit events. Initial audit event model baseline exists.
