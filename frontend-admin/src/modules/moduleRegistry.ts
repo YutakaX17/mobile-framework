@@ -1,0 +1,135 @@
+export type AdminModuleArea = "builder" | "core" | "operations";
+
+export type AdminModuleContribution = {
+  area: AdminModuleArea;
+  capabilities: string[];
+  id: string;
+  label: string;
+  order: number;
+  routePath: string;
+  section: string;
+  summary: string;
+};
+
+export type ModuleRegistryValidation = {
+  duplicateIds: string[];
+  duplicateRoutePaths: string[];
+  isValid: boolean;
+};
+
+export const adminModuleContributions: AdminModuleContribution[] = [
+  {
+    area: "core",
+    capabilities: ["dashboard:view"],
+    id: "dashboard",
+    label: "Dashboard",
+    order: 10,
+    routePath: "/dashboard",
+    section: "Admin dashboard",
+    summary: "Operational control surface"
+  },
+  {
+    area: "builder",
+    capabilities: ["apps:manage"],
+    id: "apps",
+    label: "Apps",
+    order: 20,
+    routePath: "/apps",
+    section: "App builder",
+    summary: "App composition workspace"
+  },
+  {
+    area: "builder",
+    capabilities: ["forms:manage"],
+    id: "forms",
+    label: "Forms",
+    order: 30,
+    routePath: "/forms",
+    section: "Form builder",
+    summary: "Form definition workspace"
+  },
+  {
+    area: "builder",
+    capabilities: ["themes:manage"],
+    id: "themes",
+    label: "Themes",
+    order: 40,
+    routePath: "/themes",
+    section: "Theme builder",
+    summary: "Design token workspace"
+  },
+  {
+    area: "operations",
+    capabilities: ["workflows:manage"],
+    id: "workflows",
+    label: "Workflows",
+    order: 50,
+    routePath: "/workflows",
+    section: "Workflow builder",
+    summary: "Approval and automation workspace"
+  },
+  {
+    area: "operations",
+    capabilities: ["deployments:manage"],
+    id: "deployments",
+    label: "Deployments",
+    order: 60,
+    routePath: "/deployments",
+    section: "Deployment manager",
+    summary: "Package release workspace"
+  }
+];
+
+export function getOrderedAdminModules(
+  contributions: AdminModuleContribution[] = adminModuleContributions
+): AdminModuleContribution[] {
+  return [...contributions].sort((left, right) => left.order - right.order || left.label.localeCompare(right.label));
+}
+
+export function findAdminModuleByRoute(
+  routePath: string,
+  contributions: AdminModuleContribution[] = adminModuleContributions
+): AdminModuleContribution | undefined {
+  return contributions.find((contribution) => contribution.routePath === routePath);
+}
+
+export function validateAdminModuleRegistry(
+  contributions: AdminModuleContribution[] = adminModuleContributions
+): ModuleRegistryValidation {
+  const duplicateIds = findDuplicates(contributions.map((contribution) => contribution.id));
+  const duplicateRoutePaths = findDuplicates(contributions.map((contribution) => contribution.routePath));
+
+  return {
+    duplicateIds,
+    duplicateRoutePaths,
+    isValid: duplicateIds.length === 0 && duplicateRoutePaths.length === 0
+  };
+}
+
+export function registerAdminModule(
+  contributions: AdminModuleContribution[],
+  contribution: AdminModuleContribution
+): AdminModuleContribution[] {
+  const nextContributions = [...contributions, contribution];
+  const validation = validateAdminModuleRegistry(nextContributions);
+
+  if (!validation.isValid) {
+    throw new Error("Admin module registry contains duplicate ids or route paths.");
+  }
+
+  return getOrderedAdminModules(nextContributions);
+}
+
+function findDuplicates(values: string[]): string[] {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      duplicates.add(value);
+    }
+    seen.add(value);
+  }
+
+  return [...duplicates].sort();
+}
