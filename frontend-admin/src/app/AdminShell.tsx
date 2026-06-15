@@ -22,14 +22,14 @@ export function AdminShell() {
       <a className="skip-link" href="#workspace-content">
         Skip to workspace
       </a>
-      <aside className="sidebar" aria-label="Primary navigation">
+      <aside className="sidebar">
         <div className="brand-block">
           <span className="brand-mark" aria-hidden="true">
             MF
           </span>
           <span className="brand-name">Mobile Framework</span>
         </div>
-        <nav className="nav-list">
+        <nav className="nav-list" aria-label="Primary navigation">
           {visibleRoutes.map((route) => (
             <NavLink
               className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}

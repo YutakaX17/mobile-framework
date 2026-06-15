@@ -53,6 +53,8 @@ The local notification system lives in `src/app/NotificationProvider.tsx` and `s
 
 Vitest is the unit test runner. Shared fixture builders live in `src/tests/testFixtures.ts` for auth users, module contributions, and notifications.
 
+Playwright smoke tests live in `src/tests/smoke` and run through `npm run smoke`. The repository validation command runs unit tests, production build checks, and the smoke suite.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -65,6 +67,7 @@ Equivalent direct commands from `frontend-admin/`:
 
 ```powershell
 npm ci
+npx playwright install chromium
 npm run validate
 ```
 

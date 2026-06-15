@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "smoke": "playwright test",
     "test": "vitest run",
-    "validate": "npm run test && npm run build"
+    "validate": "npm run test && npm run build && npm run smoke"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
@@ -16,6 +18,7 @@
     "react-router-dom": "^7.17.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
