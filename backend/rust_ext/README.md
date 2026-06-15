@@ -34,5 +34,6 @@ python -m maturin develop --manifest-path backend/rust_ext/Cargo.toml
 - `diff_app_json(old_input, new_input)`: compares two app definition JSON payloads and returns a deterministic JSON array of changes with `change_type`, `path`, and `old`/`new` values where applicable.
 - `hash_config_json(input)`: canonicalizes JSON and returns a stable `sha256:<hex>` digest for configuration payloads.
 - `hash_package_json(input)`: canonicalizes JSON and returns a stable `sha256:<hex>` digest for deployment package payloads.
+- `merge_sync_json(base_input, local_input, remote_input)`: performs a deterministic three-way JSON merge and returns `{"status":"merged"|"conflict","merged":...,"conflicts":[...]}`. Conflicts include stable `path`, `base`, `local`, and `remote` values.
 
-Package signing and sync merge helpers should be added in separate tracked tasks.
+Package signing and sync endpoint/model work should be added in separate tracked tasks.

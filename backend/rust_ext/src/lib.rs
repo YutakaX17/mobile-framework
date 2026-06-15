@@ -41,6 +41,12 @@ fn hash_package_json(input: &str) -> PyResult<String> {
         .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
 }
 
+#[pyfunction]
+fn merge_sync_json(base_input: &str, local_input: &str, remote_input: &str) -> PyResult<String> {
+    merge_sync_json_str(base_input, local_input, remote_input)
+        .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
+}
+
 fn canonicalize_json_str(input: &str) -> Result<String, serde_json::Error> {
     let value: Value = serde_json::from_str(input)?;
     serde_json::to_string(&value)
@@ -126,6 +132,101 @@ fn array_path(parent: &str, index: usize) -> String {
     format!("{parent}[{index}]")
 }
 
+fn merge_sync_json_str(
+    base_input: &str,
+    local_input: &str,
+    remote_input: &str,
+) -> Result<String, serde_json::Error> {
+    let base_value: Value = serde_json::from_str(base_input)?;
+    let local_value: Value = serde_json::from_str(local_input)?;
+    let remote_value: Value = serde_json::from_str(remote_input)?;
+    let (merged, conflicts) = merge_values(
+        "$",
+        Some(&base_value),
+        Some(&local_value),
+        Some(&remote_value),
+    );
+    let status = if conflicts.is_empty() {
+        "merged"
+    } else {
+        "conflict"
+    };
+    serde_json::to_string(&json!({
+        "status": status,
+        "merged": merged,
+        "conflicts": conflicts
+    }))
+}
+
+fn merge_values(
+    path: &str,
+    base_value: Option<&Value>,
+    local_value: Option<&Value>,
+    remote_value: Option<&Value>,
+) -> (Value, Vec<Value>) {
+    if local_value == remote_value {
+        return (local_value.cloned().unwrap_or(Value::Null), Vec::new());
+    }
+    if base_value == local_value {
+        return (remote_value.cloned().unwrap_or(Value::Null), Vec::new());
+    }
+    if base_value == remote_value {
+        return (local_value.cloned().unwrap_or(Value::Null), Vec::new());
+    }
+
+    if let (
+        Some(Value::Object(base_map)),
+        Some(Value::Object(local_map)),
+        Some(Value::Object(remote_map)),
+    ) = (base_value, local_value, remote_value)
+    {
+        let keys: BTreeSet<_> = base_map
+            .keys()
+            .chain(local_map.keys())
+            .chain(remote_map.keys())
+            .collect();
+        let mut merged_map = serde_json::Map::new();
+        let mut conflicts = Vec::new();
+        for key in keys {
+            let child_path = object_path(path, key);
+            let (merged_child, child_conflicts) = merge_values(
+                &child_path,
+                base_map.get(key),
+                local_map.get(key),
+                remote_map.get(key),
+            );
+            if local_map.contains_key(key)
+                || remote_map.contains_key(key)
+                || !child_conflicts.is_empty()
+            {
+                if !matches!(merged_child, Value::Null)
+                    || local_map.contains_key(key)
+                    || remote_map.contains_key(key)
+                {
+                    merged_map.insert(key.to_string(), merged_child);
+                }
+            }
+            conflicts.extend(child_conflicts);
+        }
+        return (Value::Object(merged_map), conflicts);
+    }
+
+    let merged = remote_value
+        .or(local_value)
+        .or(base_value)
+        .cloned()
+        .unwrap_or(Value::Null);
+    (
+        merged,
+        vec![json!({
+            "path": path,
+            "base": base_value.cloned().unwrap_or(Value::Null),
+            "local": local_value.cloned().unwrap_or(Value::Null),
+            "remote": remote_value.cloned().unwrap_or(Value::Null)
+        })],
+    )
+}
+
 fn hash_config_json_str(input: &str) -> Result<String, serde_json::Error> {
     canonical_json_sha256(input)
 }
@@ -158,6 +259,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(hash_config_json, m)?)?;
     m.add_function(wrap_pyfunction!(hash_package_json, m)?)?;
     m.add_function(wrap_pyfunction!(health_check, m)?)?;
+    m.add_function(wrap_pyfunction!(merge_sync_json, m)?)?;
     Ok(())
 }
 
@@ -322,5 +424,147 @@ mod tests {
     #[test]
     fn hash_package_json_rejects_invalid_input() {
         assert!(hash_package_json_str(r#"{"missing": "brace""#).is_err());
+    }
+
+    #[test]
+    fn merge_sync_json_returns_unchanged_payload_without_conflicts() {
+        let result = merge_sync_json_str(
+            r#"{"entity_id":"patient_1","version":1}"#,
+            r#"{"entity_id":"patient_1","version":1}"#,
+            r#"{"entity_id":"patient_1","version":1}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result).unwrap(),
+            json!({
+                "status": "merged",
+                "merged": {"entity_id": "patient_1", "version": 1},
+                "conflicts": []
+            })
+        );
+    }
+
+    #[test]
+    fn merge_sync_json_applies_local_only_change() {
+        let result = merge_sync_json_str(
+            r#"{"name":"Old","version":1}"#,
+            r#"{"name":"Local","version":1}"#,
+            r#"{"name":"Old","version":1}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result).unwrap(),
+            json!({
+                "status": "merged",
+                "merged": {"name": "Local", "version": 1},
+                "conflicts": []
+            })
+        );
+    }
+
+    #[test]
+    fn merge_sync_json_applies_remote_only_change() {
+        let result = merge_sync_json_str(
+            r#"{"name":"Old","version":1}"#,
+            r#"{"name":"Old","version":1}"#,
+            r#"{"name":"Remote","version":1}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result).unwrap(),
+            json!({
+                "status": "merged",
+                "merged": {"name": "Remote", "version": 1},
+                "conflicts": []
+            })
+        );
+    }
+
+    #[test]
+    fn merge_sync_json_merges_non_conflicting_object_changes() {
+        let result = merge_sync_json_str(
+            r#"{"name":"Old","status":"draft","metadata":{"priority":"normal"}}"#,
+            r#"{"name":"Local","status":"draft","metadata":{"priority":"normal"}}"#,
+            r#"{"name":"Old","status":"submitted","metadata":{"priority":"high"}}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result).unwrap(),
+            json!({
+                "status": "merged",
+                "merged": {
+                    "name": "Local",
+                    "status": "submitted",
+                    "metadata": {"priority": "high"}
+                },
+                "conflicts": []
+            })
+        );
+    }
+
+    #[test]
+    fn merge_sync_json_reports_conflicting_scalar_change() {
+        let result = merge_sync_json_str(
+            r#"{"status":"draft"}"#,
+            r#"{"status":"local"}"#,
+            r#"{"status":"remote"}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result).unwrap(),
+            json!({
+                "status": "conflict",
+                "merged": {"status": "remote"},
+                "conflicts": [
+                    {
+                        "path": "$.status",
+                        "base": "draft",
+                        "local": "local",
+                        "remote": "remote"
+                    }
+                ]
+            })
+        );
+    }
+
+    #[test]
+    fn merge_sync_json_reports_conflicting_array_change() {
+        let result = merge_sync_json_str(
+            r#"{"screens":["home"]}"#,
+            r#"{"screens":["home","intake"]}"#,
+            r#"{"screens":["home","settings"]}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result).unwrap(),
+            json!({
+                "status": "conflict",
+                "merged": {"screens": ["home", "settings"]},
+                "conflicts": [
+                    {
+                        "path": "$.screens",
+                        "base": ["home"],
+                        "local": ["home", "intake"],
+                        "remote": ["home", "settings"]
+                    }
+                ]
+            })
+        );
+    }
+
+    #[test]
+    fn merge_sync_json_rejects_invalid_input() {
+        assert!(
+            merge_sync_json_str(r#"{"missing": "brace""#, r#"{"ok":true}"#, r#"{"ok":true}"#)
+                .is_err()
+        );
+        assert!(
+            merge_sync_json_str(r#"{"ok":true}"#, r#"{"missing": "brace""#, r#"{"ok":true}"#)
+                .is_err()
+        );
+        assert!(
+            merge_sync_json_str(r#"{"ok":true}"#, r#"{"ok":true}"#, r#"{"missing": "brace""#)
+                .is_err()
+        );
     }
 }
