@@ -30,7 +30,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` M1 Backend Kernel.
 - `[x]` M2 Contracts And Rust Extension.
 - `[x]` M3 Admin Shell.
-- `[ ]` M4 Theme And Form Builder MVP.
+- `[~]` M4 Theme And Form Builder MVP.
 - `[ ]` M5 Mobile Runtime MVP.
 - `[ ]` M6 Workflow And Deployment MVP.
 - `[ ]` M7 Production Hardening.
@@ -43,7 +43,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-03 Rust Extension.
 - `[x]` EPIC-04 Shared Contracts.
 - `[x]` EPIC-05 Admin Frontend Shell.
-- `[ ]` EPIC-06 Theme Builder.
+- `[~]` EPIC-06 Theme Builder.
 - `[ ]` EPIC-07 Form Builder.
 - `[ ]` EPIC-08 App And Screen Builder.
 - `[ ]` EPIC-09 Deployment Packages.
@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-06 Theme Builder: next planned epic after completing the admin frontend shell foundation.
+- `[~]` EPIC-06 Theme Builder: theme backend model baseline is in progress under task `#127`.
 
 ## Completed Work
 
@@ -101,6 +101,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#122` completed: admin frontend testing setup added.
 - `[x]` Task `#124` completed: admin frontend Playwright smoke test added.
 - `[x]` EPIC-05 Admin Frontend Shell completed: Vite React TypeScript scaffold, routing, API client, auth shell, module registry, design system, icons, shell layout, permissions guard, error boundary, notifications, testing setup, Playwright smoke test, documentation, and CI validation are in place.
+- `[x]` Task `#127` completed: theme backend model baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
