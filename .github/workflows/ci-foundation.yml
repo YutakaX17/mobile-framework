@@ -46,5 +46,10 @@ jobs:
           rustc --version
           cargo --version
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Validate Rust extension
-        run: python tools/validate_rust_ext.py
+        run: python tools/validate_rust_ext.py --include-python-wrapper
