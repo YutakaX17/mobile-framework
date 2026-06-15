@@ -33,3 +33,18 @@ jobs:
 
       - name: Validate backend scaffold
         run: python tools/validate_backend.py
+
+  validate-rust-extension:
+    name: Validate Rust Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: Validate Rust extension
+        run: python tools/validate_rust_ext.py

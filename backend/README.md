@@ -36,6 +36,12 @@ Run backend validation from the repository root:
 python tools/validate_backend.py
 ```
 
+Run Rust extension validation from the repository root:
+
+```powershell
+python tools/validate_rust_ext.py
+```
+
 Equivalent direct commands:
 
 ```powershell
