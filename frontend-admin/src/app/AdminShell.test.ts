@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { countQueueItemsByStatus, shellMetrics, workQueue } from "./adminShellModel";
 import { adminRoutes, findAdminRoute } from "./routes";
+import { getShellActionClassName, getUserRoleLabel, shellActions } from "./shellLayoutModel";
 
 describe("admin shell model", () => {
   it("starts with operational dashboard metrics", () => {
@@ -31,5 +32,12 @@ describe("admin shell model", () => {
     ]);
     expect(findAdminRoute("/forms")?.label).toBe("Forms");
     expect(findAdminRoute("/unknown")).toBeUndefined();
+  });
+
+  it("defines shell actions and user menu labels", () => {
+    expect(shellActions.map((action) => action.id)).toEqual(["validate", "publish-review"]);
+    expect(getShellActionClassName(shellActions[1])).toBe("primary-action");
+    expect(getUserRoleLabel(["platform-admin", "builder"])).toBe("platform-admin, builder");
+    expect(getUserRoleLabel([])).toBe("No roles assigned");
   });
 });

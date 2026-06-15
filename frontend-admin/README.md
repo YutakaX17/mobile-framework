@@ -33,6 +33,10 @@ The design token foundation lives in `src/design-system/tokens.ts`. Shell CSS co
 
 Admin shell icons are registered in `src/design-system/icons.tsx` and rendered through `AdminIcon`, currently backed by Lucide React.
 
+## Shell Layout
+
+The shell layout keeps sidebar navigation, topbar actions, workspace content, skip navigation, and the authenticated user menu in `src/app/AdminShell.tsx`. Topbar action metadata lives in `src/app/shellLayoutModel.ts`.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -50,7 +54,7 @@ npm run validate
 
 ## Planned Areas
 
-- `src/app`: application shell, routing, auth, permissions, global layout. Initial shell, route foundation, and login view exist.
+- `src/app`: application shell, routing, auth, permissions, global layout. Initial shell layout, route foundation, and login view exist.
 - `src/api`: typed API client foundation and request/error primitives.
 - `src/auth`: local auth session model, provider, and guard helpers.
 - `src/modules`: typed frontend module contribution registry.

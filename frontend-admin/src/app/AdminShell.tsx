@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useAuthSession } from "../auth/AuthProvider";
 import { AdminIcon } from "../design-system";
 import { AdminRoutes, adminRoutes, useCurrentRoute } from "./routes";
+import { getShellActionClassName, getUserRoleLabel, shellActions } from "./shellLayoutModel";
 
 export function AdminShell() {
   const currentRoute = useCurrentRoute();
@@ -10,6 +11,9 @@ export function AdminShell() {
 
   return (
     <main className="admin-shell">
+      <a className="skip-link" href="#workspace-content">
+        Skip to workspace
+      </a>
       <aside className="sidebar" aria-label="Primary navigation">
         <div className="brand-block">
           <span className="brand-mark" aria-hidden="true">
@@ -33,28 +37,36 @@ export function AdminShell() {
 
       <section className="workspace">
         <header className="topbar">
-          <div>
+          <div className="topbar-main">
             <p className="eyebrow">{currentRoute?.section ?? "Unknown route"}</p>
             <h1>{currentRoute?.summary ?? "Workspace not found"}</h1>
           </div>
           <div className="topbar-actions" aria-label="Current workspace controls">
-            <span className="user-chip">{state.user?.displayName}</span>
-            <button type="button">
-              <AdminIcon name="validate" />
-              Validate
-            </button>
-            <button type="button" className="primary-action">
-              <AdminIcon name="publish" />
-              Publish review
-            </button>
-            <button type="button" onClick={signOut}>
-              <AdminIcon name="signOut" />
-              Sign out
-            </button>
+            {shellActions.map((action) => (
+              <button className={getShellActionClassName(action)} key={action.id} type="button">
+                <AdminIcon name={action.icon} />
+                {action.label}
+              </button>
+            ))}
+            <details className="user-menu">
+              <summary>
+                <span className="user-chip">{state.user?.displayName}</span>
+              </summary>
+              <div className="user-menu-panel">
+                <strong>{state.user?.email}</strong>
+                <span>{getUserRoleLabel(state.user?.roles ?? [])}</span>
+                <button type="button" onClick={signOut}>
+                  <AdminIcon name="signOut" />
+                  Sign out
+                </button>
+              </div>
+            </details>
           </div>
         </header>
 
-        <AdminRoutes />
+        <section className="workspace-content" id="workspace-content" tabIndex={-1}>
+          <AdminRoutes />
+        </section>
       </section>
     </main>
   );
