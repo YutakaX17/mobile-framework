@@ -25,6 +25,10 @@ The initial auth shell lives in `src/auth` and protects admin routes behind a de
 
 Admin navigation and workspace metadata are sourced from `src/modules/moduleRegistry.ts`, which provides the first typed contribution registry for future frontend modules.
 
+## Design System
+
+The design token foundation lives in `src/design-system/tokens.ts`. Shell CSS consumes the same token names as custom properties under the `--mf-*` prefix.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -47,6 +51,6 @@ npm run validate
 - `src/auth`: local auth session model, provider, and guard helpers.
 - `src/modules`: typed frontend module contribution registry.
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
-- `src/design-system`: tokens, components, accessibility helpers, previews.
+- `src/design-system`: typed tokens, components, accessibility helpers, previews. Initial token foundation exists.
 - `src/generated`: generated contract/API types.
 - `src/tests`: shared test utilities and smoke tests.

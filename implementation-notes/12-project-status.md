@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-05 Admin Frontend Shell: initial Vite React TypeScript scaffold, routing foundation, API client foundation, auth shell, and module registry are complete; design system foundation remains pending.
+- `[~]` EPIC-05 Admin Frontend Shell: initial Vite React TypeScript scaffold, routing foundation, API client foundation, auth shell, module registry, and design system foundation are complete; icon system, permissions guard, error boundary, notifications, and Playwright smoke test remain pending.
 
 ## Completed Work
 
@@ -92,6 +92,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#104` completed: admin frontend API client foundation added.
 - `[x]` Task `#106` completed: admin frontend auth flow shell added.
 - `[x]` Task `#108` completed: admin frontend module contribution registry added.
+- `[x]` Task `#110` completed: admin frontend design system foundation added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
