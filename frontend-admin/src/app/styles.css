@@ -53,11 +53,15 @@ input {
 }
 
 button {
+  align-items: center;
   border: 1px solid var(--mf-color-border-strong);
   border-radius: var(--mf-radius-sm);
   background: var(--mf-color-surface);
   color: var(--mf-color-text);
   cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
   min-height: 38px;
   padding: 0 14px;
 }
@@ -113,10 +117,17 @@ input:focus-visible,
 }
 
 .nav-link {
+  align-items: center;
   border-radius: var(--mf-radius-sm);
   color: #dfe7e3;
+  display: flex;
+  gap: 10px;
   padding: 10px 12px;
   text-decoration: none;
+}
+
+.icon {
+  flex: 0 0 auto;
 }
 
 .nav-link.active {

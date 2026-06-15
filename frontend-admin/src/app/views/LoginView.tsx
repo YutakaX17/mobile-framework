@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useAuthSession } from "../../auth/AuthProvider";
 import { getPostLoginPath } from "../../auth/authSession";
+import { AdminIcon } from "../../design-system";
 
 export function LoginView() {
   const { signIn, state } = useAuthSession();
@@ -38,6 +39,7 @@ export function LoginView() {
             value={email}
           />
           <button className="primary-action" type="submit">
+            <AdminIcon name="login" />
             Continue
           </button>
         </form>
