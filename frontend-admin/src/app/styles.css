@@ -418,6 +418,79 @@ input:focus-visible,
   color: #7f2b2b;
 }
 
+.status-published,
+.status-validated {
+  background: var(--mf-color-good-surface);
+  color: #245b35;
+}
+
+.status-archived,
+.status-rejected {
+  background: var(--mf-color-critical-surface);
+  color: #7f2b2b;
+}
+
+.theme-list-view {
+  display: grid;
+  gap: 18px;
+}
+
+.theme-summary-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.theme-list {
+  display: grid;
+  gap: 12px;
+}
+
+.theme-card {
+  align-items: start;
+  background: var(--mf-color-surface);
+  border: 1px solid var(--mf-color-border);
+  border-radius: var(--mf-radius-md);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
+  padding: 18px;
+}
+
+.theme-card h3 {
+  margin: 0 0 8px;
+}
+
+.theme-card p:last-child {
+  color: var(--mf-color-text-muted);
+  margin-bottom: 0;
+}
+
+.theme-meta {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.theme-meta div {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.theme-meta dt {
+  color: var(--mf-color-text-muted);
+  font-size: 0.82rem;
+  font-weight: var(--mf-font-weight-bold);
+}
+
+.theme-meta dd {
+  margin: 0;
+}
+
 .login-shell {
   align-items: center;
   display: grid;
@@ -502,6 +575,10 @@ input:focus-visible,
 
   .metrics-grid {
     grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+
+  .theme-card {
+    grid-template-columns: 1fr;
   }
 }
 

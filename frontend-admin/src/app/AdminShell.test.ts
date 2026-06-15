@@ -35,6 +35,10 @@ describe("admin shell model", () => {
     expect(findAdminRoute("/unknown")).toBeUndefined();
   });
 
+  it("routes themes to a dedicated workspace", () => {
+    expect(findAdminRoute("/themes")?.summary).toBe("Design token workspace");
+  });
+
   it("defines shell actions and user menu labels", () => {
     expect(shellActions.map((action) => action.id)).toEqual(["validate", "publish-review"]);
     expect(shellActions.map((action) => action.notification.title)).toEqual([

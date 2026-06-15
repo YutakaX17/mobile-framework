@@ -49,6 +49,10 @@ The app is wrapped by `src/app/ErrorBoundary.tsx` so render failures show a stab
 
 The local notification system lives in `src/app/NotificationProvider.tsx` and `src/app/notificationModel.ts`. Shell actions enqueue accessible notifications through the shared provider.
 
+## Theme Builder
+
+The `/themes` workspace renders the initial read-only theme list page. Theme API helpers live in `src/api/themeApi.ts`.
+
 ## Testing
 
 Vitest is the unit test runner. Shared fixture builders live in `src/tests/testFixtures.ts` for auth users, module contributions, and notifications.
