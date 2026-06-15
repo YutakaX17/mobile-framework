@@ -1,9 +1,11 @@
 import { NavLink } from "react-router-dom";
 
+import { useAuthSession } from "../auth/AuthProvider";
 import { AdminRoutes, adminRoutes, useCurrentRoute } from "./routes";
 
 export function AdminShell() {
   const currentRoute = useCurrentRoute();
+  const { signOut, state } = useAuthSession();
 
   return (
     <main className="admin-shell">
@@ -34,9 +36,13 @@ export function AdminShell() {
             <h1>{currentRoute?.summary ?? "Workspace not found"}</h1>
           </div>
           <div className="topbar-actions" aria-label="Current workspace controls">
+            <span className="user-chip">{state.user?.displayName}</span>
             <button type="button">Validate</button>
             <button type="button" className="primary-action">
               Publish review
+            </button>
+            <button type="button" onClick={signOut}>
+              Sign out
             </button>
           </div>
         </header>

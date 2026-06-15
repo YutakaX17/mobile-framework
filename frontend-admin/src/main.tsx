@@ -2,8 +2,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import { AdminShell } from "./app/AdminShell";
+import { AppRoutes } from "./app/AppRoutes";
 import "./app/styles.css";
+import { AuthProvider } from "./auth/AuthProvider";
 
 const root = document.getElementById("root");
 
@@ -14,7 +15,9 @@ if (!root) {
 createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
-      <AdminShell />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 );
