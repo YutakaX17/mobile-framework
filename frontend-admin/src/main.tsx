@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
 import { AdminShell } from "./app/AdminShell";
 import "./app/styles.css";
@@ -12,6 +13,8 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <AdminShell />
+    <BrowserRouter>
+      <AdminShell />
+    </BrowserRouter>
   </StrictMode>,
 );

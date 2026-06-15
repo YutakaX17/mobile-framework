@@ -1,6 +1,17 @@
 # Frontend Admin
 
-Vite, React, and TypeScript admin builder frontend. The current scaffold provides the app entrypoint, an operational admin shell placeholder, and local validation wiring.
+Vite, React, and TypeScript admin builder frontend. The current scaffold provides the app entrypoint, an operational admin shell, initial route map, and local validation wiring.
+
+## Routing
+
+Initial admin navigation is defined in `src/app/routes.tsx` and currently registers:
+
+- `/dashboard`
+- `/apps`
+- `/forms`
+- `/themes`
+- `/workflows`
+- `/deployments`
 
 ## Local Validation
 
@@ -19,7 +30,7 @@ npm run validate
 
 ## Planned Areas
 
-- `src/app`: application shell, routing, auth, permissions, global layout. Initial shell scaffold exists.
+- `src/app`: application shell, routing, auth, permissions, global layout. Initial shell and route foundation exist.
 - `src/modules`: frontend module contribution registry.
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
 - `src/design-system`: tokens, components, accessibility helpers, previews.
