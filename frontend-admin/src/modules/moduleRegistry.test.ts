@@ -49,6 +49,7 @@ describe("admin module registry", () => {
     const contribution: AdminModuleContribution = {
       area: "builder",
       capabilities: ["reports:manage"],
+      icon: "apps",
       id: "reports",
       label: "Reports",
       order: 25,

@@ -29,6 +29,10 @@ Admin navigation and workspace metadata are sourced from `src/modules/moduleRegi
 
 The design token foundation lives in `src/design-system/tokens.ts`. Shell CSS consumes the same token names as custom properties under the `--mf-*` prefix.
 
+## Icon System
+
+Admin shell icons are registered in `src/design-system/icons.tsx` and rendered through `AdminIcon`, currently backed by Lucide React.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -51,6 +55,6 @@ npm run validate
 - `src/auth`: local auth session model, provider, and guard helpers.
 - `src/modules`: typed frontend module contribution registry.
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
-- `src/design-system`: typed tokens, components, accessibility helpers, previews. Initial token foundation exists.
+- `src/design-system`: typed tokens, icons, components, accessibility helpers, previews. Initial token and icon foundations exist.
 - `src/generated`: generated contract/API types.
 - `src/tests`: shared test utilities and smoke tests.

@@ -1,8 +1,11 @@
+import type { IconName } from "../design-system";
+
 export type AdminModuleArea = "builder" | "core" | "operations";
 
 export type AdminModuleContribution = {
   area: AdminModuleArea;
   capabilities: string[];
+  icon: IconName;
   id: string;
   label: string;
   order: number;
@@ -21,6 +24,7 @@ export const adminModuleContributions: AdminModuleContribution[] = [
   {
     area: "core",
     capabilities: ["dashboard:view"],
+    icon: "dashboard",
     id: "dashboard",
     label: "Dashboard",
     order: 10,
@@ -31,6 +35,7 @@ export const adminModuleContributions: AdminModuleContribution[] = [
   {
     area: "builder",
     capabilities: ["apps:manage"],
+    icon: "apps",
     id: "apps",
     label: "Apps",
     order: 20,
@@ -41,6 +46,7 @@ export const adminModuleContributions: AdminModuleContribution[] = [
   {
     area: "builder",
     capabilities: ["forms:manage"],
+    icon: "forms",
     id: "forms",
     label: "Forms",
     order: 30,
@@ -51,6 +57,7 @@ export const adminModuleContributions: AdminModuleContribution[] = [
   {
     area: "builder",
     capabilities: ["themes:manage"],
+    icon: "themes",
     id: "themes",
     label: "Themes",
     order: 40,
@@ -61,6 +68,7 @@ export const adminModuleContributions: AdminModuleContribution[] = [
   {
     area: "operations",
     capabilities: ["workflows:manage"],
+    icon: "workflows",
     id: "workflows",
     label: "Workflows",
     order: 50,
@@ -71,6 +79,7 @@ export const adminModuleContributions: AdminModuleContribution[] = [
   {
     area: "operations",
     capabilities: ["deployments:manage"],
+    icon: "deployments",
     id: "deployments",
     label: "Deployments",
     order: 60,

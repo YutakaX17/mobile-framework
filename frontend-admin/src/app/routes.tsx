@@ -1,17 +1,20 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { findAdminModuleByRoute, getOrderedAdminModules } from "../modules/moduleRegistry";
+import type { IconName } from "../design-system";
 import { DashboardView } from "./views/DashboardView";
 import { PlaceholderView } from "./views/PlaceholderView";
 
 export type AdminRoute = {
   path: string;
   label: string;
+  icon: IconName;
   section: string;
   summary: string;
 };
 
 export const adminRoutes: AdminRoute[] = getOrderedAdminModules().map((module) => ({
+  icon: module.icon,
   label: module.label,
   path: module.routePath,
   section: module.section,
@@ -27,6 +30,7 @@ export function findAdminRoute(pathname: string): AdminRoute | undefined {
 
   return {
     label: module.label,
+    icon: module.icon,
     path: module.routePath,
     section: module.section,
     summary: module.summary

@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 import { useAuthSession } from "../auth/AuthProvider";
+import { AdminIcon } from "../design-system";
 import { AdminRoutes, adminRoutes, useCurrentRoute } from "./routes";
 
 export function AdminShell() {
@@ -23,6 +24,7 @@ export function AdminShell() {
               key={route.path}
               to={route.path}
             >
+              <AdminIcon name={route.icon} />
               {route.label}
             </NavLink>
           ))}
@@ -37,11 +39,16 @@ export function AdminShell() {
           </div>
           <div className="topbar-actions" aria-label="Current workspace controls">
             <span className="user-chip">{state.user?.displayName}</span>
-            <button type="button">Validate</button>
+            <button type="button">
+              <AdminIcon name="validate" />
+              Validate
+            </button>
             <button type="button" className="primary-action">
+              <AdminIcon name="publish" />
               Publish review
             </button>
             <button type="button" onClick={signOut}>
+              <AdminIcon name="signOut" />
               Sign out
             </button>
           </div>
