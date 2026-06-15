@@ -31,7 +31,8 @@ python -m maturin develop --manifest-path backend/rust_ext/Cargo.toml
 - `health_check()`: confirms the native module is importable.
 - `extension_version()`: returns the Rust crate version.
 - `canonicalize_json(input)`: parses JSON and returns deterministic minified JSON with object keys ordered recursively. Invalid JSON returns an error instead of panicking.
+- `diff_app_json(old_input, new_input)`: compares two app definition JSON payloads and returns a deterministic JSON array of changes with `change_type`, `path`, and `old`/`new` values where applicable.
 - `hash_config_json(input)`: canonicalizes JSON and returns a stable `sha256:<hex>` digest for configuration payloads.
 - `hash_package_json(input)`: canonicalizes JSON and returns a stable `sha256:<hex>` digest for deployment package payloads.
 
-Package signing, app diffing, and sync merge helpers should be added in separate tracked tasks.
+Package signing and sync merge helpers should be added in separate tracked tasks.
