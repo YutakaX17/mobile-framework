@@ -45,6 +45,10 @@ The initial permissions guard lives in `src/auth/permissions.ts`. Admin routes c
 
 The app is wrapped by `src/app/ErrorBoundary.tsx` so render failures show a stable recovery view instead of a blank screen.
 
+## Notifications
+
+The local notification system lives in `src/app/NotificationProvider.tsx` and `src/app/notificationModel.ts`. Shell actions enqueue accessible notifications through the shared provider.
+
 ## Local Validation
 
 Install and validate from the repository root:

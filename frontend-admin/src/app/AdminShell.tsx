@@ -4,12 +4,14 @@ import { useAuthSession } from "../auth/AuthProvider";
 import { canAccessModule } from "../auth/permissions";
 import { AdminIcon } from "../design-system";
 import { findAdminModuleByRoute } from "../modules/moduleRegistry";
+import { NotificationCenter, useNotifications } from "./NotificationProvider";
 import { AdminRoutes, adminRoutes, useCurrentRoute } from "./routes";
 import { getShellActionClassName, getUserRoleLabel, shellActions } from "./shellLayoutModel";
 
 export function AdminShell() {
   const currentRoute = useCurrentRoute();
   const { signOut, state } = useAuthSession();
+  const { addNotification } = useNotifications();
   const visibleRoutes = adminRoutes.filter((route) => {
     const module = findAdminModuleByRoute(route.path);
     return module ? canAccessModule(state.user, module) : false;
@@ -49,7 +51,12 @@ export function AdminShell() {
           </div>
           <div className="topbar-actions" aria-label="Current workspace controls">
             {shellActions.map((action) => (
-              <button className={getShellActionClassName(action)} key={action.id} type="button">
+              <button
+                className={getShellActionClassName(action)}
+                key={action.id}
+                onClick={() => addNotification(action.notification)}
+                type="button"
+              >
                 <AdminIcon name={action.icon} />
                 {action.label}
               </button>
@@ -73,6 +80,7 @@ export function AdminShell() {
         <section className="workspace-content" id="workspace-content" tabIndex={-1}>
           <AdminRoutes />
         </section>
+        <NotificationCenter />
       </section>
     </main>
   );

@@ -157,6 +157,7 @@ input:focus-visible,
   grid-template-rows: auto auto 1fr;
   min-width: 0;
   padding: var(--mf-spacing-xl);
+  position: relative;
 }
 
 .topbar {
@@ -249,6 +250,44 @@ input:focus-visible,
   background: var(--mf-color-accent);
   border-color: var(--mf-color-accent);
   color: var(--mf-color-text-inverted);
+}
+
+.notification-region {
+  display: grid;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 32px));
+  position: fixed;
+  right: 24px;
+  top: 24px;
+  z-index: 4;
+}
+
+.notification {
+  background: var(--mf-color-surface);
+  border: 1px solid var(--mf-color-border);
+  border-left: 5px solid var(--mf-color-accent);
+  border-radius: var(--mf-radius-md);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 14px;
+}
+
+.notification p {
+  color: var(--mf-color-text-muted);
+  margin: 4px 0 0;
+}
+
+.notification-success {
+  border-left-color: var(--mf-color-good);
+}
+
+.notification-warning {
+  border-left-color: var(--mf-color-warning);
+}
+
+.notification-critical {
+  border-left-color: var(--mf-color-critical);
 }
 
 .metrics-grid {
@@ -453,6 +492,12 @@ input:focus-visible,
   .user-menu-panel {
     left: 0;
     right: auto;
+  }
+
+  .notification-region {
+    left: 16px;
+    right: 16px;
+    top: 16px;
   }
 
   .metrics-grid {

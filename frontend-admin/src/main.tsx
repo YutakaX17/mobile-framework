@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import { AppRoutes } from "./app/AppRoutes";
 import { ErrorBoundary } from "./app/ErrorBoundary";
+import { NotificationProvider } from "./app/NotificationProvider";
 import "./app/styles.css";
 import { AuthProvider } from "./auth/AuthProvider";
 
@@ -17,9 +18,11 @@ createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
       <ErrorBoundary>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </NotificationProvider>
       </ErrorBoundary>
     </BrowserRouter>
   </StrictMode>,
