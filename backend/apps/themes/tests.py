@@ -3,7 +3,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import Client, TestCase
 
 from apps.tenants.models import Tenant
 from apps.themes.models import Theme, ThemeRevision, ThemeRevisionStatus
@@ -99,3 +99,54 @@ class ThemeRegistryTests(TestCase):
 
         with self.assertRaises(ValidationError):
             revision.full_clean()
+
+
+class ThemeApiTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.tenant = Tenant.objects.create(slug="demo", name="Demo Tenant")
+        self.payload = load_valid_theme()
+        self.theme = Theme.from_payload(self.tenant, self.payload)
+        self.theme.save()
+        self.revision = ThemeRevision.create_next(
+            self.theme,
+            deepcopy(self.payload),
+            status=ThemeRevisionStatus.PUBLISHED,
+        )
+        self.theme.current_revision = self.revision
+        self.theme.save()
+
+    def test_theme_list_returns_tenant_theme_summaries(self):
+        response = self.client.get("/api/themes/", {"tenant": "demo"})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["themes"][0]["theme_id"], "field_ops")
+        self.assertEqual(payload["themes"][0]["current_revision"]["status"], ThemeRevisionStatus.PUBLISHED)
+        self.assertNotIn("payload", payload["themes"][0]["current_revision"])
+
+    def test_theme_detail_returns_current_revision_payload(self):
+        response = self.client.get("/api/themes/field_ops/", {"tenant": "demo"})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["theme"]["theme_id"], "field_ops")
+        self.assertEqual(payload["theme"]["current_revision"]["payload"]["theme_id"], "field_ops")
+
+    def test_theme_api_requires_tenant_query_parameter(self):
+        response = self.client.get("/api/themes/")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"]["code"], "validation_error")
+
+    def test_theme_api_returns_not_found_for_missing_tenant(self):
+        response = self.client.get("/api/themes/", {"tenant": "missing"})
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_theme_detail_returns_not_found_for_missing_theme(self):
+        response = self.client.get("/api/themes/missing_theme/", {"tenant": "demo"})
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
