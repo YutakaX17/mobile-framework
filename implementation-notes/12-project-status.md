@@ -28,8 +28,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 - `[x]` M0 Repository Foundation.
 - `[x]` M1 Backend Kernel.
-- `[~]` M2 Contracts And Rust Extension.
-- `[ ]` M3 Admin Shell.
+- `[x]` M2 Contracts And Rust Extension.
+- `[~]` M3 Admin Shell.
 - `[ ]` M4 Theme And Form Builder MVP.
 - `[ ]` M5 Mobile Runtime MVP.
 - `[ ]` M6 Workflow And Deployment MVP.
@@ -40,9 +40,9 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-00 Product And Architecture.
 - `[x]` EPIC-01 Repository And Tooling.
 - `[x]` EPIC-02 Backend Core.
-- `[~]` EPIC-03 Rust Extension.
+- `[x]` EPIC-03 Rust Extension.
 - `[x]` EPIC-04 Shared Contracts.
-- `[ ]` EPIC-05 Admin Frontend Shell.
+- `[~]` EPIC-05 Admin Frontend Shell.
 - `[ ]` EPIC-06 Theme Builder.
 - `[ ]` EPIC-07 Form Builder.
 - `[ ]` EPIC-08 App And Screen Builder.
@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-03 Rust Extension: initial Rust extension scaffold, JSON canonicalization helper, config/package JSON hash helpers, app definition diff helper, sync JSON merge helper, CI validation, and Python wrapper tests are complete.
+- `[~]` EPIC-05 Admin Frontend Shell: M2 contract and Rust extension work is complete; admin frontend shell scaffold and routing remain pending.
 
 ## Completed Work
 
@@ -86,6 +86,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#93` completed: Rust sync JSON merge helper added.
 - `[x]` Task `#95` completed: Rust extension validation script and CI job added.
 - `[x]` Task `#97` completed: Rust extension Python wrapper tests added and wired into CI.
+- `[x]` EPIC-03 Rust Extension completed: PyO3/maturin scaffold, bounded JSON helpers, Rust tests, Python wrapper tests, and CI validation are in place.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
