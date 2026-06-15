@@ -7,6 +7,7 @@ import { findAdminModuleByRoute, getOrderedAdminModules } from "../modules/modul
 import type { IconName } from "../design-system";
 import { DashboardView } from "./views/DashboardView";
 import { PlaceholderView } from "./views/PlaceholderView";
+import { ThemeListView } from "./views/ThemeListView";
 import { UnauthorizedView } from "./views/UnauthorizedView";
 
 export type AdminRoute = {
@@ -59,7 +60,7 @@ export function AdminRoutes() {
         .filter((route) => route.path !== "/dashboard")
         .map((route) => (
           <Route
-            element={<GuardedRoute route={route} user={user} view={<PlaceholderView route={route} />} />}
+            element={<GuardedRoute route={route} user={user} view={getRouteView(route)} />}
             key={route.path}
             path={route.path}
           />
@@ -67,6 +68,14 @@ export function AdminRoutes() {
       <Route path="*" element={<PlaceholderView route={undefined} />} />
     </Routes>
   );
+}
+
+function getRouteView(route: AdminRoute): ReactNode {
+  if (route.path === "/themes") {
+    return <ThemeListView />;
+  }
+
+  return <PlaceholderView route={route} />;
 }
 
 type GuardedRouteProps = {

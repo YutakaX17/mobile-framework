@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-06 Theme Builder: theme backend model and read-only API baselines are complete; editor and publishing workflows remain pending.
+- `[~]` EPIC-06 Theme Builder: theme backend model, read-only API, and initial list page baselines are complete; editor and publishing workflows remain pending.
 
 ## Completed Work
 
@@ -103,6 +103,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-05 Admin Frontend Shell completed: Vite React TypeScript scaffold, routing, API client, auth shell, module registry, design system, icons, shell layout, permissions guard, error boundary, notifications, testing setup, Playwright smoke test, documentation, and CI validation are in place.
 - `[x]` Task `#127` completed: theme backend model baseline added.
 - `[x]` Task `#129` completed: theme backend read-only API baseline added.
+- `[x]` Task `#131` completed: theme list page added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
