@@ -53,3 +53,20 @@ jobs:
 
       - name: Validate Rust extension
         run: python tools/validate_rust_ext.py --include-python-wrapper
+
+  validate-frontend-admin:
+    name: Validate Frontend Admin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: frontend-admin/package-lock.json
+
+      - name: Validate frontend admin
+        run: python tools/validate_frontend_admin.py
