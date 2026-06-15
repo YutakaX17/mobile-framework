@@ -26,4 +26,10 @@ python -m pip install maturin
 python -m maturin develop --manifest-path backend/rust_ext/Cargo.toml
 ```
 
-The scaffold exposes only `health_check()` and `extension_version()`. Package hashing, JSON canonicalization, app diffing, and sync merge helpers should be added in separate tracked tasks.
+## Helpers
+
+- `health_check()`: confirms the native module is importable.
+- `extension_version()`: returns the Rust crate version.
+- `canonicalize_json(input)`: parses JSON and returns deterministic minified JSON with object keys ordered recursively. Invalid JSON returns an error instead of panicking.
+
+Package hashing, app diffing, and sync merge helpers should be added in separate tracked tasks.
