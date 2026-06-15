@@ -27,12 +27,26 @@ fn hash_config_json(input: &str) -> PyResult<String> {
         .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
 }
 
+#[pyfunction]
+fn hash_package_json(input: &str) -> PyResult<String> {
+    hash_package_json_str(input)
+        .map_err(|error| PyValueError::new_err(format!("invalid JSON input: {error}")))
+}
+
 fn canonicalize_json_str(input: &str) -> Result<String, serde_json::Error> {
     let value: Value = serde_json::from_str(input)?;
     serde_json::to_string(&value)
 }
 
 fn hash_config_json_str(input: &str) -> Result<String, serde_json::Error> {
+    canonical_json_sha256(input)
+}
+
+fn hash_package_json_str(input: &str) -> Result<String, serde_json::Error> {
+    canonical_json_sha256(input)
+}
+
+fn canonical_json_sha256(input: &str) -> Result<String, serde_json::Error> {
     let canonical = canonicalize_json_str(input)?;
     let digest = Sha256::digest(canonical.as_bytes());
     Ok(format!("sha256:{}", to_lower_hex(&digest)))
@@ -53,6 +67,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(canonicalize_json, m)?)?;
     m.add_function(wrap_pyfunction!(extension_version, m)?)?;
     m.add_function(wrap_pyfunction!(hash_config_json, m)?)?;
+    m.add_function(wrap_pyfunction!(hash_package_json, m)?)?;
     m.add_function(wrap_pyfunction!(health_check, m)?)?;
     Ok(())
 }
@@ -125,5 +140,30 @@ mod tests {
     #[test]
     fn hash_config_json_rejects_invalid_input() {
         assert!(hash_config_json_str(r#"{"missing": "brace""#).is_err());
+    }
+
+    #[test]
+    fn hash_package_json_is_stable_for_equivalent_object_ordering() {
+        let first = hash_package_json_str(
+            r#"{"signature":"placeholder","hash":"sha256:abc","app":{"version":"1.0.0","app_id":"field_ops"}}"#,
+        )
+        .unwrap();
+        let second = hash_package_json_str(
+            r#"{"app":{"app_id":"field_ops","version":"1.0.0"},"hash":"sha256:abc","signature":"placeholder"}"#,
+        )
+        .unwrap();
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn hash_package_json_is_sensitive_to_array_order() {
+        let first = hash_package_json_str(r#"{"modules":["core","forms"]}"#).unwrap();
+        let second = hash_package_json_str(r#"{"modules":["forms","core"]}"#).unwrap();
+        assert_ne!(first, second);
+    }
+
+    #[test]
+    fn hash_package_json_rejects_invalid_input() {
+        assert!(hash_package_json_str(r#"{"missing": "brace""#).is_err());
     }
 }

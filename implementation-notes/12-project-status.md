@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-03 Rust Extension: initial Rust extension scaffold, JSON canonicalization helper, and config JSON hash helper are complete; package hashing, diff, and sync merge helpers remain pending.
+- `[~]` EPIC-03 Rust Extension: initial Rust extension scaffold, JSON canonicalization helper, config JSON hash helper, and package JSON hash helper are complete; diff and sync merge helpers remain pending.
 
 ## Completed Work
 
@@ -81,6 +81,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#83` completed: initial PyO3/maturin Rust extension scaffold added.
 - `[x]` Task `#85` completed: Rust JSON canonicalization helper added.
 - `[x]` Task `#87` completed: Rust config JSON hash helper added.
+- `[x]` Task `#89` completed: Rust package JSON hash helper added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
