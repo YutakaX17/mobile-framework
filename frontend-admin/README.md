@@ -13,6 +13,10 @@ Initial admin navigation is defined in `src/app/routes.tsx` and currently regist
 - `/workflows`
 - `/deployments`
 
+## API Client
+
+The initial typed API client lives in `src/api/adminApiClient.ts`. It defaults to `/api` and can be pointed at another backend by setting `VITE_ADMIN_API_BASE_URL`.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -31,6 +35,7 @@ npm run validate
 ## Planned Areas
 
 - `src/app`: application shell, routing, auth, permissions, global layout. Initial shell and route foundation exist.
+- `src/api`: typed API client foundation and request/error primitives.
 - `src/modules`: frontend module contribution registry.
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
 - `src/design-system`: tokens, components, accessibility helpers, previews.
