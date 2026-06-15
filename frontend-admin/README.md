@@ -41,6 +41,10 @@ The shell layout keeps sidebar navigation, topbar actions, workspace content, sk
 
 The initial permissions guard lives in `src/auth/permissions.ts`. Admin routes compare authenticated user roles against module contribution capabilities before rendering protected workspaces.
 
+## Error Boundary
+
+The app is wrapped by `src/app/ErrorBoundary.tsx` so render failures show a stable recovery view instead of a blank screen.
+
 ## Local Validation
 
 Install and validate from the repository root:

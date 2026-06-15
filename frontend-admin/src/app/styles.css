@@ -405,6 +405,11 @@ input:focus-visible,
   margin: 0 0 20px;
 }
 
+.error-message {
+  color: var(--mf-color-text-muted);
+  margin: 0 0 20px;
+}
+
 .login-form {
   display: grid;
   gap: 12px;
