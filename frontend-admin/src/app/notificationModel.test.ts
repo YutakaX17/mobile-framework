@@ -6,12 +6,13 @@ import {
   notificationReducer,
   type NotificationInput
 } from "./notificationModel";
+import { createTestNotification } from "../tests/testFixtures";
 
-const notification: NotificationInput = {
+const notification: NotificationInput = createTestNotification({
   message: "The current workspace was queued for validation.",
   title: "Validation queued",
   tone: "success"
-};
+});
 
 describe("notification model", () => {
   it("adds notifications newest first", () => {

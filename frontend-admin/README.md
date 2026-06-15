@@ -49,6 +49,10 @@ The app is wrapped by `src/app/ErrorBoundary.tsx` so render failures show a stab
 
 The local notification system lives in `src/app/NotificationProvider.tsx` and `src/app/notificationModel.ts`. Shell actions enqueue accessible notifications through the shared provider.
 
+## Testing
+
+Vitest is the unit test runner. Shared fixture builders live in `src/tests/testFixtures.ts` for auth users, module contributions, and notifications.
+
 ## Local Validation
 
 Install and validate from the repository root:
@@ -73,4 +77,4 @@ npm run validate
 - `src/builders`: theme, form, app/screen, workflow, and deployment builders.
 - `src/design-system`: typed tokens, icons, components, accessibility helpers, previews. Initial token and icon foundations exist.
 - `src/generated`: generated contract/API types.
-- `src/tests`: shared test utilities and smoke tests.
+- `src/tests`: shared test utilities and smoke tests. Initial fixture builders exist.
