@@ -8,6 +8,7 @@ try:
         hash_config_json,
         hash_package_json,
         health_check,
+        merge_sync_json,
     )
 except ImportError as exc:  # pragma: no cover - exercised once the extension is built.
     raise ImportError(
@@ -22,4 +23,5 @@ __all__ = [
     "hash_config_json",
     "hash_package_json",
     "health_check",
+    "merge_sync_json",
 ]
