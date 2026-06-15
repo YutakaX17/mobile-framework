@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-05 Admin Frontend Shell: initial Vite React TypeScript scaffold and routing foundation are complete; auth shell, API client, module registry, and design system foundation remain pending.
+- `[~]` EPIC-05 Admin Frontend Shell: initial Vite React TypeScript scaffold, routing foundation, and API client foundation are complete; auth shell, module registry, and design system foundation remain pending.
 
 ## Completed Work
 
@@ -89,6 +89,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-03 Rust Extension completed: PyO3/maturin scaffold, bounded JSON helpers, Rust tests, Python wrapper tests, and CI validation are in place.
 - `[x]` Task `#100` completed: admin frontend Vite React TypeScript scaffold and validation wiring added.
 - `[x]` Task `#102` completed: admin frontend routing foundation added.
+- `[x]` Task `#104` completed: admin frontend API client foundation added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
