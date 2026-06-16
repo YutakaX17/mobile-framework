@@ -9,11 +9,13 @@ import {
   getFormPayload,
   getFormPropertyRows,
   getFormToolboxItems,
+  getFormValidationRuleSummaries,
   type FormDetail,
   type FormField,
   type FormFieldPropertySummary,
   type FormLogicRuleSummary,
-  type FormPropertyRow
+  type FormPropertyRow,
+  type FormValidationRuleSummary
 } from "../../api/formApi";
 
 type FormDesignerState =
@@ -54,6 +56,7 @@ export function FormDesignerView() {
   const formProperties = useMemo(() => getFormPropertyRows(payload), [payload]);
   const fieldProperties = useMemo(() => getFormFieldPropertySummaries(payload), [payload]);
   const logicRules = useMemo(() => getFormLogicRuleSummaries(payload), [payload]);
+  const validationRules = useMemo(() => getFormValidationRuleSummaries(payload), [payload]);
 
   return (
     <section className="form-designer-view" aria-labelledby="form-designer-title">
@@ -156,8 +159,40 @@ export function FormDesignerView() {
           </section>
 
           <LogicPanel rules={logicRules} />
+          <ValidationPanel rules={validationRules} />
         </>
       ) : null}
+    </section>
+  );
+}
+
+type ValidationPanelProps = {
+  rules: FormValidationRuleSummary[];
+};
+
+function ValidationPanel({ rules }: ValidationPanelProps) {
+  return (
+    <section className="validation-panel" aria-label="Validation rules">
+      <div className="preview-panel-heading">
+        <h3>Validation rules</h3>
+        <span className="queue-count">{rules.length} rules</span>
+      </div>
+      {rules.length > 0 ? (
+        <div className="validation-rule-list">
+          {rules.map((rule) => (
+            <article className="validation-rule" key={`${rule.field_id}-${rule.rule}`}>
+              <div>
+                <p className="eyebrow">{rule.field_id}</p>
+                <h4>{rule.field_label}</h4>
+              </div>
+              <strong>{rule.rule}</strong>
+              <span>{rule.value}</span>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p>No validation rules are configured.</p>
+      )}
     </section>
   );
 }

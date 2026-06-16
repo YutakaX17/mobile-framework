@@ -96,6 +96,13 @@ export type FormLogicRuleSummary = {
   rule_type: string;
 };
 
+export type FormValidationRuleSummary = {
+  field_id: string;
+  field_label: string;
+  rule: string;
+  value: string;
+};
+
 type FormListResponse = {
   forms: FormSummary[];
 };
@@ -247,8 +254,28 @@ export function getFormLogicRuleSummaries(payload: FormPayload | undefined): For
   });
 }
 
+export function getFormValidationRuleSummaries(payload: FormPayload | undefined): FormValidationRuleSummary[] {
+  return (payload?.fields ?? []).flatMap((field) =>
+    Object.entries(field.validation ?? {})
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([rule, value]) => ({
+        field_id: field.field_id,
+        field_label: field.label,
+        rule: formatRuleName(rule),
+        value: String(value)
+      }))
+  );
+}
+
 function formatFieldType(fieldType: string): string {
   return fieldType
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatRuleName(rule: string): string {
+  return rule
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");

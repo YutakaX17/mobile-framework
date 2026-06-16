@@ -627,24 +627,28 @@ input:focus-visible,
   margin: 0;
 }
 
-.logic-panel {
+.logic-panel,
+.validation-panel {
   background: var(--mf-color-surface);
   border: 1px solid var(--mf-color-border);
   border-radius: var(--mf-radius-md);
   padding: 18px;
 }
 
-.logic-panel p:last-child {
+.logic-panel p:last-child,
+.validation-panel p:last-child {
   color: var(--mf-color-text-muted);
   margin-bottom: 0;
 }
 
-.logic-rule-list {
+.logic-rule-list,
+.validation-rule-list {
   display: grid;
   gap: 10px;
 }
 
-.logic-rule {
+.logic-rule,
+.validation-rule {
   align-items: center;
   border-top: 1px solid #e2e8e5;
   display: grid;
@@ -653,13 +657,24 @@ input:focus-visible,
   padding-top: 10px;
 }
 
-.logic-rule:first-child {
+.logic-rule:first-child,
+.validation-rule:first-child {
   border-top: 0;
   padding-top: 0;
 }
 
-.logic-rule h4 {
+.logic-rule h4,
+.validation-rule h4 {
   margin: 0;
+}
+
+.validation-rule strong,
+.validation-rule span {
+  justify-self: end;
+}
+
+.validation-rule span {
+  color: var(--mf-color-text-muted);
 }
 
 .logic-rule code {
@@ -913,9 +928,15 @@ input:focus-visible,
     grid-template-columns: 1fr;
   }
 
-  .logic-rule {
+  .logic-rule,
+  .validation-rule {
     align-items: start;
     grid-template-columns: 1fr;
+  }
+
+  .validation-rule strong,
+  .validation-rule span {
+    justify-self: start;
   }
 }
 

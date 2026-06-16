@@ -11,6 +11,7 @@ import {
   getFormPayload,
   getFormPropertyRows,
   getFormToolboxItems,
+  getFormValidationRuleSummaries,
   type FormSummary
 } from "./formApi";
 
@@ -222,6 +223,32 @@ describe("form API helpers", () => {
         field_label: "Age",
         kind: "calculation",
         rule_type: "server_evaluated"
+      }
+    ]);
+  });
+
+  it("extracts validation rule summaries from form payload fields", () => {
+    const payload = getFormPayload(form);
+    const payloadWithoutValidation = payload
+      ? {
+          ...payload,
+          fields: payload.fields.map((field) => ({ ...field, validation: undefined }))
+        }
+      : undefined;
+
+    expect(getFormValidationRuleSummaries(payloadWithoutValidation)).toEqual([]);
+    expect(getFormValidationRuleSummaries(payload)).toEqual([
+      {
+        field_id: "full_name",
+        field_label: "Full name",
+        rule: "Max Length",
+        value: "120"
+      },
+      {
+        field_id: "full_name",
+        field_label: "Full name",
+        rule: "Min Length",
+        value: "2"
       }
     ]);
   });
