@@ -51,7 +51,7 @@ The local notification system lives in `src/app/NotificationProvider.tsx` and `s
 
 ## Theme Builder
 
-The `/themes` workspace renders the initial read-only theme list page. `/themes/:themeId` renders the first token detail baseline for color, typography, spacing, radius, and mode inspection. Theme API helpers live in `src/api/themeApi.ts`.
+The `/themes` workspace renders the initial read-only theme list page. `/themes/:themeId` renders the first token detail baseline for color, typography, spacing, radius, mode, and contrast inspection. Theme API helpers live in `src/api/themeApi.ts`.
 
 ## Testing
 

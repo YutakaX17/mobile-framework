@@ -11,6 +11,7 @@ import {
   type ThemeDetail,
   type ThemeTokenRow
 } from "../../api/themeApi";
+import { formatContrastRatio, getThemeContrastChecks, type ContrastCheck } from "../themeContrast";
 
 type ThemeDetailState =
   | { status: "loading"; theme: ThemeDetail | null }
@@ -107,10 +108,44 @@ export function ThemeDetailView() {
             <TokenPanel title="Spacing" rows={getNumberTokenRows(payload, "spacing")} />
             <TokenPanel title="Radius" rows={getNumberTokenRows(payload, "radius")} />
             <TokenPanel title="Modes" rows={getModeRows(payload)} />
+            <ContrastPanel checks={getThemeContrastChecks(payload)} />
           </section>
         </>
       ) : null}
     </section>
+  );
+}
+
+type ContrastPanelProps = {
+  checks: ContrastCheck[];
+};
+
+function ContrastPanel({ checks }: ContrastPanelProps) {
+  return (
+    <article className="token-panel contrast-panel">
+      <h3>Contrast</h3>
+      {checks.length > 0 ? (
+        <div className="contrast-checks">
+          {checks.map((check) => (
+            <div className="contrast-check" key={`${check.label}-${check.foreground}-${check.background}`}>
+              <div>
+                <strong>{check.label}</strong>
+                <span>{formatContrastRatio(check.ratio)}</span>
+              </div>
+              <div className="contrast-swatches" aria-hidden="true">
+                <span style={{ backgroundColor: check.background }} />
+                <span style={{ backgroundColor: check.foreground }} />
+              </div>
+              <span className={`status ${check.passesAA ? "status-ready" : "status-blocked"}`}>
+                {check.passesAAA ? "AAA" : check.passesAA ? "AA" : "Fail"}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No contrast pairs available.</p>
+      )}
+    </article>
   );
 }
 
