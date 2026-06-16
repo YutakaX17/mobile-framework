@@ -20,6 +20,7 @@ The backend includes a minimal Django project:
 - `apps/modules`: initial module registry, manifest validation, dependency validation, and compatibility validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
 - `apps/themes`: initial tenant-scoped theme model, revision baseline, shared theme schema validation, read-only API baseline, draft editing action baseline, publish action baseline, and rollback action baseline.
+- `apps/form_builder`: initial tenant-scoped form definition, revision baseline, shared form schema validation, and read-only API baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 - `rust_ext`: initial PyO3/maturin scaffold for bounded native helpers.
 
@@ -75,7 +76,7 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry, dependency validation, and compatibility validation baselines exist.
 - `apps/configurations`: tenant-scoped definitions, revisions, status workflow, and schema validation. Initial configuration registry baseline exists.
 - `apps/app_builder`: app definitions, navigation, screens, actions, publish states.
-- `apps/form_builder`: form definitions, fields, validation, submissions.
+- `apps/form_builder`: form definitions, fields, validation, submissions. Initial form model, revision, and read-only API baselines exist.
 - `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation.
 - `apps/themes`: design tokens, theme validation, preview, publishing. Initial theme model, revision, and read-only API baselines exist.
 - `apps/deployments`: immutable package compilation, signing, channels, rollback.
