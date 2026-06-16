@@ -443,6 +443,7 @@ input:focus-visible,
 
 .form-list-view,
 .form-designer-view,
+.app-list-view,
 .theme-list-view {
   display: grid;
   gap: 18px;
@@ -461,12 +462,14 @@ input:focus-visible,
   justify-content: flex-end;
 }
 
+.app-list,
 .form-list,
 .theme-list {
   display: grid;
   gap: 12px;
 }
 
+.app-card,
 .form-card,
 .theme-card {
   align-items: start;
@@ -479,16 +482,19 @@ input:focus-visible,
   padding: 18px;
 }
 
+.app-card h3,
 .form-card h3,
 .theme-card h3 {
   margin: 0 0 8px;
 }
 
+.app-card h3 a,
 .form-card h3 a,
 .theme-card h3 a {
   color: var(--mf-color-text);
 }
 
+.app-card p:last-child,
 .form-card p:last-child,
 .theme-card p:last-child {
   color: var(--mf-color-text-muted);
@@ -993,6 +999,7 @@ input:focus-visible,
     grid-template-columns: repeat(2, minmax(140px, 1fr));
   }
 
+  .app-card,
   .form-card,
   .theme-card {
     grid-template-columns: 1fr;

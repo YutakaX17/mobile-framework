@@ -5,6 +5,7 @@ import { useAuthenticatedUser } from "../auth/AuthProvider";
 import { canAccessModule } from "../auth/permissions";
 import { findAdminModuleByRoute, getOrderedAdminModules } from "../modules/moduleRegistry";
 import type { IconName } from "../design-system";
+import { AppListView } from "./views/AppListView";
 import { DashboardView } from "./views/DashboardView";
 import { FormDesignerView } from "./views/FormDesignerView";
 import { FormListView } from "./views/FormListView";
@@ -100,6 +101,10 @@ function findNestedAdminModule(pathname: string) {
 }
 
 function getRouteView(route: AdminRoute): ReactNode {
+  if (route.path === "/apps") {
+    return <AppListView />;
+  }
+
   if (route.path === "/forms") {
     return <FormListView />;
   }
