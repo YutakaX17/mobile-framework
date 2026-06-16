@@ -6,6 +6,7 @@ import { canAccessModule } from "../auth/permissions";
 import { findAdminModuleByRoute, getOrderedAdminModules } from "../modules/moduleRegistry";
 import type { IconName } from "../design-system";
 import { DashboardView } from "./views/DashboardView";
+import { FormDesignerView } from "./views/FormDesignerView";
 import { FormListView } from "./views/FormListView";
 import { PlaceholderView } from "./views/PlaceholderView";
 import { ThemeDetailView } from "./views/ThemeDetailView";
@@ -53,12 +54,19 @@ export function useCurrentRoute(): AdminRoute | undefined {
 
 export function AdminRoutes() {
   const user = useAuthenticatedUser();
+  const formsRoute = findAdminRoute("/forms");
   const themesRoute = findAdminRoute("/themes");
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<GuardedRoute route={adminRoutes[0]} user={user} view={<DashboardView />} />} />
+      {formsRoute ? (
+        <Route
+          path="/forms/:formId"
+          element={<GuardedRoute route={formsRoute} user={user} view={<FormDesignerView />} />}
+        />
+      ) : null}
       {themesRoute ? (
         <Route
           path="/themes/:themeId"
@@ -80,6 +88,10 @@ export function AdminRoutes() {
 }
 
 function findNestedAdminModule(pathname: string) {
+  if (pathname.startsWith("/forms/")) {
+    return findAdminModuleByRoute("/forms");
+  }
+
   if (pathname.startsWith("/themes/")) {
     return findAdminModuleByRoute("/themes");
   }

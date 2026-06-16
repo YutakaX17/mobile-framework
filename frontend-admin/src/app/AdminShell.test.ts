@@ -42,6 +42,7 @@ describe("admin shell model", () => {
 
   it("routes forms to a dedicated workspace", () => {
     expect(findAdminRoute("/forms")?.summary).toBe("Form definition workspace");
+    expect(findAdminRoute("/forms/patient_intake")?.path).toBe("/forms");
   });
 
   it("defines shell actions and user menu labels", () => {

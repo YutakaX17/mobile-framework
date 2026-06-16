@@ -55,7 +55,7 @@ The `/themes` workspace renders the initial read-only theme list page. `/themes/
 
 ## Form Builder
 
-The `/forms` workspace renders the initial read-only form list page backed by `src/api/formApi.ts`.
+The `/forms` workspace renders the initial read-only form list page backed by `src/api/formApi.ts`. `/forms/:formId` renders the first form designer baseline with field toolbox and canvas inspection.
 
 ## Testing
 

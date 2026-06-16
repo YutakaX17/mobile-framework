@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { countFormsByStatus, fetchFormSummaries, type FormSummary } from "../../api/formApi";
 
@@ -89,7 +90,9 @@ export function FormListView() {
               <article className="form-card" key={form.form_id}>
                 <div>
                   <p className="eyebrow">{form.form_id}</p>
-                  <h3>{form.name}</h3>
+                  <h3>
+                    <Link to={`/forms/${form.form_id}`}>{form.name}</Link>
+                  </h3>
                   {form.description ? <p>{form.description}</p> : null}
                 </div>
                 <dl className="theme-meta">
