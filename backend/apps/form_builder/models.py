@@ -17,6 +17,10 @@ class FormRevisionStatus(models.TextChoices):
     ARCHIVED = "archived", "Archived"
 
 
+class FormSubmissionStatus(models.TextChoices):
+    RECEIVED = "received", "Received"
+
+
 class FormDefinition(TenantScopedModel):
     form_id = models.SlugField(max_length=80)
     name = models.CharField(max_length=160)
@@ -125,3 +129,47 @@ class FormRevision(TenantScopedModel):
 
     def __str__(self) -> str:
         return f"{self.form}#{self.revision}"
+
+
+class FormSubmission(TenantScopedModel):
+    form = models.ForeignKey(FormDefinition, related_name="submissions", on_delete=models.PROTECT)
+    revision = models.ForeignKey(FormRevision, related_name="submissions", on_delete=models.PROTECT)
+    status = models.CharField(
+        max_length=16,
+        choices=FormSubmissionStatus.choices,
+        default=FormSubmissionStatus.RECEIVED,
+        db_index=True,
+    )
+    answers = models.JSONField()
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="form_submissions",
+    )
+
+    class Meta:
+        ordering = ["-created_at", "id"]
+
+    @property
+    def answer_count(self) -> int:
+        return len(self.answers) if isinstance(self.answers, dict) else 0
+
+    def clean(self) -> None:
+        super().clean()
+        if self.form_id and self.tenant_id != self.form.tenant_id:
+            raise ValidationError({"tenant": "Must match the form definition tenant."})
+        if self.revision_id and self.tenant_id != self.revision.tenant_id:
+            raise ValidationError({"tenant": "Must match the form revision tenant."})
+        if self.form_id and self.revision_id and self.revision.form_id != self.form_id:
+            raise ValidationError({"revision": "Must belong to the submitted form."})
+        if not isinstance(self.answers, dict):
+            raise ValidationError({"answers": "Must be a JSON object."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.form}#{self.revision.revision}:submission:{self.id or 'new'}"
