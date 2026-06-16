@@ -81,6 +81,11 @@ type ThemeDetailResponse = {
   theme: ThemeDetail;
 };
 
+type ThemeUpdateResponse = {
+  draft_revision: ThemeRevisionSummary;
+  theme: ThemeDetail;
+};
+
 export async function fetchThemeSummaries(
   client: AdminApiClient = adminApiClient,
   tenant = "demo"
@@ -108,6 +113,25 @@ export async function fetchThemeDetail(
   }
 
   return result.data.theme;
+}
+
+export async function updateThemeDraft(
+  themeId: string,
+  payload: ThemePayload,
+  client: AdminApiClient = adminApiClient,
+  tenant = "demo"
+): Promise<ThemeUpdateResponse> {
+  const result = await client.put<ThemeUpdateResponse, ThemePayload>(
+    `/themes/${encodeURIComponent(themeId)}/`,
+    payload,
+    { query: { tenant } }
+  );
+
+  if (!result.data || !isRecord(result.data.theme) || !isRecord(result.data.draft_revision)) {
+    throw new Error("Theme update response did not include theme and draft revision objects.");
+  }
+
+  return result.data;
 }
 
 export function countThemesByStatus(themes: ThemeSummary[], status: ThemeRevisionStatus): number {

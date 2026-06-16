@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import json
+
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest, JsonResponse
 
 from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 from apps.tenants.models import Tenant
 
 from .models import Theme, ThemeRevision
-from .services import publish_theme_revision, rollback_theme_revision
+from .services import create_theme_draft_revision, publish_theme_revision, rollback_theme_revision
 
 
 def _method_not_allowed(allowed_method: str) -> JsonResponse:
@@ -15,6 +18,25 @@ def _method_not_allowed(allowed_method: str) -> JsonResponse:
             code=ApiErrorCode.VALIDATION_ERROR,
             message=f"Only {allowed_method} requests are supported.",
             status_code=405,
+        )
+    )
+
+
+def _validation_error_response(message: str, error: ValidationError | None = None) -> JsonResponse:
+    details: list[ApiErrorDetail] = []
+    if error is not None:
+        if hasattr(error, "message_dict"):
+            for field, messages in error.message_dict.items():
+                details.extend(ApiErrorDetail(field=field, message=str(item)) for item in messages)
+        else:
+            details.extend(ApiErrorDetail(message=str(item)) for item in error.messages)
+
+    return api_error_response(
+        ApiError(
+            code=ApiErrorCode.VALIDATION_ERROR,
+            message=message,
+            details=details,
+            status_code=400,
         )
     )
 
@@ -42,8 +64,19 @@ def _tenant_from_request(request: HttpRequest) -> Tenant | JsonResponse:
         )
 
 
-def _serialize_current_revision(theme: Theme, include_payload: bool = False) -> dict | None:
-    revision = theme.current_revision
+def _json_payload_from_request(request: HttpRequest) -> dict | JsonResponse:
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        return _validation_error_response("Request body must be valid JSON.")
+
+    if not isinstance(payload, dict):
+        return _validation_error_response("Request body must be a JSON object.")
+
+    return payload
+
+
+def _serialize_revision(revision: ThemeRevision | None, include_payload: bool = False) -> dict | None:
     if revision is None:
         return None
 
@@ -56,6 +89,10 @@ def _serialize_current_revision(theme: Theme, include_payload: bool = False) -> 
     if include_payload:
         data["payload"] = revision.payload
     return data
+
+
+def _serialize_current_revision(theme: Theme, include_payload: bool = False) -> dict | None:
+    return _serialize_revision(theme.current_revision, include_payload=include_payload)
 
 
 def _serialize_theme_summary(theme: Theme) -> dict:
@@ -84,8 +121,8 @@ def theme_list(request: HttpRequest) -> JsonResponse:
 
 
 def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
-    if request.method != "GET":
-        return _method_not_allowed("GET")
+    if request.method not in {"GET", "PUT"}:
+        return _method_not_allowed("GET or PUT")
 
     tenant = _tenant_from_request(request)
     if isinstance(tenant, JsonResponse):
@@ -101,6 +138,26 @@ def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
                 status_code=404,
             )
         )
+
+    if request.method == "PUT":
+        payload = _json_payload_from_request(request)
+        if isinstance(payload, JsonResponse):
+            return payload
+
+        user = getattr(request, "user", None)
+        created_by = user if getattr(user, "is_authenticated", False) else None
+        try:
+            draft_revision = create_theme_draft_revision(theme, payload, created_by=created_by)
+        except ValidationError as exc:
+            return _validation_error_response("Theme payload is invalid.", exc)
+
+        theme.refresh_from_db()
+        data = _serialize_theme_summary(theme)
+        data["current_revision"] = _serialize_current_revision(theme, include_payload=True)
+        return JsonResponse({
+            "draft_revision": _serialize_revision(draft_revision, include_payload=True),
+            "theme": data,
+        })
 
     data = _serialize_theme_summary(theme)
     data["current_revision"] = _serialize_current_revision(theme, include_payload=True)

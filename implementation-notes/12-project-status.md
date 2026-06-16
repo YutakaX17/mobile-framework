@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, and rollback workflow baselines are complete; editing workflow remains pending.
+- `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
 
@@ -110,6 +110,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#139` completed: theme asset reference baseline added.
 - `[x]` Task `#141` completed: theme publish workflow baseline added.
 - `[x]` Task `#143` completed: theme rollback workflow baseline added.
+- `[x]` Task `#145` completed: theme editing workflow baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.

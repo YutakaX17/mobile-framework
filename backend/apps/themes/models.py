@@ -109,7 +109,6 @@ class ThemeRevision(TenantScopedModel):
         validate_theme_payload(self.payload)
         expected_values = {
             "theme_id": self.theme.theme_id if self.theme_id else None,
-            "name": self.theme.name if self.theme_id else None,
             "schema_version": self.schema_version,
             "version": self.version,
         }
