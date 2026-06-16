@@ -7,6 +7,7 @@ import { findAdminModuleByRoute, getOrderedAdminModules } from "../modules/modul
 import type { IconName } from "../design-system";
 import { DashboardView } from "./views/DashboardView";
 import { PlaceholderView } from "./views/PlaceholderView";
+import { ThemeDetailView } from "./views/ThemeDetailView";
 import { ThemeListView } from "./views/ThemeListView";
 import { UnauthorizedView } from "./views/UnauthorizedView";
 
@@ -29,7 +30,7 @@ export const adminRoutes: AdminRoute[] = getOrderedAdminModules().map((module) =
 }));
 
 export function findAdminRoute(pathname: string): AdminRoute | undefined {
-  const module = findAdminModuleByRoute(pathname);
+  const module = findAdminModuleByRoute(pathname) ?? findNestedAdminModule(pathname);
 
   if (!module) {
     return undefined;
@@ -51,11 +52,18 @@ export function useCurrentRoute(): AdminRoute | undefined {
 
 export function AdminRoutes() {
   const user = useAuthenticatedUser();
+  const themesRoute = findAdminRoute("/themes");
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<GuardedRoute route={adminRoutes[0]} user={user} view={<DashboardView />} />} />
+      {themesRoute ? (
+        <Route
+          path="/themes/:themeId"
+          element={<GuardedRoute route={themesRoute} user={user} view={<ThemeDetailView />} />}
+        />
+      ) : null}
       {adminRoutes
         .filter((route) => route.path !== "/dashboard")
         .map((route) => (
@@ -68,6 +76,14 @@ export function AdminRoutes() {
       <Route path="*" element={<PlaceholderView route={undefined} />} />
     </Routes>
   );
+}
+
+function findNestedAdminModule(pathname: string) {
+  if (pathname.startsWith("/themes/")) {
+    return findAdminModuleByRoute("/themes");
+  }
+
+  return undefined;
 }
 
 function getRouteView(route: AdminRoute): ReactNode {
