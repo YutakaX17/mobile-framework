@@ -169,6 +169,23 @@ public data class FormSubmitAction(
     val target: String? = null
 )
 
+public data class MobileFormSubmission(
+    val schema_version: String,
+    val local_id: String,
+    val device_id: String,
+    val form_id: String,
+    val revision: Int,
+    val submitted_at: String,
+    val answers: JsonObject,
+    val metadata: MobileFormSubmissionMetadata? = null
+)
+
+public data class MobileFormSubmissionMetadata(
+    val app_id: String? = null,
+    val package_version: String? = null,
+    val screen_id: String? = null
+)
+
 public data class ModuleManifest(
     val schema_version: String,
     val module_id: String,

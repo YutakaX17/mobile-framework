@@ -155,6 +155,21 @@ class FormSubmitAction(TypedDict):
     action_type: Literal['create_submission', 'update_entity', 'start_workflow']
     target: NotRequired[str]
 
+class MobileFormSubmission(TypedDict):
+    schema_version: Literal['v1']
+    local_id: str
+    device_id: str
+    form_id: str
+    revision: int
+    submitted_at: str
+    answers: dict[str, JsonValue]
+    metadata: NotRequired[MobileFormSubmissionMetadata]
+
+class MobileFormSubmissionMetadata(TypedDict):
+    app_id: NotRequired[str]
+    package_version: NotRequired[str]
+    screen_id: NotRequired[str]
+
 class ModuleManifest(TypedDict):
     schema_version: Literal['v1']
     module_id: str

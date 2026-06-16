@@ -177,6 +177,23 @@ export interface FormSubmitAction {
   target?: string;
 }
 
+export interface MobileFormSubmission {
+  schema_version: "v1";
+  local_id: string;
+  device_id: string;
+  form_id: string;
+  revision: number;
+  submitted_at: string;
+  answers: Record<string, JsonValue>;
+  metadata?: MobileFormSubmissionMetadata;
+}
+
+export interface MobileFormSubmissionMetadata {
+  app_id?: string;
+  package_version?: string;
+  screen_id?: string;
+}
+
 export interface ModuleManifest {
   schema_version: "v1";
   module_id: string;
