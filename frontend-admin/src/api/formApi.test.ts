@@ -9,6 +9,7 @@ import {
   getFormFieldPropertySummaries,
   getFormLogicRuleSummaries,
   getFormPayload,
+  getFormPreviewItems,
   getFormPropertyRows,
   getFormToolboxItems,
   getFormValidationRuleSummaries,
@@ -249,6 +250,40 @@ describe("form API helpers", () => {
         field_label: "Full name",
         rule: "Min Length",
         value: "2"
+      }
+    ]);
+  });
+
+  it("extracts preview items from form payload fields", () => {
+    const payload = getFormPayload(form);
+
+    expect(getFormPreviewItems(payload)).toEqual([
+      {
+        field_id: "full_name",
+        label: "Full name",
+        options: [],
+        placeholder: "Enter full name",
+        read_only: false,
+        required: true,
+        type: "text"
+      },
+      {
+        field_id: "age",
+        label: "Age",
+        options: [],
+        placeholder: "Enter age",
+        read_only: false,
+        required: false,
+        type: "number"
+      },
+      {
+        field_id: "gender",
+        label: "Gender",
+        options: ["Female"],
+        placeholder: "1 options",
+        read_only: false,
+        required: false,
+        type: "select"
       }
     ]);
   });

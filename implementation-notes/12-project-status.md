@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, and validation rule baselines are complete; preview, submission endpoint, and mobile contract remain pending.
+- `[~]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, and preview baselines are complete; submission endpoint and mobile contract remain pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -118,6 +118,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#153` completed: form properties panel baseline added.
 - `[x]` Task `#155` completed: form conditional logic baseline added.
 - `[x]` Task `#157` completed: form validation rule baseline added.
+- `[x]` Task `#159` completed: form preview baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.

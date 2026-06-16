@@ -103,6 +103,16 @@ export type FormValidationRuleSummary = {
   value: string;
 };
 
+export type FormPreviewItem = {
+  field_id: string;
+  label: string;
+  options: string[];
+  placeholder: string;
+  read_only: boolean;
+  required: boolean;
+  type: "checkbox" | "date" | "file" | "number" | "select" | "text" | "unsupported";
+};
+
 type FormListResponse = {
   forms: FormSummary[];
 };
@@ -267,11 +277,58 @@ export function getFormValidationRuleSummaries(payload: FormPayload | undefined)
   );
 }
 
+export function getFormPreviewItems(payload: FormPayload | undefined): FormPreviewItem[] {
+  return (payload?.fields ?? []).map((field) => ({
+    field_id: field.field_id,
+    label: field.label,
+    options: (field.options ?? []).map((option) => option.label),
+    placeholder: previewPlaceholder(field),
+    read_only: Boolean(field.read_only),
+    required: Boolean(field.required),
+    type: previewType(field.field_type)
+  }));
+}
+
 function formatFieldType(fieldType: string): string {
   return fieldType
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function previewType(fieldType: string): FormPreviewItem["type"] {
+  if (["text", "time", "barcode_qr", "signature"].includes(fieldType)) {
+    return "text";
+  }
+  if (fieldType === "number") {
+    return "number";
+  }
+  if (fieldType === "date") {
+    return "date";
+  }
+  if (["boolean", "checkbox"].includes(fieldType)) {
+    return "checkbox";
+  }
+  if (["select", "multi_select", "radio"].includes(fieldType)) {
+    return "select";
+  }
+  if (["file", "image"].includes(fieldType)) {
+    return "file";
+  }
+
+  return "unsupported";
+}
+
+function previewPlaceholder(field: FormField): string {
+  if (field.help_text) {
+    return field.help_text;
+  }
+
+  if (field.options?.length) {
+    return `${field.options.length} options`;
+  }
+
+  return field.read_only ? "Read only value" : `Enter ${field.label.toLowerCase()}`;
 }
 
 function formatRuleName(rule: string): string {
