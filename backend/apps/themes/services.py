@@ -25,3 +25,7 @@ def publish_theme_revision(theme, revision):
     theme.current_revision = revision
     theme.save(update_fields=["current_revision", "updated_at"])
     return revision
+
+
+def rollback_theme_revision(theme, revision):
+    return publish_theme_revision(theme, revision)
