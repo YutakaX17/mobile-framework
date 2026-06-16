@@ -53,6 +53,10 @@ The local notification system lives in `src/app/NotificationProvider.tsx` and `s
 
 The `/themes` workspace renders the initial read-only theme list page. `/themes/:themeId` renders the first token detail baseline for color, typography, spacing, radius, mode, asset reference, contrast, and live preview inspection. Theme API helpers live in `src/api/themeApi.ts`, including draft update support for the editing workflow baseline.
 
+## Form Builder
+
+The `/forms` workspace renders the initial read-only form list page backed by `src/api/formApi.ts`.
+
 ## Testing
 
 Vitest is the unit test runner. Shared fixture builders live in `src/tests/testFixtures.ts` for auth users, module contributions, and notifications.

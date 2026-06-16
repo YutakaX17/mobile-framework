@@ -441,6 +441,7 @@ input:focus-visible,
   color: #7f2b2b;
 }
 
+.form-list-view,
 .theme-list-view {
   display: grid;
   gap: 18px;
@@ -459,11 +460,13 @@ input:focus-visible,
   justify-content: flex-end;
 }
 
+.form-list,
 .theme-list {
   display: grid;
   gap: 12px;
 }
 
+.form-card,
 .theme-card {
   align-items: start;
   background: var(--mf-color-surface);
@@ -475,6 +478,7 @@ input:focus-visible,
   padding: 18px;
 }
 
+.form-card h3,
 .theme-card h3 {
   margin: 0 0 8px;
 }
@@ -483,6 +487,7 @@ input:focus-visible,
   color: var(--mf-color-text);
 }
 
+.form-card p:last-child,
 .theme-card p:last-child {
   color: var(--mf-color-text-muted);
   margin-bottom: 0;
@@ -739,6 +744,7 @@ input:focus-visible,
     grid-template-columns: repeat(2, minmax(140px, 1fr));
   }
 
+  .form-card,
   .theme-card {
     grid-template-columns: 1fr;
   }
