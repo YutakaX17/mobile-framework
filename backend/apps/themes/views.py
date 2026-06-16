@@ -5,14 +5,15 @@ from django.http import HttpRequest, JsonResponse
 from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 from apps.tenants.models import Tenant
 
-from .models import Theme
+from .models import Theme, ThemeRevision
+from .services import publish_theme_revision
 
 
-def _method_not_allowed() -> JsonResponse:
+def _method_not_allowed(allowed_method: str) -> JsonResponse:
     return api_error_response(
         ApiError(
             code=ApiErrorCode.VALIDATION_ERROR,
-            message="Only GET requests are supported.",
+            message=f"Only {allowed_method} requests are supported.",
             status_code=405,
         )
     )
@@ -68,7 +69,7 @@ def _serialize_theme_summary(theme: Theme) -> dict:
 
 def theme_list(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed()
+        return _method_not_allowed("GET")
 
     tenant = _tenant_from_request(request)
     if isinstance(tenant, JsonResponse):
@@ -84,7 +85,7 @@ def theme_list(request: HttpRequest) -> JsonResponse:
 
 def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed()
+        return _method_not_allowed("GET")
 
     tenant = _tenant_from_request(request)
     if isinstance(tenant, JsonResponse):
@@ -101,6 +102,43 @@ def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
             )
         )
 
+    data = _serialize_theme_summary(theme)
+    data["current_revision"] = _serialize_current_revision(theme, include_payload=True)
+    return JsonResponse({"theme": data})
+
+
+def theme_revision_publish(request: HttpRequest, theme_id: str, revision: int) -> JsonResponse:
+    if request.method != "POST":
+        return _method_not_allowed("POST")
+
+    tenant = _tenant_from_request(request)
+    if isinstance(tenant, JsonResponse):
+        return tenant
+
+    try:
+        theme = Theme.objects.select_related("current_revision").get(tenant=tenant, theme_id=theme_id)
+    except Theme.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"Theme `{theme_id}` was not found.",
+                status_code=404,
+            )
+        )
+
+    try:
+        revision_obj = theme.revisions.get(revision=revision)
+    except ThemeRevision.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"Theme revision `{revision}` was not found.",
+                status_code=404,
+            )
+        )
+
+    publish_theme_revision(theme, revision_obj)
+    theme.refresh_from_db()
     data = _serialize_theme_summary(theme)
     data["current_revision"] = _serialize_current_revision(theme, include_payload=True)
     return JsonResponse({"theme": data})

@@ -19,7 +19,7 @@ The backend includes a minimal Django project:
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry, manifest validation, dependency validation, and compatibility validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
-- `apps/themes`: initial tenant-scoped theme model, revision baseline, shared theme schema validation, and read-only API baseline.
+- `apps/themes`: initial tenant-scoped theme model, revision baseline, shared theme schema validation, read-only API baseline, and publish action baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 - `rust_ext`: initial PyO3/maturin scaffold for bounded native helpers.
 
