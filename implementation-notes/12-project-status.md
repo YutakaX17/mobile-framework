@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
-- `[~]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, and navigation model/schema baselines are complete; screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow remain pending.
+- `[~]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, and screen model/schema baselines are complete; action binding, permission binding, mobile preview, app validation, and publish draft flow remain pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -129,6 +129,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#171` completed: component registry baseline added.
 - `[x]` Task `#173` completed: component property editor baseline added.
 - `[x]` Task `#175` completed: navigation model/schema baseline added.
+- `[x]` Task `#177` completed: screen model/schema baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.

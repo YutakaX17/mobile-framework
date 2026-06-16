@@ -233,12 +233,32 @@ function ScreenCanvasCard({ screen }: ScreenCanvasCardProps) {
           <dd>{screen.screen_type}</dd>
         </div>
         <div>
+          <dt>Order</dt>
+          <dd>{screen.order}</dd>
+        </div>
+        <div>
           <dt>Route</dt>
           <dd>{screen.route}</dd>
         </div>
         <div>
           <dt>Layout</dt>
           <dd>{screen.layout}</dd>
+        </div>
+        <div>
+          <dt>Display</dt>
+          <dd>{screen.display_title}</dd>
+        </div>
+        <div>
+          <dt>Icon</dt>
+          <dd>{screen.display_icon}</dd>
+        </div>
+        <div>
+          <dt>Offline</dt>
+          <dd>{screen.offline_cache_strategy}</dd>
+        </div>
+        <div>
+          <dt>Sync required</dt>
+          <dd>{screen.sync_required ? "yes" : "no"}</dd>
         </div>
       </dl>
       <div className="app-component-stack">

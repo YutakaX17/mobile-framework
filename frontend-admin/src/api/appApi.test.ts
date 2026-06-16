@@ -57,10 +57,20 @@ const app: AppSummary = {
               label: "Patient Intake"
             }
           ],
+          display: {
+            description: "Capture a patient intake form.",
+            icon: "form",
+            title: "Patient Intake"
+          },
           layout: {
             type: "single_column"
           },
           name: "Patient Intake",
+          offline: {
+            cache_strategy: "screen_and_data",
+            sync_required: true
+          },
+          order: 0,
           route: "/intake",
           screen_id: "intake",
           screen_type: "form"
@@ -157,11 +167,17 @@ describe("app API helpers", () => {
       {
         action_count: 1,
         component_count: 1,
+        display_description: "Capture a patient intake form.",
+        display_icon: "form",
+        display_title: "Patient Intake",
         layout: "single_column",
         name: "Patient Intake",
+        offline_cache_strategy: "screen_and_data",
+        order: 0,
         route: "/intake",
         screen_id: "intake",
         screen_type: "form",
+        sync_required: true,
         top_level_components: [
           {
             binding: {

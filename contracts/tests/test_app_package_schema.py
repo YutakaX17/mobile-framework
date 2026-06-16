@@ -37,7 +37,10 @@ INVALID_FIXTURES = {
         FIXTURES / "invalid" / "v1" / "component-missing-component-id.json",
         FIXTURES / "invalid" / "v1" / "component-unknown-type.json",
     ],
-    "screen.schema.json": [FIXTURES / "invalid" / "v1" / "screen-form-missing-form-component.json"],
+    "screen.schema.json": [
+        FIXTURES / "invalid" / "v1" / "screen-form-missing-form-component.json",
+        FIXTURES / "invalid" / "v1" / "screen-invalid-order.json",
+    ],
     "app.schema.json": [
         FIXTURES / "invalid" / "v1" / "app-missing-navigation.json",
         FIXTURES / "invalid" / "v1" / "app-navigation-invalid-order.json",

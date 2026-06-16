@@ -63,7 +63,10 @@
     "screen": {
       "schema": "schemas/v1/screen.schema.json",
       "valid": ["fixtures/valid/v1/screen-intake.json"],
-      "invalid": ["fixtures/invalid/v1/screen-form-missing-form-component.json"]
+      "invalid": [
+        "fixtures/invalid/v1/screen-form-missing-form-component.json",
+        "fixtures/invalid/v1/screen-invalid-order.json"
+      ]
     },
     "sync_rule": {
       "schema": "schemas/v1/sync-rule.schema.json",

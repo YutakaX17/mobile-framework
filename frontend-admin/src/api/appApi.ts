@@ -55,10 +55,20 @@ export type AppAction = {
 export type AppScreen = {
   actions?: AppAction[];
   components: AppComponent[];
+  display?: {
+    description?: string;
+    icon?: string;
+    title?: string;
+  };
   layout?: {
     type?: string;
   };
   name: string;
+  offline?: {
+    cache_strategy?: "none" | "screen" | "screen_and_data";
+    sync_required?: boolean;
+  };
+  order?: number;
   permission?: string;
   route?: string;
   screen_id: string;
@@ -82,11 +92,17 @@ export type AppDetail = AppSummary;
 export type AppCanvasScreen = {
   action_count: number;
   component_count: number;
+  display_description: string;
+  display_icon: string;
+  display_title: string;
   layout: string;
   name: string;
+  offline_cache_strategy: string;
+  order: number;
   route: string;
   screen_id: string;
   screen_type: string;
+  sync_required: boolean;
   top_level_components: AppComponent[];
 };
 
@@ -169,11 +185,17 @@ export function getAppCanvasScreens(payload: AppPayload | undefined): AppCanvasS
   return (payload?.screens ?? []).map((screen) => ({
     action_count: screen.actions?.length ?? 0,
     component_count: countComponents(screen.components),
+    display_description: screen.display?.description ?? "not set",
+    display_icon: screen.display?.icon ?? "not set",
+    display_title: screen.display?.title ?? screen.name,
     layout: screen.layout?.type ?? "single_column",
     name: screen.name,
+    offline_cache_strategy: screen.offline?.cache_strategy ?? "none",
+    order: screen.order ?? 0,
     route: screen.route ?? "not routed",
     screen_id: screen.screen_id,
     screen_type: screen.screen_type,
+    sync_required: screen.offline?.sync_required ?? false,
     top_level_components: screen.components
   }));
 }

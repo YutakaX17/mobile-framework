@@ -211,8 +211,18 @@
                                     "screen_id":  "intake",
                                     "name":  "Patient Intake",
                                     "screen_type":  "form",
+                                    "order":  0,
                                     "route":  "/intake",
                                     "permission":  "forms.submit_patient_intake",
+                                    "display":  {
+                                                    "title":  "Patient Intake",
+                                                    "description":  "Capture a patient intake form.",
+                                                    "icon":  "form"
+                                                },
+                                    "offline":  {
+                                                    "cache_strategy":  "screen_and_data",
+                                                    "sync_required":  true
+                                                },
                                     "layout":  {
                                                    "type":  "single_column"
                                                },
