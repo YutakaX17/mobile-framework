@@ -7,6 +7,7 @@ import {
   getFormFieldPropertySummaries,
   getFormLogicRuleSummaries,
   getFormPayload,
+  getFormPreviewItems,
   getFormPropertyRows,
   getFormToolboxItems,
   getFormValidationRuleSummaries,
@@ -14,6 +15,7 @@ import {
   type FormField,
   type FormFieldPropertySummary,
   type FormLogicRuleSummary,
+  type FormPreviewItem,
   type FormPropertyRow,
   type FormValidationRuleSummary
 } from "../../api/formApi";
@@ -56,6 +58,7 @@ export function FormDesignerView() {
   const formProperties = useMemo(() => getFormPropertyRows(payload), [payload]);
   const fieldProperties = useMemo(() => getFormFieldPropertySummaries(payload), [payload]);
   const logicRules = useMemo(() => getFormLogicRuleSummaries(payload), [payload]);
+  const previewItems = useMemo(() => getFormPreviewItems(payload), [payload]);
   const validationRules = useMemo(() => getFormValidationRuleSummaries(payload), [payload]);
 
   return (
@@ -160,10 +163,79 @@ export function FormDesignerView() {
 
           <LogicPanel rules={logicRules} />
           <ValidationPanel rules={validationRules} />
+          <FormPreviewPanel items={previewItems} title={payload.name} />
         </>
       ) : null}
     </section>
   );
+}
+
+type FormPreviewPanelProps = {
+  items: FormPreviewItem[];
+  title: string;
+};
+
+function FormPreviewPanel({ items, title }: FormPreviewPanelProps) {
+  return (
+    <section className="form-preview-panel" aria-label="Form preview">
+      <div className="preview-panel-heading">
+        <h3>Preview</h3>
+        <span className="queue-count">{items.length} fields</span>
+      </div>
+      <div className="form-preview-screen">
+        <header>
+          <p>Mobile form</p>
+          <h4>{title}</h4>
+        </header>
+        {items.length > 0 ? (
+          <div className="form-preview-fields">
+            {items.map((item) => (
+              <PreviewField item={item} key={item.field_id} />
+            ))}
+          </div>
+        ) : (
+          <p>No preview fields are available.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+type PreviewFieldProps = {
+  item: FormPreviewItem;
+};
+
+function PreviewField({ item }: PreviewFieldProps) {
+  return (
+    <label className={`preview-field preview-field-${item.type}`}>
+      <span>
+        {item.label}
+        {item.required ? <strong>required</strong> : null}
+      </span>
+      <PreviewControl item={item} />
+    </label>
+  );
+}
+
+function PreviewControl({ item }: PreviewFieldProps) {
+  if (item.type === "checkbox") {
+    return <input aria-label={item.label} disabled={item.read_only} type="checkbox" />;
+  }
+  if (item.type === "select") {
+    return (
+      <select aria-label={item.label} disabled={item.read_only}>
+        <option>{item.placeholder}</option>
+        {item.options.map((option) => (
+          <option key={option}>{option}</option>
+        ))}
+      </select>
+    );
+  }
+  if (item.type === "unsupported") {
+    return <span className="preview-unsupported">{item.placeholder}</span>;
+  }
+
+  return <input aria-label={item.label} disabled={item.read_only} placeholder={item.placeholder} type={item.type} />;
 }
 
 type ValidationPanelProps = {
