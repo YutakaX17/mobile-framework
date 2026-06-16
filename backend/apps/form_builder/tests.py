@@ -5,7 +5,7 @@ from pathlib import Path
 from django.core.exceptions import ValidationError
 from django.test import Client, TestCase
 
-from apps.form_builder.models import FormDefinition, FormRevision, FormRevisionStatus
+from apps.form_builder.models import FormDefinition, FormRevision, FormRevisionStatus, FormSubmission, FormSubmissionStatus
 from apps.tenants.models import Tenant
 
 
@@ -151,3 +151,84 @@ class FormApiTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_form_submit_creates_submission_for_current_revision(self):
+        response = self.client.post(
+            "/api/forms/patient_intake/submissions/?tenant=demo",
+            data=json.dumps({"answers": {"age": 36, "full_name": "Ada Lovelace"}}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        payload = response.json()["submission"]
+        self.assertEqual(payload["form_id"], "patient_intake")
+        self.assertEqual(payload["revision"], self.revision.revision)
+        self.assertEqual(payload["status"], FormSubmissionStatus.RECEIVED)
+        self.assertEqual(payload["answer_count"], 2)
+
+        submission = FormSubmission.objects.get(id=payload["id"])
+        self.assertEqual(submission.tenant, self.tenant)
+        self.assertEqual(submission.form, self.form)
+        self.assertEqual(submission.revision, self.revision)
+        self.assertEqual(submission.answers["full_name"], "Ada Lovelace")
+
+    def test_form_submit_is_tenant_scoped(self):
+        other_tenant = Tenant.objects.create(slug="other", name="Other Tenant")
+        other_form = FormDefinition.from_payload(other_tenant, self.payload)
+        other_form.save()
+        other_revision = FormRevision.create_next(
+            other_form,
+            deepcopy(self.payload),
+            status=FormRevisionStatus.PUBLISHED,
+        )
+        other_form.current_revision = other_revision
+        other_form.save()
+
+        response = self.client.post(
+            "/api/forms/patient_intake/submissions/?tenant=other",
+            data=json.dumps({"answers": {"full_name": "Grace Hopper"}}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        submission = FormSubmission.objects.get(id=response.json()["submission"]["id"])
+        self.assertEqual(submission.tenant, other_tenant)
+        self.assertEqual(submission.form, other_form)
+        self.assertEqual(submission.revision, other_revision)
+        self.assertEqual(FormSubmission.objects.filter(tenant=self.tenant).count(), 0)
+
+    def test_form_submit_returns_not_found_for_missing_form(self):
+        response = self.client.post(
+            "/api/forms/missing_form/submissions/?tenant=demo",
+            data=json.dumps({"answers": {"full_name": "Ada Lovelace"}}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_form_submit_returns_conflict_without_current_revision(self):
+        self.form.current_revision = None
+        self.form.save()
+
+        response = self.client.post(
+            "/api/forms/patient_intake/submissions/?tenant=demo",
+            data=json.dumps({"answers": {"full_name": "Ada Lovelace"}}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.json()["error"]["code"], "conflict")
+        self.assertEqual(FormSubmission.objects.count(), 0)
+
+    def test_form_submit_rejects_invalid_body(self):
+        response = self.client.post(
+            "/api/forms/patient_intake/submissions/?tenant=demo",
+            data=json.dumps({"answers": []}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"]["code"], "validation_error")
+        self.assertEqual(response.json()["error"]["details"][0]["field"], "answers")
+        self.assertEqual(FormSubmission.objects.count(), 0)
