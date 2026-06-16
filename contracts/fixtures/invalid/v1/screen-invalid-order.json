@@ -1,8 +1,8 @@
-﻿{
+{
   "screen_id": "intake",
   "name": "Patient Intake",
   "screen_type": "form",
-  "order": 0,
+  "order": -1,
   "route": "/intake",
   "permission": "forms.submit_patient_intake",
   "display": {

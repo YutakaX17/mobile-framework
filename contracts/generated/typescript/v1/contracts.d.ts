@@ -272,10 +272,20 @@ export interface Screen {
   screen_id: string;
   name: string;
   screen_type: "dashboard" | "form" | "detail" | "list" | "settings" | "custom";
+  order?: number;
   route?: string;
   permission?: string;
   layout?: {
     type?: "single_column" | "two_column" | "list" | "card_grid";
+  };
+  display?: {
+    title?: string;
+    description?: string;
+    icon?: string;
+  };
+  offline?: {
+    cache_strategy?: "none" | "screen" | "screen_and_data";
+    sync_required?: boolean;
   };
   components: Component[];
   actions?: Action[];

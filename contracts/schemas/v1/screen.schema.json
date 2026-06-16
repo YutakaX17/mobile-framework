@@ -22,6 +22,12 @@
       "type": "string",
       "enum": ["dashboard", "form", "detail", "list", "settings", "custom"]
     },
+    "order": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000,
+      "default": 0
+    },
     "route": {
       "type": "string",
       "pattern": "^/[a-z0-9_/-]*$",
@@ -39,6 +45,41 @@
         "type": {
           "type": "string",
           "enum": ["single_column", "two_column", "list", "card_grid"]
+        }
+      }
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        }
+      }
+    },
+    "offline": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cache_strategy": {
+          "type": "string",
+          "enum": ["none", "screen", "screen_and_data"],
+          "default": "none"
+        },
+        "sync_required": {
+          "type": "boolean",
+          "default": false
         }
       }
     },

@@ -260,9 +260,12 @@ public data class Screen(
     val screen_id: String,
     val name: String,
     val screen_type: String,
+    val order: Int? = null,
     val route: String? = null,
     val permission: String? = null,
     val layout: JsonObject? = null,
+    val display: JsonObject? = null,
+    val offline: JsonObject? = null,
     val components: List<Component>,
     val actions: List<Action>? = null,
     val extensions: JsonObject? = null

@@ -235,9 +235,12 @@ class Screen(TypedDict):
     screen_id: str
     name: str
     screen_type: Literal['dashboard', 'form', 'detail', 'list', 'settings', 'custom']
+    order: NotRequired[int]
     route: NotRequired[str]
     permission: NotRequired[str]
     layout: NotRequired[dict[str, JsonValue]]
+    display: NotRequired[dict[str, JsonValue]]
+    offline: NotRequired[dict[str, JsonValue]]
     components: list[Component]
     actions: NotRequired[list[Action]]
     extensions: NotRequired[dict[str, JsonValue]]
