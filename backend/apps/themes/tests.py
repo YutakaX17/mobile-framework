@@ -150,3 +150,37 @@ class ThemeApiTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_publish_revision_sets_current_revision(self):
+        next_payload = deepcopy(self.payload)
+        next_revision = ThemeRevision.create_next(
+            self.theme,
+            next_payload,
+            status=ThemeRevisionStatus.VALIDATED,
+        )
+
+        response = self.client.post(
+            f"/api/themes/field_ops/revisions/{next_revision.revision}/publish/?tenant=demo",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["theme"]["current_revision"]["revision"], next_revision.revision)
+        next_revision.refresh_from_db()
+        self.revision.refresh_from_db()
+        self.theme.refresh_from_db()
+        self.assertEqual(next_revision.status, ThemeRevisionStatus.PUBLISHED)
+        self.assertEqual(self.revision.status, ThemeRevisionStatus.ARCHIVED)
+        self.assertEqual(self.theme.current_revision_id, next_revision.id)
+
+    def test_publish_revision_returns_not_found_for_missing_revision(self):
+        response = self.client.post("/api/themes/field_ops/revisions/99/publish/?tenant=demo")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_publish_revision_returns_not_found_for_missing_theme(self):
+        response = self.client.post("/api/themes/missing_theme/revisions/1/publish/?tenant=demo")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
