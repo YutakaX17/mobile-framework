@@ -443,6 +443,7 @@ input:focus-visible,
 
 .form-list-view,
 .form-designer-view,
+.app-designer-view,
 .app-list-view,
 .theme-list-view {
   display: grid;
@@ -631,6 +632,34 @@ input:focus-visible,
 
 .field-properties h4 {
   margin: 0;
+}
+
+.app-designer-grid {
+  align-items: start;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(210px, 0.28fr) minmax(0, 1fr) minmax(240px, 0.34fr);
+}
+
+.app-screen-canvas,
+.app-component-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.app-screen-card {
+  background: var(--mf-color-surface);
+  border: 1px solid var(--mf-color-border);
+  border-radius: var(--mf-radius-md);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.screen-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .logic-panel,
@@ -1009,6 +1038,7 @@ input:focus-visible,
     grid-template-columns: 1fr;
   }
 
+  .app-designer-grid,
   .form-designer-grid {
     grid-template-columns: 1fr;
   }
