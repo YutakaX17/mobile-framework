@@ -24,6 +24,7 @@ export type FormField = {
     data_path: string;
     entity_type?: string;
   };
+  calculation?: FormRule;
   field_id: string;
   field_type: string;
   help_text?: string;
@@ -32,6 +33,12 @@ export type FormField = {
   read_only?: boolean;
   required?: boolean;
   validation?: Record<string, unknown>;
+  visibility?: FormRule;
+};
+
+export type FormRule = {
+  expression: string;
+  rule_type: string;
 };
 
 export type FormLayoutSection = {
@@ -79,6 +86,14 @@ export type FormFieldPropertySummary = {
   field_id: string;
   label: string;
   rows: FormPropertyRow[];
+};
+
+export type FormLogicRuleSummary = {
+  expression: string;
+  field_id: string;
+  field_label: string;
+  kind: "calculation" | "visibility";
+  rule_type: string;
 };
 
 type FormListResponse = {
@@ -202,6 +217,34 @@ export function getFormFieldPropertySummaries(payload: FormPayload | undefined):
       { label: "Validation", value: String(Object.keys(field.validation ?? {}).length) }
     ]
   }));
+}
+
+export function getFormLogicRuleSummaries(payload: FormPayload | undefined): FormLogicRuleSummary[] {
+  return (payload?.fields ?? []).flatMap((field) => {
+    const rules: FormLogicRuleSummary[] = [];
+
+    if (field.visibility) {
+      rules.push({
+        expression: field.visibility.expression,
+        field_id: field.field_id,
+        field_label: field.label,
+        kind: "visibility",
+        rule_type: field.visibility.rule_type
+      });
+    }
+
+    if (field.calculation) {
+      rules.push({
+        expression: field.calculation.expression,
+        field_id: field.field_id,
+        field_label: field.label,
+        kind: "calculation",
+        rule_type: field.calculation.rule_type
+      });
+    }
+
+    return rules;
+  });
 }
 
 function formatFieldType(fieldType: string): string {

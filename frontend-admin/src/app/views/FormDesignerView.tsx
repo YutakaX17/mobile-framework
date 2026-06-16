@@ -5,12 +5,14 @@ import {
   fetchFormDetail,
   getFormCanvasSections,
   getFormFieldPropertySummaries,
+  getFormLogicRuleSummaries,
   getFormPayload,
   getFormPropertyRows,
   getFormToolboxItems,
   type FormDetail,
   type FormField,
   type FormFieldPropertySummary,
+  type FormLogicRuleSummary,
   type FormPropertyRow
 } from "../../api/formApi";
 
@@ -51,6 +53,7 @@ export function FormDesignerView() {
   const canvasSections = useMemo(() => getFormCanvasSections(payload), [payload]);
   const formProperties = useMemo(() => getFormPropertyRows(payload), [payload]);
   const fieldProperties = useMemo(() => getFormFieldPropertySummaries(payload), [payload]);
+  const logicRules = useMemo(() => getFormLogicRuleSummaries(payload), [payload]);
 
   return (
     <section className="form-designer-view" aria-labelledby="form-designer-title">
@@ -151,8 +154,41 @@ export function FormDesignerView() {
               </div>
             </aside>
           </section>
+
+          <LogicPanel rules={logicRules} />
         </>
       ) : null}
+    </section>
+  );
+}
+
+type LogicPanelProps = {
+  rules: FormLogicRuleSummary[];
+};
+
+function LogicPanel({ rules }: LogicPanelProps) {
+  return (
+    <section className="logic-panel" aria-label="Conditional logic">
+      <div className="preview-panel-heading">
+        <h3>Conditional logic</h3>
+        <span className="queue-count">{rules.length} rules</span>
+      </div>
+      {rules.length > 0 ? (
+        <div className="logic-rule-list">
+          {rules.map((rule) => (
+            <article className="logic-rule" key={`${rule.field_id}-${rule.kind}`}>
+              <div>
+                <p className="eyebrow">{rule.kind}</p>
+                <h4>{rule.field_label}</h4>
+              </div>
+              <code>{rule.expression}</code>
+              <span className="status status-draft">{rule.rule_type}</span>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p>No conditional visibility or calculation rules are configured.</p>
+      )}
     </section>
   );
 }
