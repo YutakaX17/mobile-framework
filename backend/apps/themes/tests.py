@@ -184,3 +184,37 @@ class ThemeApiTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_rollback_revision_sets_current_revision(self):
+        archived_payload = deepcopy(self.payload)
+        archived_revision = ThemeRevision.create_next(
+            self.theme,
+            archived_payload,
+            status=ThemeRevisionStatus.ARCHIVED,
+        )
+
+        response = self.client.post(
+            f"/api/themes/field_ops/revisions/{archived_revision.revision}/rollback/?tenant=demo",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["theme"]["current_revision"]["revision"], archived_revision.revision)
+        archived_revision.refresh_from_db()
+        self.revision.refresh_from_db()
+        self.theme.refresh_from_db()
+        self.assertEqual(archived_revision.status, ThemeRevisionStatus.PUBLISHED)
+        self.assertEqual(self.revision.status, ThemeRevisionStatus.ARCHIVED)
+        self.assertEqual(self.theme.current_revision_id, archived_revision.id)
+
+    def test_rollback_revision_returns_not_found_for_missing_revision(self):
+        response = self.client.post("/api/themes/field_ops/revisions/99/rollback/?tenant=demo")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_rollback_revision_returns_not_found_for_missing_theme(self):
+        response = self.client.post("/api/themes/missing_theme/revisions/1/rollback/?tenant=demo")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")

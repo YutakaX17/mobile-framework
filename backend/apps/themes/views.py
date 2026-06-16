@@ -6,7 +6,7 @@ from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_r
 from apps.tenants.models import Tenant
 
 from .models import Theme, ThemeRevision
-from .services import publish_theme_revision
+from .services import publish_theme_revision, rollback_theme_revision
 
 
 def _method_not_allowed(allowed_method: str) -> JsonResponse:
@@ -138,6 +138,43 @@ def theme_revision_publish(request: HttpRequest, theme_id: str, revision: int) -
         )
 
     publish_theme_revision(theme, revision_obj)
+    theme.refresh_from_db()
+    data = _serialize_theme_summary(theme)
+    data["current_revision"] = _serialize_current_revision(theme, include_payload=True)
+    return JsonResponse({"theme": data})
+
+
+def theme_revision_rollback(request: HttpRequest, theme_id: str, revision: int) -> JsonResponse:
+    if request.method != "POST":
+        return _method_not_allowed("POST")
+
+    tenant = _tenant_from_request(request)
+    if isinstance(tenant, JsonResponse):
+        return tenant
+
+    try:
+        theme = Theme.objects.select_related("current_revision").get(tenant=tenant, theme_id=theme_id)
+    except Theme.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"Theme `{theme_id}` was not found.",
+                status_code=404,
+            )
+        )
+
+    try:
+        revision_obj = theme.revisions.get(revision=revision)
+    except ThemeRevision.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"Theme revision `{revision}` was not found.",
+                status_code=404,
+            )
+        )
+
+    rollback_theme_revision(theme, revision_obj)
     theme.refresh_from_db()
     data = _serialize_theme_summary(theme)
     data["current_revision"] = _serialize_current_revision(theme, include_payload=True)
