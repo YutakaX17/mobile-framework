@@ -6,7 +6,9 @@ import {
   fetchFormDetail,
   fetchFormSummaries,
   getFormCanvasSections,
+  getFormFieldPropertySummaries,
   getFormPayload,
+  getFormPropertyRows,
   getFormToolboxItems,
   type FormSummary
 } from "./formApi";
@@ -21,7 +23,11 @@ const form: FormSummary = {
           field_id: "full_name",
           field_type: "text",
           label: "Full name",
-          required: true
+          required: true,
+          validation: {
+            max_length: 120,
+            min_length: 2
+          }
         },
         {
           binding: { data_path: "patient.age", entity_type: "patient" },
@@ -149,5 +155,30 @@ describe("form API helpers", () => {
         section_id: "identity"
       }
     ]);
+  });
+
+  it("extracts form and field property rows from form payloads", () => {
+    const payload = getFormPayload(form);
+
+    expect(getFormPropertyRows(payload)).toEqual([
+      { label: "Form id", value: "patient_intake" },
+      { label: "Version", value: "0.1.0" },
+      { label: "Mode", value: "standalone" },
+      { label: "Entity", value: "not set" },
+      { label: "Layout", value: "sectioned" },
+      { label: "Fields", value: "3" }
+    ]);
+    expect(getFormFieldPropertySummaries(payload)[0]).toEqual({
+      field_id: "full_name",
+      label: "Full name",
+      rows: [
+        { label: "Type", value: "Text" },
+        { label: "Binding", value: "patient.full_name" },
+        { label: "Required", value: "yes" },
+        { label: "Read only", value: "no" },
+        { label: "Options", value: "0" },
+        { label: "Validation", value: "2" }
+      ]
+    });
   });
 });
