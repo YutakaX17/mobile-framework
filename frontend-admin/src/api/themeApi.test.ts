@@ -11,6 +11,8 @@ import {
   getNumberTokenRows,
   getThemePayload,
   getTypographyTokenRows,
+  updateThemeDraft,
+  type ThemePayload,
   type ThemeSummary
 } from "./themeApi";
 
@@ -135,6 +137,66 @@ describe("theme API helpers", () => {
     });
 
     await expect(fetchThemeDetail("field_ops", client, "demo")).rejects.toThrow("theme object");
+  });
+
+  it("updates a theme draft revision for a tenant", async () => {
+    let requestedUrl = "";
+    let requestInit: RequestInit | undefined;
+    const client = createAdminApiClient({
+      baseUrl: "/api",
+      fetcher: async (input, init) => {
+        requestedUrl = String(input);
+        requestInit = init;
+        return new Response(
+          JSON.stringify({
+            draft_revision: {
+              payload: theme.current_revision?.payload,
+              revision: 2,
+              schema_version: "v1",
+              status: "draft",
+              version: "0.2.0"
+            },
+            theme
+          }),
+          {
+            headers: { "Content-Type": "application/json" },
+            status: 200
+          }
+        );
+      }
+    });
+
+    const result = await updateThemeDraft(
+      "field_ops",
+      theme.current_revision?.payload as ThemePayload,
+      client,
+      "demo"
+    );
+
+    expect(requestedUrl).toBe("/api/themes/field_ops/?tenant=demo");
+    expect(requestInit?.method).toBe("PUT");
+    expect(JSON.parse(String(requestInit?.body))).toMatchObject({ theme_id: "field_ops" });
+    expect(result.draft_revision).toMatchObject({ revision: 2, status: "draft" });
+  });
+
+  it("rejects malformed theme update responses", async () => {
+    const client = createAdminApiClient({
+      baseUrl: "/api",
+      fetcher: async () =>
+        new Response(JSON.stringify({ theme }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200
+        })
+    });
+
+    await expect(
+      updateThemeDraft(
+        "field_ops",
+        theme.current_revision?.payload as ThemePayload,
+        client,
+        "demo"
+      )
+    ).rejects.toThrow("draft revision");
   });
 
   it("counts themes by current revision status", () => {

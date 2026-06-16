@@ -151,6 +151,57 @@ class ThemeApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["error"]["code"], "not_found")
 
+    def test_update_theme_creates_draft_revision(self):
+        updated_payload = deepcopy(self.payload)
+        updated_payload["name"] = "Field Operations Draft"
+        updated_payload["description"] = "Updated theme draft."
+        updated_payload["version"] = "0.2.0"
+
+        response = self.client.put(
+            "/api/themes/field_ops/?tenant=demo",
+            data=json.dumps(updated_payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["theme"]["name"], "Field Operations Draft")
+        self.assertEqual(payload["theme"]["current_revision"]["revision"], self.revision.revision)
+        self.assertEqual(payload["draft_revision"]["revision"], 2)
+        self.assertEqual(payload["draft_revision"]["status"], ThemeRevisionStatus.DRAFT)
+        self.assertEqual(payload["draft_revision"]["payload"]["version"], "0.2.0")
+
+        self.theme.refresh_from_db()
+        self.revision.refresh_from_db()
+        draft_revision = self.theme.revisions.get(revision=2)
+        self.assertEqual(self.theme.current_revision_id, self.revision.id)
+        self.assertEqual(self.revision.status, ThemeRevisionStatus.PUBLISHED)
+        self.assertEqual(draft_revision.status, ThemeRevisionStatus.DRAFT)
+
+    def test_update_theme_returns_not_found_for_missing_theme(self):
+        response = self.client.put(
+            "/api/themes/missing_theme/?tenant=demo",
+            data=json.dumps(self.payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_update_theme_rejects_invalid_payload(self):
+        invalid_payload = deepcopy(self.payload)
+        invalid_payload.pop("name")
+
+        response = self.client.put(
+            "/api/themes/field_ops/?tenant=demo",
+            data=json.dumps(invalid_payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"]["code"], "validation_error")
+        self.assertEqual(self.theme.revisions.count(), 1)
+
     def test_publish_revision_sets_current_revision(self):
         next_payload = deepcopy(self.payload)
         next_revision = ThemeRevision.create_next(

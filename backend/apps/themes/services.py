@@ -12,6 +12,28 @@ def validate_theme_payload(payload: dict[str, Any]) -> None:
 
 
 @transaction.atomic
+def create_theme_draft_revision(theme, payload: dict[str, Any], created_by=None):
+    from django.core.exceptions import ValidationError
+
+    from .models import ThemeRevision, ThemeRevisionStatus
+
+    validate_theme_payload(payload)
+    if payload.get("theme_id") != theme.theme_id:
+        raise ValidationError({"theme_id": f"Must match existing theme id `{theme.theme_id}`."})
+
+    theme.name = payload["name"]
+    theme.description = payload.get("description", "")
+    theme.save(update_fields=["name", "description", "updated_at"])
+
+    return ThemeRevision.create_next(
+        theme,
+        payload,
+        created_by=created_by,
+        status=ThemeRevisionStatus.DRAFT,
+    )
+
+
+@transaction.atomic
 def publish_theme_revision(theme, revision):
     from .models import ThemeRevision, ThemeRevisionStatus
 
