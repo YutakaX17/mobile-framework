@@ -7,6 +7,7 @@ import {
   fetchFormSummaries,
   getFormCanvasSections,
   getFormFieldPropertySummaries,
+  getFormLogicRuleSummaries,
   getFormPayload,
   getFormPropertyRows,
   getFormToolboxItems,
@@ -180,5 +181,48 @@ describe("form API helpers", () => {
         { label: "Validation", value: "2" }
       ]
     });
+  });
+
+  it("extracts conditional logic rules from form payload fields", () => {
+    const payload = getFormPayload(form);
+    const payloadWithLogic = payload
+      ? {
+          ...payload,
+          fields: [
+            {
+              ...payload.fields[0],
+              visibility: {
+                expression: "patient.age >= 18",
+                rule_type: "supported_expression"
+              }
+            },
+            {
+              ...payload.fields[1],
+              calculation: {
+                expression: "current_year - patient.birth_year",
+                rule_type: "server_evaluated"
+              }
+            }
+          ]
+        }
+      : undefined;
+
+    expect(getFormLogicRuleSummaries(payload)).toEqual([]);
+    expect(getFormLogicRuleSummaries(payloadWithLogic)).toEqual([
+      {
+        expression: "patient.age >= 18",
+        field_id: "full_name",
+        field_label: "Full name",
+        kind: "visibility",
+        rule_type: "supported_expression"
+      },
+      {
+        expression: "current_year - patient.birth_year",
+        field_id: "age",
+        field_label: "Age",
+        kind: "calculation",
+        rule_type: "server_evaluated"
+      }
+    ]);
   });
 });
