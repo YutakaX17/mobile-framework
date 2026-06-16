@@ -6,10 +6,12 @@ import {
   fetchAppDetail,
   getAppActionSummaries,
   getAppCanvasScreens,
+  getAppComponentPropertySummaries,
   getAppPayload,
   type AppActionSummary,
   type AppCanvasScreen,
   type AppComponent,
+  type AppComponentPropertySummary,
   type AppDetail,
   type AppNavigationItem
 } from "../../api/appApi";
@@ -49,6 +51,7 @@ export function AppDesignerView() {
   const payload = useMemo(() => (state.app ? getAppPayload(state.app) : undefined), [state.app]);
   const screens = useMemo(() => getAppCanvasScreens(payload), [payload]);
   const actions = useMemo(() => getAppActionSummaries(payload), [payload]);
+  const componentProperties = useMemo(() => getAppComponentPropertySummaries(payload), [payload]);
   const componentToolboxItems = useMemo(() => getComponentToolboxItems(payload), [payload]);
 
   return (
@@ -144,6 +147,7 @@ export function AppDesignerView() {
                   <dd>{payload.permissions?.length ?? 0}</dd>
                 </div>
               </dl>
+              <ComponentPropertiesList items={componentProperties} />
             </aside>
           </section>
 
@@ -167,7 +171,7 @@ function ComponentRegistryList({ items }: ComponentRegistryListProps) {
           <div className="toolbox-item" key={item.component_type}>
             <strong>{item.label}</strong>
             <span>
-              {item.summary} · {item.count} on canvas
+              {item.summary} - {item.count} on canvas
             </span>
           </div>
         ))}
@@ -249,6 +253,60 @@ function ComponentBlock({ component }: ComponentBlockProps) {
       <span className="status status-draft">{component.component_type}</span>
     </article>
   );
+}
+
+type ComponentPropertiesListProps = {
+  items: AppComponentPropertySummary[];
+};
+
+function ComponentPropertiesList({ items }: ComponentPropertiesListProps) {
+  return (
+    <section className="field-properties-list" aria-label="Component properties">
+      <h3>Component properties</h3>
+      {items.length > 0 ? (
+        items.map((item) => (
+          <article className="field-properties" key={`${item.screen_id}-${item.component_id}`}>
+            <p className="eyebrow">
+              {item.screen_name} - {item.screen_id}
+            </p>
+            <h4>{item.label}</h4>
+            <dl className="property-list">
+              <div>
+                <dt>Component</dt>
+                <dd>{item.component_id}</dd>
+              </div>
+              <div>
+                <dt>Type</dt>
+                <dd>{item.component_type}</dd>
+              </div>
+              <div>
+                <dt>Binding</dt>
+                <dd>{item.binding}</dd>
+              </div>
+              <div>
+                <dt>Children</dt>
+                <dd>{item.child_count}</dd>
+              </div>
+              <div>
+                <dt>Custom</dt>
+                <dd>{formatComponentProperties(item)}</dd>
+              </div>
+            </dl>
+          </article>
+        ))
+      ) : (
+        <p>No component properties are configured.</p>
+      )}
+    </section>
+  );
+}
+
+function formatComponentProperties(item: AppComponentPropertySummary): string {
+  if (item.property_count === 0) {
+    return "none";
+  }
+
+  return item.properties.map((property) => `${property.name}: ${property.value}`).join(", ");
 }
 
 type ActionPanelProps = {
