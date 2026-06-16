@@ -1,0 +1,14 @@
+{
+  "schema_version": "v1",
+  "local_id": "local-0001",
+  "device_id": "device-alpha-01",
+  "form_id": "patient_intake",
+  "revision": 3,
+  "submitted_at": "2026-06-16T11:00:00Z",
+  "answers": [
+    {
+      "field_id": "full_name",
+      "value": "Ada Lovelace"
+    }
+  ]
+}

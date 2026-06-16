@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "local_id": "local-0001",
+  "device_id": "device-alpha-01",
+  "form_id": "patient_intake",
+  "revision": 3,
+  "submitted_at": "2026-06-16T11:00:00Z",
+  "answers": {
+    "full_name": "Ada Lovelace",
+    "age": 36,
+    "consent": true,
+    "symptoms": ["fatigue", "dizziness"]
+  },
+  "metadata": {
+    "app_id": "field_ops",
+    "package_version": "0.1.0",
+    "screen_id": "patient_intake_screen"
+  }
+}

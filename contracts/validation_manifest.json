@@ -40,6 +40,14 @@
         "fixtures/invalid/v1/form-unknown-mode.json"
       ]
     },
+    "mobile_form_submission": {
+      "schema": "schemas/v1/mobile-form-submission.schema.json",
+      "valid": ["fixtures/valid/v1/mobile-form-submission-patient-intake.json"],
+      "invalid": [
+        "fixtures/invalid/v1/mobile-form-submission-invalid-answers.json",
+        "fixtures/invalid/v1/mobile-form-submission-missing-local-id.json"
+      ]
+    },
     "module_manifest": {
       "schema": "schemas/v1/module-manifest.schema.json",
       "valid": ["fixtures/valid/v1/module-manifest-core.json"],

@@ -44,7 +44,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-04 Shared Contracts.
 - `[x]` EPIC-05 Admin Frontend Shell.
 - `[x]` EPIC-06 Theme Builder.
-- `[~]` EPIC-07 Form Builder.
+- `[x]` EPIC-07 Form Builder.
 - `[ ]` EPIC-08 App And Screen Builder.
 - `[ ]` EPIC-09 Deployment Packages.
 - `[ ]` EPIC-10 Mobile Runtime.
@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, and submission endpoint baselines are complete; mobile contract remains pending.
+- `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -120,6 +120,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#157` completed: form validation rule baseline added.
 - `[x]` Task `#159` completed: form preview baseline added.
 - `[x]` Task `#161` completed: form submission endpoint baseline added.
+- `[x]` Task `#163` completed: mobile form contract baseline added.
+- `[x]` EPIC-07 Form Builder completed: typed form schema, admin builder surfaces, backend APIs, preview, submission endpoint, and mobile submission contract baseline are in place.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
