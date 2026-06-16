@@ -94,6 +94,23 @@ export type AppActionSummary = {
   target: string;
 };
 
+export type AppComponentPropertyRow = {
+  name: string;
+  value: string;
+};
+
+export type AppComponentPropertySummary = {
+  binding: string;
+  child_count: number;
+  component_id: string;
+  component_type: string;
+  label: string;
+  properties: AppComponentPropertyRow[];
+  property_count: number;
+  screen_id: string;
+  screen_name: string;
+};
+
 type AppListResponse = {
   apps: AppSummary[];
 };
@@ -169,8 +186,55 @@ export function getAppActionSummaries(payload: AppPayload | undefined): AppActio
   );
 }
 
+export function getAppComponentPropertySummaries(
+  payload: AppPayload | undefined
+): AppComponentPropertySummary[] {
+  return (payload?.screens ?? []).flatMap((screen) =>
+    screen.components.flatMap((component) => flattenComponentProperties(screen, component))
+  );
+}
+
 function countComponents(components: AppComponent[]): number {
   return components.reduce((total, component) => total + 1 + countComponents(component.children ?? []), 0);
+}
+
+function flattenComponentProperties(
+  screen: AppScreen,
+  component: AppComponent
+): AppComponentPropertySummary[] {
+  const properties = Object.entries(component.properties ?? {})
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([name, value]) => ({
+      name,
+      value: formatPropertyValue(value)
+    }));
+
+  return [
+    {
+      binding: formatComponentBinding(component),
+      child_count: component.children?.length ?? 0,
+      component_id: component.component_id,
+      component_type: component.component_type,
+      label: component.label ?? "not set",
+      properties,
+      property_count: properties.length,
+      screen_id: screen.screen_id,
+      screen_name: screen.name
+    },
+    ...(component.children ?? []).flatMap((child) => flattenComponentProperties(screen, child))
+  ];
+}
+
+function formatComponentBinding(component: AppComponent): string {
+  return component.binding?.form_id ?? component.binding?.data_path ?? component.binding?.action_id ?? "unbound";
+}
+
+function formatPropertyValue(value: string | number | boolean | null): string {
+  if (value === null) {
+    return "not set";
+  }
+
+  return String(value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

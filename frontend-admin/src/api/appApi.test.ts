@@ -7,6 +7,7 @@ import {
   fetchAppSummaries,
   getAppActionSummaries,
   getAppCanvasScreens,
+  getAppComponentPropertySummaries,
   getAppPayload,
   type AppSummary
 } from "./appApi";
@@ -176,6 +177,87 @@ describe("app API helpers", () => {
         label: "Submit",
         screen_id: "intake",
         target: "patient_intake"
+      }
+    ]);
+  });
+
+  it("extracts component property summaries from an app payload", () => {
+    const payload = getAppPayload(app);
+    if (!payload) {
+      throw new Error("Expected test payload to be available.");
+    }
+    const component = payload.screens[0].components[0];
+    const enrichedPayload = {
+      ...payload,
+      screens: [
+        {
+          ...payload.screens[0],
+          components: [
+            {
+              ...component,
+              children: [
+                {
+                  binding: {
+                    data_path: "patient.notes"
+                  },
+                  component_id: "notes",
+                  component_type: "textarea",
+                  properties: {
+                    placeholder: "Optional notes",
+                    rows: 3
+                  }
+                }
+              ],
+              properties: {
+                disabled: false,
+                submit_label: "Save"
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    expect(getAppComponentPropertySummaries(enrichedPayload)).toEqual([
+      {
+        binding: "patient_intake",
+        child_count: 1,
+        component_id: "intake_form",
+        component_type: "form",
+        label: "Patient Intake",
+        properties: [
+          {
+            name: "disabled",
+            value: "false"
+          },
+          {
+            name: "submit_label",
+            value: "Save"
+          }
+        ],
+        property_count: 2,
+        screen_id: "intake",
+        screen_name: "Patient Intake"
+      },
+      {
+        binding: "patient.notes",
+        child_count: 0,
+        component_id: "notes",
+        component_type: "textarea",
+        label: "not set",
+        properties: [
+          {
+            name: "placeholder",
+            value: "Optional notes"
+          },
+          {
+            name: "rows",
+            value: "3"
+          }
+        ],
+        property_count: 2,
+        screen_id: "intake",
+        screen_name: "Patient Intake"
       }
     ]);
   });
