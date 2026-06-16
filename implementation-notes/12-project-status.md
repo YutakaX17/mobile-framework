@@ -54,7 +54,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 ## Active Work
 
-- `[~]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, and contrast checker baselines are complete; editing and publishing workflows remain pending.
+- `[~]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, and live preview baselines are complete; editing and publishing workflows remain pending.
 
 ## Completed Work
 
@@ -106,6 +106,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#131` completed: theme list page added.
 - `[x]` Task `#133` completed: theme editor token detail baseline added.
 - `[x]` Task `#135` completed: theme color contrast checker added.
+- `[x]` Task `#137` completed: theme live preview baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
