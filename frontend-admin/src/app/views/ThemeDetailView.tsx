@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import {
@@ -12,6 +12,11 @@ import {
   type ThemeTokenRow
 } from "../../api/themeApi";
 import { formatContrastRatio, getThemeContrastChecks, type ContrastCheck } from "../themeContrast";
+import {
+  getThemePreviewModeOptions,
+  resolveThemePreviewTokens,
+  type ThemePreviewTokens
+} from "../themePreview";
 
 type ThemeDetailState =
   | { status: "loading"; theme: ThemeDetail | null }
@@ -48,6 +53,12 @@ export function ThemeDetailView() {
   const payload = useMemo(
     () => (state.theme ? getThemePayload(state.theme) : undefined),
     [state.theme]
+  );
+  const modeOptions = useMemo(() => getThemePreviewModeOptions(payload), [payload]);
+  const [selectedModeId, setSelectedModeId] = useState("");
+  const previewTokens = useMemo(
+    () => resolveThemePreviewTokens(payload, selectedModeId || modeOptions[0]?.id),
+    [modeOptions, payload, selectedModeId]
   );
 
   return (
@@ -103,6 +114,12 @@ export function ThemeDetailView() {
           </section>
 
           <section className="token-panel-grid" aria-label="Theme tokens">
+            <ThemePreviewPanel
+              modeOptions={modeOptions}
+              onModeChange={setSelectedModeId}
+              selectedModeId={selectedModeId || modeOptions[0]?.id || ""}
+              tokens={previewTokens}
+            />
             <TokenPanel title="Colors" rows={getColorTokenRows(payload)} />
             <TokenPanel title="Typography" rows={getTypographyTokenRows(payload)} />
             <TokenPanel title="Spacing" rows={getNumberTokenRows(payload, "spacing")} />
@@ -113,6 +130,55 @@ export function ThemeDetailView() {
         </>
       ) : null}
     </section>
+  );
+}
+
+type ThemePreviewPanelProps = {
+  modeOptions: { id: string; label: string }[];
+  onModeChange: (modeId: string) => void;
+  selectedModeId: string;
+  tokens: ThemePreviewTokens;
+};
+
+function ThemePreviewPanel({ modeOptions, onModeChange, selectedModeId, tokens }: ThemePreviewPanelProps) {
+  const previewStyle = {
+    "--preview-background": tokens.background,
+    "--preview-primary": tokens.primary,
+    "--preview-radius": `${tokens.borderRadius}px`,
+    "--preview-surface": tokens.surface,
+    "--preview-text": tokens.text,
+    color: tokens.text,
+    fontFamily: tokens.fontFamily,
+    padding: tokens.padding
+  } as CSSProperties;
+
+  return (
+    <article className="token-panel preview-panel">
+      <div className="preview-panel-heading">
+        <h3>Live preview</h3>
+        {modeOptions.length > 0 ? (
+          <select
+            aria-label="Preview mode"
+            onChange={(event) => onModeChange(event.target.value)}
+            value={selectedModeId}
+          >
+            {modeOptions.map((mode) => (
+              <option key={mode.id} value={mode.id}>
+                {mode.label}
+              </option>
+            ))}
+          </select>
+        ) : null}
+      </div>
+      <div className="theme-preview" style={previewStyle}>
+        <section>
+          <p>Mobile screen</p>
+          <h4>Field Operations</h4>
+          <span>3 tasks ready</span>
+          <button type="button">Start review</button>
+        </section>
+      </div>
+    </article>
   );
 }
 
