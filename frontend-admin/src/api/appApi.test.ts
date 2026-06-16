@@ -1,11 +1,68 @@
 import { describe, expect, it } from "vitest";
 
 import { createAdminApiClient } from "./adminApiClient";
-import { countAppsByStatus, fetchAppSummaries, type AppSummary } from "./appApi";
+import {
+  countAppsByStatus,
+  fetchAppDetail,
+  fetchAppSummaries,
+  getAppActionSummaries,
+  getAppCanvasScreens,
+  getAppPayload,
+  type AppSummary
+} from "./appApi";
 
 const app: AppSummary = {
   app_id: "field_ops_app",
   current_revision: {
+    payload: {
+      app_id: "field_ops_app",
+      name: "Field Operations",
+      navigation: [
+        {
+          icon: "form",
+          label: "Intake",
+          permission: "forms.submit_patient_intake",
+          screen_id: "intake"
+        }
+      ],
+      permissions: [
+        {
+          code: "forms.submit_patient_intake",
+          label: "Submit patient intake"
+        }
+      ],
+      schema_version: "v1",
+      screens: [
+        {
+          actions: [
+            {
+              action_id: "submit_intake",
+              action_type: "submit_form",
+              label: "Submit",
+              target: "patient_intake"
+            }
+          ],
+          components: [
+            {
+              binding: {
+                form_id: "patient_intake"
+              },
+              component_id: "intake_form",
+              component_type: "form",
+              label: "Patient Intake"
+            }
+          ],
+          layout: {
+            type: "single_column"
+          },
+          name: "Patient Intake",
+          route: "/intake",
+          screen_id: "intake",
+          screen_type: "form"
+        }
+      ],
+      version: "0.1.0"
+    },
     navigation_count: 1,
     permission_count: 1,
     revision: 1,
@@ -51,8 +108,75 @@ describe("app API helpers", () => {
     await expect(fetchAppSummaries(client, "demo")).rejects.toThrow("apps array");
   });
 
+  it("loads an app detail payload", async () => {
+    let requestedUrl = "";
+    const client = createAdminApiClient({
+      baseUrl: "/api",
+      fetcher: async (input) => {
+        requestedUrl = String(input);
+        return new Response(JSON.stringify({ app }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200
+        });
+      }
+    });
+
+    const detail = await fetchAppDetail("field_ops_app", client, "demo");
+
+    expect(requestedUrl).toBe("/api/apps/field_ops_app/?tenant=demo");
+    expect(detail.current_revision?.payload).toBeDefined();
+  });
+
+  it("rejects malformed app detail responses", async () => {
+    const client = createAdminApiClient({
+      baseUrl: "/api",
+      fetcher: async () =>
+        new Response(JSON.stringify({ item: app }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200
+        })
+    });
+
+    await expect(fetchAppDetail("field_ops_app", client, "demo")).rejects.toThrow("app object");
+  });
+
   it("counts apps by current revision status", () => {
     expect(countAppsByStatus([app], "published")).toBe(1);
     expect(countAppsByStatus([app], "draft")).toBe(0);
+  });
+
+  it("extracts screen canvas summaries from an app payload", () => {
+    const payload = getAppPayload(app);
+
+    expect(getAppCanvasScreens(payload)).toEqual([
+      {
+        action_count: 1,
+        component_count: 1,
+        layout: "single_column",
+        name: "Patient Intake",
+        route: "/intake",
+        screen_id: "intake",
+        screen_type: "form",
+        top_level_components: [
+          {
+            binding: {
+              form_id: "patient_intake"
+            },
+            component_id: "intake_form",
+            component_type: "form",
+            label: "Patient Intake"
+          }
+        ]
+      }
+    ]);
+    expect(getAppActionSummaries(payload)).toEqual([
+      {
+        action_id: "submit_intake",
+        action_type: "submit_form",
+        label: "Submit",
+        screen_id: "intake",
+        target: "patient_intake"
+      }
+    ]);
   });
 });

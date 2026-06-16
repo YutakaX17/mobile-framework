@@ -45,6 +45,11 @@ describe("admin shell model", () => {
     expect(findAdminRoute("/forms/patient_intake")?.path).toBe("/forms");
   });
 
+  it("routes apps to a dedicated workspace", () => {
+    expect(findAdminRoute("/apps")?.summary).toBe("App composition workspace");
+    expect(findAdminRoute("/apps/field_ops_app")?.path).toBe("/apps");
+  });
+
   it("defines shell actions and user menu labels", () => {
     expect(shellActions.map((action) => action.id)).toEqual(["validate", "publish-review"]);
     expect(shellActions.map((action) => action.notification.title)).toEqual([

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { countAppsByStatus, fetchAppSummaries, type AppSummary } from "../../api/appApi";
 
@@ -97,7 +98,9 @@ export function AppListView() {
               <article className="app-card" key={app.app_id}>
                 <div>
                   <p className="eyebrow">{app.app_id}</p>
-                  <h3>{app.name}</h3>
+                  <h3>
+                    <Link to={`/apps/${app.app_id}`}>{app.name}</Link>
+                  </h3>
                   {app.description ? <p>{app.description}</p> : null}
                 </div>
                 <dl className="theme-meta">
