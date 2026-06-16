@@ -18,6 +18,7 @@ SCHEMA_ROOT = CONTRACTS_ROOT / "schemas" / "v1"
 CONFIGURATION_SCHEMA_FILES = {
     "action": "action.schema.json",
     "app": "app.schema.json",
+    "component": "component.schema.json",
     "deployment_package": "deployment-package.schema.json",
     "field": "field.schema.json",
     "form": "form.schema.json",

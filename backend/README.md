@@ -19,6 +19,7 @@ The backend includes a minimal Django project:
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
 - `apps/modules`: initial module registry, manifest validation, dependency validation, and compatibility validation baseline.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
+- `apps/app_builder`: initial tenant-scoped app definition, revision baseline, shared app schema validation, and read-only API baseline.
 - `apps/themes`: initial tenant-scoped theme model, revision baseline, shared theme schema validation, read-only API baseline, draft editing action baseline, publish action baseline, and rollback action baseline.
 - `apps/form_builder`: initial tenant-scoped form definition, revision baseline, shared form schema validation, read-only API baseline, and submission endpoint baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
@@ -49,7 +50,7 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.audit tests --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.form_builder apps.app_builder apps.audit tests --settings=config.settings.test
 ```
 
 Local development uses SQLite by default. To point development settings at the Compose PostgreSQL service, start the service and set:
@@ -75,7 +76,7 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
 - `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry, dependency validation, and compatibility validation baselines exist.
 - `apps/configurations`: tenant-scoped definitions, revisions, status workflow, and schema validation. Initial configuration registry baseline exists.
-- `apps/app_builder`: app definitions, navigation, screens, actions, publish states.
+- `apps/app_builder`: app definitions, navigation, screens, actions, publish states. Initial app model, revision, and read-only API baselines exist.
 - `apps/form_builder`: form definitions, fields, validation, submissions. Initial form model, revision, read-only API, and submission endpoint baselines exist.
 - `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation.
 - `apps/themes`: design tokens, theme validation, preview, publishing. Initial theme model, revision, and read-only API baselines exist.
