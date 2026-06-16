@@ -66,6 +66,17 @@ button {
   padding: 0 14px;
 }
 
+.button-link {
+  align-items: center;
+  border: 1px solid var(--mf-color-border-strong);
+  border-radius: var(--mf-radius-sm);
+  color: var(--mf-color-text);
+  display: inline-flex;
+  min-height: 38px;
+  padding: 0 14px;
+  text-decoration: none;
+}
+
 button:hover,
 button:focus-visible,
 input:focus-visible,
@@ -435,6 +446,11 @@ input:focus-visible,
   gap: 18px;
 }
 
+.theme-detail-view {
+  display: grid;
+  gap: 18px;
+}
+
 .theme-summary-actions {
   align-items: center;
   display: flex;
@@ -463,6 +479,10 @@ input:focus-visible,
   margin: 0 0 8px;
 }
 
+.theme-card h3 a {
+  color: var(--mf-color-text);
+}
+
 .theme-card p:last-child {
   color: var(--mf-color-text-muted);
   margin-bottom: 0;
@@ -489,6 +509,59 @@ input:focus-visible,
 
 .theme-meta dd {
   margin: 0;
+}
+
+.token-panel-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.token-panel {
+  background: var(--mf-color-surface);
+  border: 1px solid var(--mf-color-border);
+  border-radius: var(--mf-radius-md);
+  padding: 18px;
+}
+
+.token-panel h3 {
+  margin: 0 0 14px;
+}
+
+.token-panel dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.token-panel dl div {
+  border-top: 1px solid #e2e8e5;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: minmax(120px, 0.6fr) minmax(0, 1fr);
+  padding-top: 10px;
+}
+
+.token-panel dl div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.token-panel dt {
+  color: var(--mf-color-text-muted);
+  font-size: 0.82rem;
+  font-weight: var(--mf-font-weight-bold);
+}
+
+.token-panel dd {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.token-panel dd span,
+.token-panel p {
+  color: var(--mf-color-text-muted);
 }
 
 .login-shell {
@@ -578,6 +651,10 @@ input:focus-visible,
   }
 
   .theme-card {
+    grid-template-columns: 1fr;
+  }
+
+  .token-panel-grid {
     grid-template-columns: 1fr;
   }
 }

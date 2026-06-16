@@ -37,6 +37,7 @@ describe("admin shell model", () => {
 
   it("routes themes to a dedicated workspace", () => {
     expect(findAdminRoute("/themes")?.summary).toBe("Design token workspace");
+    expect(findAdminRoute("/themes/field_ops")?.path).toBe("/themes");
   });
 
   it("defines shell actions and user menu labels", () => {

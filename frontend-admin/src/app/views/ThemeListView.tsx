@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { countThemesByStatus, fetchThemeSummaries, type ThemeSummary } from "../../api/themeApi";
 
@@ -85,7 +86,9 @@ export function ThemeListView() {
               <article className="theme-card" key={theme.theme_id}>
                 <div>
                   <p className="eyebrow">{theme.theme_id}</p>
-                  <h3>{theme.name}</h3>
+                  <h3>
+                    <Link to={`/themes/${theme.theme_id}`}>{theme.name}</Link>
+                  </h3>
                   {theme.description ? <p>{theme.description}</p> : null}
                 </div>
                 <dl className="theme-meta">
