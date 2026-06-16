@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { getComponentToolboxItems, type ComponentToolboxItem } from "../../builders/appComponentRegistry";
 import {
   fetchAppDetail,
   getAppActionSummaries,
@@ -48,6 +49,7 @@ export function AppDesignerView() {
   const payload = useMemo(() => (state.app ? getAppPayload(state.app) : undefined), [state.app]);
   const screens = useMemo(() => getAppCanvasScreens(payload), [payload]);
   const actions = useMemo(() => getAppActionSummaries(payload), [payload]);
+  const componentToolboxItems = useMemo(() => getComponentToolboxItems(payload), [payload]);
 
   return (
     <section className="app-designer-view" aria-labelledby="app-designer-title">
@@ -113,6 +115,7 @@ export function AppDesignerView() {
             <aside className="form-toolbox" aria-label="Navigation">
               <h3>Navigation</h3>
               <NavigationList items={payload.navigation} />
+              <ComponentRegistryList items={componentToolboxItems} />
             </aside>
 
             <section className="app-screen-canvas" aria-label="Screen canvas">
@@ -147,6 +150,28 @@ export function AppDesignerView() {
           <ActionPanel actions={actions} />
         </>
       ) : null}
+    </section>
+  );
+}
+
+type ComponentRegistryListProps = {
+  items: ComponentToolboxItem[];
+};
+
+function ComponentRegistryList({ items }: ComponentRegistryListProps) {
+  return (
+    <section className="component-registry-list" aria-label="Component registry">
+      <h3>Components</h3>
+      <div className="toolbox-list">
+        {items.map((item) => (
+          <div className="toolbox-item" key={item.component_type}>
+            <strong>{item.label}</strong>
+            <span>
+              {item.summary} · {item.count} on canvas
+            </span>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
