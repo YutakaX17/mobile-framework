@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 
 import {
   fetchThemeDetail,
+  getAssetTokenRows,
   getColorTokenRows,
   getModeRows,
   getNumberTokenRows,
@@ -120,6 +121,7 @@ export function ThemeDetailView() {
               selectedModeId={selectedModeId || modeOptions[0]?.id || ""}
               tokens={previewTokens}
             />
+            <TokenPanel title="Assets" rows={getAssetTokenRows(payload)} />
             <TokenPanel title="Colors" rows={getColorTokenRows(payload)} />
             <TokenPanel title="Typography" rows={getTypographyTokenRows(payload)} />
             <TokenPanel title="Spacing" rows={getNumberTokenRows(payload, "spacing")} />

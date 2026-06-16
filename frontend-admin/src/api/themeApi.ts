@@ -29,6 +29,10 @@ export type ThemePayload = {
     override_recorded?: boolean;
     validated?: boolean;
   };
+  assets?: {
+    icon_asset_id?: string;
+    logo_asset_id?: string;
+  };
   modes?: ThemeMode[];
   name: string;
   schema_version: string;
@@ -134,6 +138,18 @@ export function getColorTokenRows(payload: ThemePayload | undefined): ThemeToken
       value: String(token)
     };
   });
+}
+
+export function getAssetTokenRows(payload: ThemePayload | undefined): ThemeTokenRow[] {
+  const assets = payload?.assets;
+  if (!assets) {
+    return [];
+  }
+
+  return [
+    { label: "logo_asset_id", value: assets.logo_asset_id },
+    { label: "icon_asset_id", value: assets.icon_asset_id }
+  ].filter((row): row is ThemeTokenRow => Boolean(row.value));
 }
 
 export function getNumberTokenRows(

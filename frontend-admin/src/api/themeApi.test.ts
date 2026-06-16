@@ -5,6 +5,7 @@ import {
   countThemesByStatus,
   fetchThemeDetail,
   fetchThemeSummaries,
+  getAssetTokenRows,
   getColorTokenRows,
   getModeRows,
   getNumberTokenRows,
@@ -16,6 +17,10 @@ import {
 const theme: ThemeSummary = {
   current_revision: {
     payload: {
+      assets: {
+        icon_asset_id: "field_ops_icon",
+        logo_asset_id: "field_ops_logo"
+      },
       modes: [
         {
           color_overrides: {
@@ -144,6 +149,10 @@ describe("theme API helpers", () => {
       { label: "background", value: "#F6F8FB" },
       { detail: "contrast #FFFFFF", label: "primary", value: "#0B5FFF" }
     ]);
+    expect(getAssetTokenRows(payload)).toEqual([
+      { label: "logo_asset_id", value: "field_ops_logo" },
+      { label: "icon_asset_id", value: "field_ops_icon" }
+    ]);
     expect(getNumberTokenRows(payload, "spacing")).toEqual([{ label: "sm", value: "8px" }]);
     expect(getNumberTokenRows(payload, "radius")).toEqual([{ label: "md", value: "10px" }]);
     expect(getTypographyTokenRows(payload)[0]).toEqual({
@@ -152,5 +161,17 @@ describe("theme API helpers", () => {
       value: "Atkinson Hyperlegible"
     });
     expect(getModeRows(payload)).toEqual([{ detail: "2 color overrides", label: "light", value: "Light" }]);
+  });
+
+  it("returns no asset rows when payload assets are absent", () => {
+    expect(getAssetTokenRows(undefined)).toEqual([]);
+    expect(
+      getAssetTokenRows({
+        name: "No Assets",
+        schema_version: "v1",
+        theme_id: "no_assets",
+        version: "0.1.0"
+      })
+    ).toEqual([]);
   });
 });
