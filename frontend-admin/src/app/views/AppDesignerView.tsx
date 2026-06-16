@@ -194,11 +194,26 @@ function NavigationList({ items }: NavigationListProps) {
       {items.map((item) => (
         <div className="toolbox-item" key={`${item.screen_id}-${item.label}`}>
           <strong>{item.label}</strong>
-          <span>{item.screen_id}</span>
+          <span>{formatNavigationMeta(item)}</span>
         </div>
       ))}
     </div>
   );
+}
+
+function formatNavigationMeta(item: AppNavigationItem): string {
+  const parts = [
+    item.screen_id,
+    item.group ?? "primary",
+    item.presentation ?? "drawer",
+    `order ${item.order ?? 0}`
+  ];
+
+  if (item.is_default) {
+    parts.push("default");
+  }
+
+  return parts.join(" - ");
 }
 
 type ScreenCanvasCardProps = {

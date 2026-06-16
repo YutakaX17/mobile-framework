@@ -33,6 +33,10 @@ class AppDefinition(TypedDict):
 
 class AppDefinitionNavigationItem(TypedDict):
     label: str
+    order: NotRequired[int]
+    group: NotRequired[Literal['primary', 'secondary', 'overflow']]
+    presentation: NotRequired[Literal['tab', 'drawer', 'hidden']]
+    is_default: NotRequired[bool]
     screen_id: str
     icon: NotRequired[str]
     permission: NotRequired[str]

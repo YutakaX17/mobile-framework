@@ -35,6 +35,10 @@ export interface AppDefinition {
 
 export interface AppDefinitionNavigationItem {
   label: string;
+  order?: number;
+  group?: "primary" | "secondary" | "overflow";
+  presentation?: "tab" | "drawer" | "hidden";
+  is_default?: boolean;
   screen_id: string;
   icon?: string;
   permission?: string;

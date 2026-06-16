@@ -21,9 +21,13 @@ export type AppSummary = {
 };
 
 export type AppNavigationItem = {
+  group?: "primary" | "secondary" | "overflow";
   icon?: string;
+  is_default?: boolean;
   label: string;
+  order?: number;
   permission?: string;
+  presentation?: "tab" | "drawer" | "hidden";
   screen_id: string;
 };
 

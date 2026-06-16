@@ -21,8 +21,12 @@ const app: AppSummary = {
       navigation: [
         {
           icon: "form",
+          group: "primary",
+          is_default: true,
           label: "Intake",
+          order: 0,
           permission: "forms.submit_patient_intake",
+          presentation: "tab",
           screen_id: "intake"
         }
       ],

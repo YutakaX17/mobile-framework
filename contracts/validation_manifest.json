@@ -9,7 +9,10 @@
     "app": {
       "schema": "schemas/v1/app.schema.json",
       "valid": ["fixtures/valid/v1/app-field-ops.json"],
-      "invalid": ["fixtures/invalid/v1/app-missing-navigation.json"]
+      "invalid": [
+        "fixtures/invalid/v1/app-missing-navigation.json",
+        "fixtures/invalid/v1/app-navigation-invalid-order.json"
+      ]
     },
     "component": {
       "schema": "schemas/v1/component.schema.json",
