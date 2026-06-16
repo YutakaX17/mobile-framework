@@ -197,6 +197,10 @@
                 "navigation":  [
                                    {
                                        "label":  "Intake",
+                                       "order":  0,
+                                       "group":  "primary",
+                                       "presentation":  "tab",
+                                       "is_default":  true,
                                        "screen_id":  "intake",
                                        "icon":  "form",
                                        "permission":  "forms.submit_patient_intake"

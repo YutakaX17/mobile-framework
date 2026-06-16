@@ -1,4 +1,4 @@
-﻿{
+{
   "schema_version": "v1",
   "app_id": "field_ops_app",
   "name": "Field Operations",
@@ -8,7 +8,7 @@
   "navigation": [
     {
       "label": "Intake",
-      "order": 0,
+      "order": -1,
       "group": "primary",
       "presentation": "tab",
       "is_default": true,

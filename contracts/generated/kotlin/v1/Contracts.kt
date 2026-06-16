@@ -31,6 +31,10 @@ public data class AppDefinition(
 
 public data class AppDefinitionNavigationItem(
     val label: String,
+    val order: Int? = null,
+    val group: String? = null,
+    val presentation: String? = null,
+    val is_default: Boolean? = null,
     val screen_id: String,
     val icon: String? = null,
     val permission: String? = null
