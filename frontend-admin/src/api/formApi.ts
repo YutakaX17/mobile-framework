@@ -70,6 +70,17 @@ export type FormToolboxItem = {
   label: string;
 };
 
+export type FormPropertyRow = {
+  label: string;
+  value: string;
+};
+
+export type FormFieldPropertySummary = {
+  field_id: string;
+  label: string;
+  rows: FormPropertyRow[];
+};
+
 type FormListResponse = {
   forms: FormSummary[];
 };
@@ -160,6 +171,36 @@ export function getFormCanvasSections(payload: FormPayload | undefined): FormCan
       .filter((field): field is FormField => Boolean(field)),
     label: section.label,
     section_id: section.section_id
+  }));
+}
+
+export function getFormPropertyRows(payload: FormPayload | undefined): FormPropertyRow[] {
+  if (!payload) {
+    return [];
+  }
+
+  return [
+    { label: "Form id", value: payload.form_id },
+    { label: "Version", value: payload.version },
+    { label: "Mode", value: payload.mode },
+    { label: "Entity", value: payload.entity_type ?? "not set" },
+    { label: "Layout", value: payload.layout?.type ?? "single_column" },
+    { label: "Fields", value: String(payload.fields.length) }
+  ];
+}
+
+export function getFormFieldPropertySummaries(payload: FormPayload | undefined): FormFieldPropertySummary[] {
+  return (payload?.fields ?? []).map((field) => ({
+    field_id: field.field_id,
+    label: field.label,
+    rows: [
+      { label: "Type", value: formatFieldType(field.field_type) },
+      { label: "Binding", value: field.binding.data_path },
+      { label: "Required", value: field.required ? "yes" : "no" },
+      { label: "Read only", value: field.read_only ? "yes" : "no" },
+      { label: "Options", value: String(field.options?.length ?? 0) },
+      { label: "Validation", value: String(Object.keys(field.validation ?? {}).length) }
+    ]
   }));
 }
 

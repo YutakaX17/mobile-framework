@@ -522,10 +522,11 @@ input:focus-visible,
   align-items: start;
   display: grid;
   gap: 14px;
-  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 1fr);
+  grid-template-columns: minmax(210px, 0.28fr) minmax(0, 1fr) minmax(240px, 0.34fr);
 }
 
 .form-toolbox,
+.form-properties-panel,
 .form-canvas-section {
   background: var(--mf-color-surface);
   border: 1px solid var(--mf-color-border);
@@ -534,6 +535,7 @@ input:focus-visible,
 }
 
 .form-toolbox h3,
+.form-properties-panel h3,
 .form-canvas-section h3 {
   margin: 0;
 }
@@ -577,6 +579,52 @@ input:focus-visible,
 
 .form-canvas-section-heading {
   margin-bottom: 14px;
+}
+
+.property-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.property-list div {
+  align-items: center;
+  border-top: 1px solid #e2e8e5;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding-top: 8px;
+}
+
+.property-list div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.property-list dt {
+  color: var(--mf-color-text-muted);
+  font-size: 0.82rem;
+  font-weight: var(--mf-font-weight-bold);
+}
+
+.property-list dd {
+  margin: 0;
+  text-align: right;
+}
+
+.field-properties-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.field-properties {
+  border-top: 1px solid #e2e8e5;
+  padding-top: 12px;
+}
+
+.field-properties h4 {
+  margin: 0;
 }
 
 .token-panel-grid {

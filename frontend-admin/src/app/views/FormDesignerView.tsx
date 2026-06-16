@@ -4,10 +4,14 @@ import { Link, useParams } from "react-router-dom";
 import {
   fetchFormDetail,
   getFormCanvasSections,
+  getFormFieldPropertySummaries,
   getFormPayload,
+  getFormPropertyRows,
   getFormToolboxItems,
   type FormDetail,
-  type FormField
+  type FormField,
+  type FormFieldPropertySummary,
+  type FormPropertyRow
 } from "../../api/formApi";
 
 type FormDesignerState =
@@ -45,6 +49,8 @@ export function FormDesignerView() {
   const payload = useMemo(() => (state.form ? getFormPayload(state.form) : undefined), [state.form]);
   const toolboxItems = useMemo(() => getFormToolboxItems(payload), [payload]);
   const canvasSections = useMemo(() => getFormCanvasSections(payload), [payload]);
+  const formProperties = useMemo(() => getFormPropertyRows(payload), [payload]);
+  const fieldProperties = useMemo(() => getFormFieldPropertySummaries(payload), [payload]);
 
   return (
     <section className="form-designer-view" aria-labelledby="form-designer-title">
@@ -134,10 +140,50 @@ export function FormDesignerView() {
                 </article>
               ))}
             </section>
+
+            <aside className="form-properties-panel" aria-label="Form properties">
+              <h3>Properties</h3>
+              <PropertyRows rows={formProperties} />
+              <div className="field-properties-list">
+                {fieldProperties.map((field) => (
+                  <FieldProperties field={field} key={field.field_id} />
+                ))}
+              </div>
+            </aside>
           </section>
         </>
       ) : null}
     </section>
+  );
+}
+
+type PropertyRowsProps = {
+  rows: FormPropertyRow[];
+};
+
+function PropertyRows({ rows }: PropertyRowsProps) {
+  return (
+    <dl className="property-list">
+      {rows.map((row) => (
+        <div key={row.label}>
+          <dt>{row.label}</dt>
+          <dd>{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+type FieldPropertiesProps = {
+  field: FormFieldPropertySummary;
+};
+
+function FieldProperties({ field }: FieldPropertiesProps) {
+  return (
+    <article className="field-properties">
+      <h4>{field.label}</h4>
+      <PropertyRows rows={field.rows} />
+    </article>
   );
 }
 
