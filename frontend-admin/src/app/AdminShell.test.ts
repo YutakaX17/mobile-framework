@@ -40,6 +40,10 @@ describe("admin shell model", () => {
     expect(findAdminRoute("/themes/field_ops")?.path).toBe("/themes");
   });
 
+  it("routes forms to a dedicated workspace", () => {
+    expect(findAdminRoute("/forms")?.summary).toBe("Form definition workspace");
+  });
+
   it("defines shell actions and user menu labels", () => {
     expect(shellActions.map((action) => action.id)).toEqual(["validate", "publish-review"]);
     expect(shellActions.map((action) => action.notification.title)).toEqual([
