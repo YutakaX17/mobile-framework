@@ -11,6 +11,8 @@ import {
   getAppMobilePreviewScreens,
   getAppPayload,
   getAppPermissionBindingSummaries,
+  getAppValidationFindings,
+  type AppPayload,
   type AppSummary
 } from "./appApi";
 
@@ -291,6 +293,92 @@ describe("app API helpers", () => {
         screen_id: "intake",
         subtitle: "Capture a patient intake form.",
         title: "Patient Intake"
+      }
+    ]);
+  });
+
+  it("returns no validation findings for a consistent app payload", () => {
+    expect(getAppValidationFindings(getAppPayload(app))).toEqual([]);
+  });
+
+  it("extracts app validation findings from inconsistent payload references", () => {
+    const payload = getAppPayload(app);
+    if (!payload) {
+      throw new Error("Expected test payload to be available.");
+    }
+    const screen = payload.screens[0];
+    const invalidPayload: AppPayload = {
+      ...payload,
+      navigation: [
+        {
+          label: "Missing",
+          screen_id: "missing_screen"
+        }
+      ],
+      screens: [
+        {
+          ...screen,
+          actions: [
+            {
+              action_id: "go_missing",
+              action_type: "navigate",
+              binding: {
+                component_id: "missing_component",
+                event: "tap",
+                source: "component"
+              },
+              label: "Go missing",
+              permission: "forms.undeclared_permission",
+              target: "missing_screen"
+            }
+          ],
+          components: [
+            {
+              binding: {
+                action_id: "missing_action"
+              },
+              component_id: "trigger_button",
+              component_type: "button",
+              label: "Trigger"
+            }
+          ]
+        },
+        {
+          ...screen
+        }
+      ]
+    };
+
+    expect(getAppValidationFindings(invalidPayload)).toEqual([
+      {
+        message: "Screen id is duplicated.",
+        severity: "error",
+        target: "screen:intake"
+      },
+      {
+        message: "Navigation item points to a missing screen.",
+        severity: "error",
+        target: "navigation:Missing"
+      },
+      {
+        message: "Component action binding points to a missing screen action.",
+        severity: "error",
+        target: "component:trigger_button"
+      },
+      {
+        message: "Permission is referenced but not declared.",
+        severity: "warning",
+        target: "action:go_missing"
+      },
+      {
+        message: "Action binding points to a missing component.",
+        severity: "error",
+        target: "action:go_missing"
+      },
+      {
+        message: "Navigate action target does not match a screen id.",
+        severity: "warning",
+        target: "action:go_missing"
       }
     ]);
   });

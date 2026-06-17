@@ -10,6 +10,7 @@ import {
   getAppMobilePreviewScreens,
   getAppPayload,
   getAppPermissionBindingSummaries,
+  getAppValidationFindings,
   type AppActionSummary,
   type AppCanvasScreen,
   type AppComponent,
@@ -18,7 +19,8 @@ import {
   type AppMobilePreviewComponent,
   type AppMobilePreviewScreen,
   type AppNavigationItem,
-  type AppPermissionBindingSummary
+  type AppPermissionBindingSummary,
+  type AppValidationFinding
 } from "../../api/appApi";
 
 type AppDesignerState =
@@ -59,6 +61,7 @@ export function AppDesignerView() {
   const componentProperties = useMemo(() => getAppComponentPropertySummaries(payload), [payload]);
   const mobilePreviewScreens = useMemo(() => getAppMobilePreviewScreens(payload), [payload]);
   const permissionBindings = useMemo(() => getAppPermissionBindingSummaries(payload), [payload]);
+  const validationFindings = useMemo(() => getAppValidationFindings(payload), [payload]);
   const componentToolboxItems = useMemo(() => getComponentToolboxItems(payload), [payload]);
 
   return (
@@ -159,6 +162,7 @@ export function AppDesignerView() {
             </aside>
           </section>
 
+          <AppValidationPanel findings={validationFindings} />
           <ActionPanel actions={actions} />
           <MobilePreviewPanel screens={mobilePreviewScreens} />
         </>
@@ -394,6 +398,40 @@ function PermissionBindingsList({ items }: PermissionBindingsListProps) {
 type ActionPanelProps = {
   actions: AppActionSummary[];
 };
+
+type AppValidationPanelProps = {
+  findings: AppValidationFinding[];
+};
+
+function AppValidationPanel({ findings }: AppValidationPanelProps) {
+  const errorCount = findings.filter((finding) => finding.severity === "error").length;
+
+  return (
+    <section className="validation-panel" aria-label="App validation">
+      <div className="preview-panel-heading">
+        <h3>App validation</h3>
+        <span className="queue-count">
+          {errorCount > 0 ? `${errorCount} errors` : "ready"}
+        </span>
+      </div>
+      {findings.length > 0 ? (
+        <div className="validation-rule-list">
+          {findings.map((finding) => (
+            <article className="validation-rule" key={`${finding.target}-${finding.message}`}>
+              <div>
+                <p className="eyebrow">{finding.target}</p>
+                <h4>{finding.message}</h4>
+              </div>
+              <strong>{finding.severity}</strong>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p>App payload references are valid.</p>
+      )}
+    </section>
+  );
+}
 
 type MobilePreviewPanelProps = {
   screens: AppMobilePreviewScreen[];
