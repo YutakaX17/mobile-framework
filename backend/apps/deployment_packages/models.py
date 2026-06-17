@@ -5,13 +5,42 @@ from django.db import models
 
 from apps.tenants.models import TenantScopedModel
 
-from .services import assert_deployment_package_hash, validate_deployment_package_payload
+from .services import (
+    assert_deployment_package_hash,
+    release_channel_choices,
+    validate_deployment_package_payload,
+    validate_release_channel_name,
+)
 
 
 class DeploymentPackageStatus(models.TextChoices):
     SIGNED = "signed", "Signed"
     ACTIVE = "active", "Active"
     ARCHIVED = "archived", "Archived"
+
+
+class DeploymentChannel(TenantScopedModel):
+    channel = models.CharField(max_length=16, choices=release_channel_choices())
+    display_name = models.CharField(max_length=80)
+    description = models.TextField(blank=True)
+    is_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["tenant__slug", "channel"]
+        constraints = [
+            models.UniqueConstraint(fields=["tenant", "channel"], name="unique_deployment_channel_per_tenant"),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_release_channel_name(self.channel)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.tenant.slug}:{self.channel}"
 
 
 class DeploymentPackage(TenantScopedModel):
@@ -21,7 +50,7 @@ class DeploymentPackage(TenantScopedModel):
     runtime_min_version = models.CharField(max_length=80)
     runtime_max_version = models.CharField(max_length=80)
     platform_version = models.CharField(max_length=80, blank=True)
-    channel = models.CharField(max_length=16, default="dev")
+    channel = models.CharField(max_length=16, choices=release_channel_choices(), default="dev")
     status = models.CharField(
         max_length=16,
         choices=DeploymentPackageStatus.choices,
@@ -62,6 +91,7 @@ class DeploymentPackage(TenantScopedModel):
         super().clean()
         validate_deployment_package_payload(self.payload)
         assert_deployment_package_hash(self.payload)
+        validate_release_channel_name(self.channel)
         expected_values = {
             "tenant_id": self.tenant.slug if self.tenant_id else None,
             "package_id": self.package_id,

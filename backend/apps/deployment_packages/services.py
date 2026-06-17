@@ -14,6 +14,39 @@ from apps.configurations.services import validate_configuration_payload
 
 PLACEHOLDER_PACKAGE_HASH = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
 PLACEHOLDER_PACKAGE_SIGNATURE = "compiler-placeholder-signature-v1-000"
+RELEASE_CHANNELS = (
+    ("dev", "Development"),
+    ("test", "Test"),
+    ("staging", "Staging"),
+    ("production", "Production"),
+)
+
+
+def release_channel_choices() -> tuple[tuple[str, str], ...]:
+    return RELEASE_CHANNELS
+
+
+def release_channel_names() -> tuple[str, ...]:
+    return tuple(channel for channel, _label in RELEASE_CHANNELS)
+
+
+def validate_release_channel_name(channel: str) -> None:
+    if channel not in release_channel_names():
+        raise ValidationError({"channel": f"Unsupported release channel `{channel}`."})
+
+
+def create_default_release_channels(tenant):
+    from .models import DeploymentChannel
+
+    channels = []
+    for channel, label in RELEASE_CHANNELS:
+        deployment_channel, _created = DeploymentChannel.objects.get_or_create(
+            tenant=tenant,
+            channel=channel,
+            defaults={"display_name": label},
+        )
+        channels.append(deployment_channel)
+    return channels
 
 
 @dataclass(frozen=True)

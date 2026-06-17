@@ -6,11 +6,13 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from apps.app_builder.models import AppDefinition, AppRevision, AppRevisionStatus
-from apps.deployment_packages.models import DeploymentPackage, DeploymentPackageStatus
+from apps.deployment_packages.models import DeploymentChannel, DeploymentPackage, DeploymentPackageStatus
 from apps.deployment_packages.services import (
     compile_deployment_package,
     compile_deployment_package_payload,
+    create_default_release_channels,
     package_hash,
+    release_channel_names,
     sign_deployment_package_payload,
     verify_deployment_package_hash,
 )
@@ -36,6 +38,43 @@ def load_valid_package() -> dict:
 def load_json(path: Path) -> dict:
     with path.open(encoding="utf-8-sig") as handle:
         return json.load(handle)
+
+
+class DeploymentChannelModelTests(TestCase):
+    def setUp(self):
+        self.tenant = Tenant.objects.create(slug="tenant_demo", name="Demo Tenant")
+        self.other_tenant = Tenant.objects.create(slug="tenant_other", name="Other Tenant")
+
+    def test_default_release_channels_can_be_created_for_tenant(self):
+        channels = create_default_release_channels(self.tenant)
+
+        self.assertEqual([channel.channel for channel in channels], list(release_channel_names()))
+        self.assertEqual(DeploymentChannel.objects.filter(tenant=self.tenant).count(), 4)
+
+        second_call = create_default_release_channels(self.tenant)
+
+        self.assertEqual([channel.id for channel in second_call], [channel.id for channel in channels])
+        self.assertEqual(DeploymentChannel.objects.filter(tenant=self.tenant).count(), 4)
+
+    def test_release_channel_is_unique_per_tenant(self):
+        DeploymentChannel.objects.create(tenant=self.tenant, channel="dev", display_name="Development")
+
+        with self.assertRaises(ValidationError):
+            DeploymentChannel.objects.create(tenant=self.tenant, channel="dev", display_name="Development")
+
+        other_channel = DeploymentChannel.objects.create(
+            tenant=self.other_tenant,
+            channel="dev",
+            display_name="Development",
+        )
+
+        self.assertEqual(str(other_channel), "tenant_other:dev")
+
+    def test_unknown_release_channel_is_rejected(self):
+        channel = DeploymentChannel(tenant=self.tenant, channel="pilot", display_name="Pilot")
+
+        with self.assertRaises(ValidationError):
+            channel.full_clean()
 
 
 class DeploymentPackageModelTests(TestCase):
@@ -101,6 +140,14 @@ class DeploymentPackageModelTests(TestCase):
         with self.assertRaises(ValidationError):
             package.save()
 
+    def test_unknown_package_channel_is_rejected(self):
+        payload = deepcopy(self.payload)
+        payload["channel"] = "pilot"
+        payload["hash"] = package_hash(payload)
+
+        with self.assertRaises(ValidationError):
+            DeploymentPackage.from_payload(self.tenant, payload).save()
+
 
 class DeploymentPackageCompilerTests(TestCase):
     def setUp(self):
@@ -156,6 +203,23 @@ class DeploymentPackageCompilerTests(TestCase):
         self.assertEqual(payload["forms"], [self.form_payload])
         self.assertEqual(payload["modules"], [self.module.manifest])
         self.assertEqual(payload["created_by"], "builder")
+        self.assertTrue(verify_deployment_package_hash(payload).is_valid)
+
+    def test_compiler_uses_requested_release_channel(self):
+        payload = compile_deployment_package_payload(
+            tenant=self.tenant,
+            package_id="pkg_field_ops_008",
+            app_revision=self.app_revision,
+            theme_revision=self.theme_revision,
+            form_revisions=[self.form_revision],
+            module_registrations=[self.module],
+            runtime_min_version="0.1.0",
+            runtime_max_version="0.1.0",
+            channel="staging",
+            created_by="builder",
+        )
+
+        self.assertEqual(payload["channel"], "staging")
         self.assertTrue(verify_deployment_package_hash(payload).is_valid)
 
     def test_compiler_can_persist_package(self):
