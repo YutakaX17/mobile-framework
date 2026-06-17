@@ -42,6 +42,7 @@
           "component_id": "intake_form",
           "component_type": "form",
           "label": "Patient Intake",
+          "permission": "forms.submit_patient_intake",
           "binding": {
             "form_id": "patient_intake"
           }
@@ -53,6 +54,7 @@
           "action_type": "submit_form",
           "label": "Submit",
           "target": "patient_intake",
+          "permission": "forms.submit_patient_intake",
           "binding": {
             "source": "component",
             "event": "submit",

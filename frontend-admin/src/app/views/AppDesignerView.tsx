@@ -8,12 +8,14 @@ import {
   getAppCanvasScreens,
   getAppComponentPropertySummaries,
   getAppPayload,
+  getAppPermissionBindingSummaries,
   type AppActionSummary,
   type AppCanvasScreen,
   type AppComponent,
   type AppComponentPropertySummary,
   type AppDetail,
-  type AppNavigationItem
+  type AppNavigationItem,
+  type AppPermissionBindingSummary
 } from "../../api/appApi";
 
 type AppDesignerState =
@@ -52,6 +54,7 @@ export function AppDesignerView() {
   const screens = useMemo(() => getAppCanvasScreens(payload), [payload]);
   const actions = useMemo(() => getAppActionSummaries(payload), [payload]);
   const componentProperties = useMemo(() => getAppComponentPropertySummaries(payload), [payload]);
+  const permissionBindings = useMemo(() => getAppPermissionBindingSummaries(payload), [payload]);
   const componentToolboxItems = useMemo(() => getComponentToolboxItems(payload), [payload]);
 
   return (
@@ -147,6 +150,7 @@ export function AppDesignerView() {
                   <dd>{payload.permissions?.length ?? 0}</dd>
                 </div>
               </dl>
+              <PermissionBindingsList items={permissionBindings} />
               <ComponentPropertiesList items={componentProperties} />
             </aside>
           </section>
@@ -342,6 +346,44 @@ function formatComponentProperties(item: AppComponentPropertySummary): string {
   }
 
   return item.properties.map((property) => `${property.name}: ${property.value}`).join(", ");
+}
+
+type PermissionBindingsListProps = {
+  items: AppPermissionBindingSummary[];
+};
+
+function PermissionBindingsList({ items }: PermissionBindingsListProps) {
+  return (
+    <section className="field-properties-list" aria-label="Permission bindings">
+      <h3>Permission bindings</h3>
+      {items.length > 0 ? (
+        items.map((item) => (
+          <article className="field-properties" key={`${item.binding_type}-${item.screen_id}-${item.target_id}`}>
+            <p className="eyebrow">
+              {item.binding_type} - {item.screen_id}
+            </p>
+            <h4>{item.label}</h4>
+            <dl className="property-list">
+              <div>
+                <dt>Target</dt>
+                <dd>{item.target_id}</dd>
+              </div>
+              <div>
+                <dt>Permission</dt>
+                <dd>{item.permission}</dd>
+              </div>
+              <div>
+                <dt>Label</dt>
+                <dd>{item.permission_label}</dd>
+              </div>
+            </dl>
+          </article>
+        ))
+      ) : (
+        <p>No permission bindings are configured.</p>
+      )}
+    </section>
+  );
 }
 
 type ActionPanelProps = {

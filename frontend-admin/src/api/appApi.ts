@@ -41,6 +41,7 @@ export type AppComponent = {
   component_id: string;
   component_type: string;
   label?: string;
+  permission?: string;
   properties?: Record<string, string | number | boolean | null>;
 };
 
@@ -157,6 +158,15 @@ export type AppComponentPropertySummary = {
   screen_name: string;
 };
 
+export type AppPermissionBindingSummary = {
+  binding_type: "navigation" | "screen" | "action" | "component";
+  label: string;
+  permission: string;
+  permission_label: string;
+  screen_id: string;
+  target_id: string;
+};
+
 type AppListResponse = {
   apps: AppSummary[];
 };
@@ -252,6 +262,50 @@ export function getAppComponentPropertySummaries(
   );
 }
 
+export function getAppPermissionBindingSummaries(
+  payload: AppPayload | undefined
+): AppPermissionBindingSummary[] {
+  const permissionLabels = new Map((payload?.permissions ?? []).map((permission) => [permission.code, permission.label]));
+  const labelFor = (permission: string) => permissionLabels.get(permission) ?? "not declared";
+  const navigationBindings = (payload?.navigation ?? [])
+    .filter((item) => item.permission)
+    .map((item) => ({
+      binding_type: "navigation" as const,
+      label: item.label,
+      permission: item.permission ?? "",
+      permission_label: labelFor(item.permission ?? ""),
+      screen_id: item.screen_id,
+      target_id: item.screen_id
+    }));
+  const screenBindings = (payload?.screens ?? []).flatMap((screen) => [
+    ...(screen.permission
+      ? [
+          {
+            binding_type: "screen" as const,
+            label: screen.name,
+            permission: screen.permission,
+            permission_label: labelFor(screen.permission),
+            screen_id: screen.screen_id,
+            target_id: screen.screen_id
+          }
+        ]
+      : []),
+    ...(screen.actions ?? [])
+      .filter((action) => action.permission)
+      .map((action) => ({
+        binding_type: "action" as const,
+        label: action.label ?? action.action_id,
+        permission: action.permission ?? "",
+        permission_label: labelFor(action.permission ?? ""),
+        screen_id: screen.screen_id,
+        target_id: action.action_id
+      })),
+    ...screen.components.flatMap((component) => flattenComponentPermissionBindings(screen, component, labelFor))
+  ]);
+
+  return [...navigationBindings, ...screenBindings];
+}
+
 function countComponents(components: AppComponent[]): number {
   return components.reduce((total, component) => total + 1 + countComponents(component.children ?? []), 0);
 }
@@ -293,6 +347,28 @@ function formatPropertyValue(value: string | number | boolean | null): string {
   }
 
   return String(value);
+}
+
+function flattenComponentPermissionBindings(
+  screen: AppScreen,
+  component: AppComponent,
+  labelFor: (permission: string) => string
+): AppPermissionBindingSummary[] {
+  return [
+    ...(component.permission
+      ? [
+          {
+            binding_type: "component" as const,
+            label: component.label ?? component.component_id,
+            permission: component.permission,
+            permission_label: labelFor(component.permission),
+            screen_id: screen.screen_id,
+            target_id: component.component_id
+          }
+        ]
+      : []),
+    ...(component.children ?? []).flatMap((child) => flattenComponentPermissionBindings(screen, child, labelFor))
+  ];
 }
 
 function formatActionBinding(action: AppAction): string {

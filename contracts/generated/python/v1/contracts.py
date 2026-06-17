@@ -52,6 +52,7 @@ class Component(TypedDict):
     component_id: str
     component_type: Literal['text', 'button', 'form', 'list', 'card', 'image', 'spacer', 'custom']
     label: NotRequired[str]
+    permission: NotRequired[str]
     binding: NotRequired[dict[str, JsonValue]]
     properties: NotRequired[dict[str, str | int | float | bool | None]]
     children: NotRequired[list[Component]]

@@ -21,6 +21,11 @@
       "type": "string",
       "maxLength": 160
     },
+    "permission": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+      "maxLength": 120
+    },
     "binding": {
       "type": "object",
       "additionalProperties": false,
