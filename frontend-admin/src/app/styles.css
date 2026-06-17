@@ -788,6 +788,27 @@ input:focus-visible,
   gap: 12px;
 }
 
+.app-mobile-preview-list {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.app-mobile-preview-screen {
+  max-width: 360px;
+}
+
+.app-mobile-preview-components,
+.app-mobile-preview-component-children {
+  display: grid;
+  gap: 10px;
+}
+
+.app-mobile-preview-component-children {
+  border-left: 2px solid var(--mf-color-border);
+  padding-left: 12px;
+}
+
 .preview-field {
   display: grid;
   gap: 6px;

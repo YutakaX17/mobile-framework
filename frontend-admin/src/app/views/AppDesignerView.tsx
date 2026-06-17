@@ -7,6 +7,7 @@ import {
   getAppActionSummaries,
   getAppCanvasScreens,
   getAppComponentPropertySummaries,
+  getAppMobilePreviewScreens,
   getAppPayload,
   getAppPermissionBindingSummaries,
   type AppActionSummary,
@@ -14,6 +15,8 @@ import {
   type AppComponent,
   type AppComponentPropertySummary,
   type AppDetail,
+  type AppMobilePreviewComponent,
+  type AppMobilePreviewScreen,
   type AppNavigationItem,
   type AppPermissionBindingSummary
 } from "../../api/appApi";
@@ -54,6 +57,7 @@ export function AppDesignerView() {
   const screens = useMemo(() => getAppCanvasScreens(payload), [payload]);
   const actions = useMemo(() => getAppActionSummaries(payload), [payload]);
   const componentProperties = useMemo(() => getAppComponentPropertySummaries(payload), [payload]);
+  const mobilePreviewScreens = useMemo(() => getAppMobilePreviewScreens(payload), [payload]);
   const permissionBindings = useMemo(() => getAppPermissionBindingSummaries(payload), [payload]);
   const componentToolboxItems = useMemo(() => getComponentToolboxItems(payload), [payload]);
 
@@ -156,6 +160,7 @@ export function AppDesignerView() {
           </section>
 
           <ActionPanel actions={actions} />
+          <MobilePreviewPanel screens={mobilePreviewScreens} />
         </>
       ) : null}
     </section>
@@ -389,6 +394,81 @@ function PermissionBindingsList({ items }: PermissionBindingsListProps) {
 type ActionPanelProps = {
   actions: AppActionSummary[];
 };
+
+type MobilePreviewPanelProps = {
+  screens: AppMobilePreviewScreen[];
+};
+
+function MobilePreviewPanel({ screens }: MobilePreviewPanelProps) {
+  return (
+    <section className="form-preview-panel" aria-label="Mobile app preview">
+      <div className="preview-panel-heading">
+        <h3>Mobile preview</h3>
+        <span className="queue-count">{screens.length} screens</span>
+      </div>
+      <div className="app-mobile-preview-list">
+        {screens.length > 0 ? (
+          screens.map((screen) => <MobilePreviewScreen screen={screen} key={screen.screen_id} />)
+        ) : (
+          <p>No preview screens are available.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+type MobilePreviewScreenProps = {
+  screen: AppMobilePreviewScreen;
+};
+
+function MobilePreviewScreen({ screen }: MobilePreviewScreenProps) {
+  return (
+    <div className="form-preview-screen app-mobile-preview-screen">
+      <header>
+        <p>
+          {screen.navigation_label} - {screen.route}
+        </p>
+        <h4>{screen.title}</h4>
+        <p>{screen.subtitle}</p>
+      </header>
+      <div className="app-mobile-preview-components">
+        {screen.components.map((component) => (
+          <MobilePreviewComponent component={component} key={component.component_id} />
+        ))}
+      </div>
+      <div className="screen-card-footer">
+        {screen.actions.map((action) => (
+          <span className="queue-count" key={action}>
+            {action}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+type MobilePreviewComponentProps = {
+  component: AppMobilePreviewComponent;
+};
+
+function MobilePreviewComponent({ component }: MobilePreviewComponentProps) {
+  return (
+    <article className="preview-field app-mobile-preview-component">
+      <span>
+        {component.label}
+        <strong>{component.component_type}</strong>
+      </span>
+      <span className="preview-unsupported">{component.binding}</span>
+      {component.children.length > 0 ? (
+        <div className="app-mobile-preview-component-children">
+          {component.children.map((child) => (
+            <MobilePreviewComponent component={child} key={child.component_id} />
+          ))}
+        </div>
+      ) : null}
+    </article>
+  );
+}
 
 function ActionPanel({ actions }: ActionPanelProps) {
   return (

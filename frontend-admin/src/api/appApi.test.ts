@@ -8,6 +8,7 @@ import {
   getAppActionSummaries,
   getAppCanvasScreens,
   getAppComponentPropertySummaries,
+  getAppMobilePreviewScreens,
   getAppPayload,
   getAppPermissionBindingSummaries,
   type AppSummary
@@ -266,6 +267,30 @@ describe("app API helpers", () => {
         permission_label: "Submit patient intake",
         screen_id: "intake",
         target_id: "intake_form"
+      }
+    ]);
+  });
+
+  it("extracts mobile preview screens from an app payload", () => {
+    const payload = getAppPayload(app);
+
+    expect(getAppMobilePreviewScreens(payload)).toEqual([
+      {
+        actions: ["Submit"],
+        components: [
+          {
+            binding: "patient_intake",
+            children: [],
+            component_id: "intake_form",
+            component_type: "form",
+            label: "Patient Intake"
+          }
+        ],
+        navigation_label: "Intake",
+        route: "/intake",
+        screen_id: "intake",
+        subtitle: "Capture a patient intake form.",
+        title: "Patient Intake"
       }
     ]);
   });

@@ -167,6 +167,24 @@ export type AppPermissionBindingSummary = {
   target_id: string;
 };
 
+export type AppMobilePreviewComponent = {
+  binding: string;
+  children: AppMobilePreviewComponent[];
+  component_id: string;
+  component_type: string;
+  label: string;
+};
+
+export type AppMobilePreviewScreen = {
+  actions: string[];
+  components: AppMobilePreviewComponent[];
+  navigation_label: string;
+  route: string;
+  screen_id: string;
+  subtitle: string;
+  title: string;
+};
+
 type AppListResponse = {
   apps: AppSummary[];
 };
@@ -306,6 +324,20 @@ export function getAppPermissionBindingSummaries(
   return [...navigationBindings, ...screenBindings];
 }
 
+export function getAppMobilePreviewScreens(payload: AppPayload | undefined): AppMobilePreviewScreen[] {
+  const navigationLabels = new Map((payload?.navigation ?? []).map((item) => [item.screen_id, item.label]));
+
+  return (payload?.screens ?? []).map((screen) => ({
+    actions: (screen.actions ?? []).map((action) => action.label ?? action.action_id),
+    components: screen.components.map((component) => getMobilePreviewComponent(component)),
+    navigation_label: navigationLabels.get(screen.screen_id) ?? "not in navigation",
+    route: screen.route ?? "not routed",
+    screen_id: screen.screen_id,
+    subtitle: screen.display?.description ?? screen.screen_type,
+    title: screen.display?.title ?? screen.name
+  }));
+}
+
 function countComponents(components: AppComponent[]): number {
   return components.reduce((total, component) => total + 1 + countComponents(component.children ?? []), 0);
 }
@@ -369,6 +401,16 @@ function flattenComponentPermissionBindings(
       : []),
     ...(component.children ?? []).flatMap((child) => flattenComponentPermissionBindings(screen, child, labelFor))
   ];
+}
+
+function getMobilePreviewComponent(component: AppComponent): AppMobilePreviewComponent {
+  return {
+    binding: formatComponentBinding(component),
+    children: (component.children ?? []).map((child) => getMobilePreviewComponent(child)),
+    component_id: component.component_id,
+    component_type: component.component_type,
+    label: component.label ?? component.component_id
+  };
 }
 
 function formatActionBinding(action: AppAction): string {
