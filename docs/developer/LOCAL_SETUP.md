@@ -70,6 +70,7 @@ Run the current foundation checks from the repository root:
 python tools/validate_foundation.py
 python contracts/validate_contracts.py
 python tools/validate_backend.py
+python tools/validate_mobile.py
 ```
 
 Expected result:
@@ -77,6 +78,7 @@ Expected result:
 - Foundation validation passes.
 - Contract validation reports the schema, fixture, and unit test counts.
 - Backend validation runs Django system checks, migration checks, PostgreSQL and worker settings tests, core health endpoint, service lifecycle, event bus, API error model, and background job registry tests, tenant model tests, identity/RBAC model tests, module registry, dependency validation, and compatibility validation tests, configuration registry tests, audit event model tests, and backend integration tests.
+- Mobile scaffold validation confirms the expected Kotlin Multiplatform module layout and baseline runtime marker files.
 
 ## Local PostgreSQL
 
@@ -132,6 +134,7 @@ Before committing:
 python tools/validate_foundation.py
 python contracts/validate_contracts.py
 python tools/validate_backend.py
+python tools/validate_mobile.py
 git diff --check
 git status --short
 ```
@@ -174,10 +177,11 @@ Run these before every PR until more surface-specific checks are added:
 python tools/validate_foundation.py
 python contracts/validate_contracts.py
 python tools/validate_backend.py
+python tools/validate_mobile.py
 git diff --check
 ```
 
-When frontend, mobile, and Rust scaffolds are added, their setup and test commands should be documented here before or with the first related implementation PR.
+When mobile Gradle tests are added, their setup and test commands should be documented here before or with the first related implementation PR.
 
 ## Environment Notes
 
