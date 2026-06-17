@@ -16,6 +16,8 @@ REQUIRED_FILES = [
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
     "composeApp/build.gradle.kts",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
+    "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellState.kt",
+    "composeApp/src/commonTest/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellStateTest.kt",
     "androidApp/build.gradle.kts",
     "androidApp/src/main/AndroidManifest.xml",
     "androidApp/src/main/kotlin/org/khodola/mobile/runtime/android/MainActivity.kt",
@@ -64,6 +66,10 @@ def main() -> int:
     require_contains(
         MOBILE / "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
         "fun MobileRuntimeApp",
+    )
+    require_contains(
+        MOBILE / "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellState.kt",
+        "data class RuntimeShellState",
     )
 
     print("Mobile scaffold validation passed.")
