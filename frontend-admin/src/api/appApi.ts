@@ -185,6 +185,12 @@ export type AppMobilePreviewScreen = {
   title: string;
 };
 
+export type AppValidationFinding = {
+  message: string;
+  severity: "error" | "warning";
+  target: string;
+};
+
 type AppListResponse = {
   apps: AppSummary[];
 };
@@ -338,8 +344,93 @@ export function getAppMobilePreviewScreens(payload: AppPayload | undefined): App
   }));
 }
 
+export function getAppValidationFindings(payload: AppPayload | undefined): AppValidationFinding[] {
+  if (!payload) {
+    return [
+      {
+        message: "App payload is missing.",
+        severity: "error",
+        target: "payload"
+      }
+    ];
+  }
+
+  const findings: AppValidationFinding[] = [];
+  const screens = payload.screens ?? [];
+  const screenIds = new Set<string>();
+  const duplicateScreenIds = new Set<string>();
+  const permissions = new Set((payload.permissions ?? []).map((permission) => permission.code));
+
+  for (const screen of screens) {
+    if (screenIds.has(screen.screen_id)) {
+      duplicateScreenIds.add(screen.screen_id);
+    }
+    screenIds.add(screen.screen_id);
+  }
+
+  for (const screenId of duplicateScreenIds) {
+    findings.push({
+      message: "Screen id is duplicated.",
+      severity: "error",
+      target: `screen:${screenId}`
+    });
+  }
+
+  for (const item of payload.navigation) {
+    if (!screenIds.has(item.screen_id)) {
+      findings.push({
+        message: "Navigation item points to a missing screen.",
+        severity: "error",
+        target: `navigation:${item.label}`
+      });
+    }
+    pushPermissionFinding(findings, permissions, item.permission, `navigation:${item.label}`);
+  }
+
+  for (const screen of screens) {
+    pushPermissionFinding(findings, permissions, screen.permission, `screen:${screen.screen_id}`);
+    const componentIds = new Set(flattenComponents(screen.components).map((component) => component.component_id));
+    const actionIds = new Set((screen.actions ?? []).map((action) => action.action_id));
+
+    for (const component of flattenComponents(screen.components)) {
+      pushPermissionFinding(findings, permissions, component.permission, `component:${component.component_id}`);
+      if (component.binding?.action_id && !actionIds.has(component.binding.action_id)) {
+        findings.push({
+          message: "Component action binding points to a missing screen action.",
+          severity: "error",
+          target: `component:${component.component_id}`
+        });
+      }
+    }
+
+    for (const action of screen.actions ?? []) {
+      pushPermissionFinding(findings, permissions, action.permission, `action:${action.action_id}`);
+      if (action.binding?.component_id && !componentIds.has(action.binding.component_id)) {
+        findings.push({
+          message: "Action binding points to a missing component.",
+          severity: "error",
+          target: `action:${action.action_id}`
+        });
+      }
+      if (action.action_type === "navigate" && action.target && !screenIds.has(action.target)) {
+        findings.push({
+          message: "Navigate action target does not match a screen id.",
+          severity: "warning",
+          target: `action:${action.action_id}`
+        });
+      }
+    }
+  }
+
+  return findings;
+}
+
 function countComponents(components: AppComponent[]): number {
   return components.reduce((total, component) => total + 1 + countComponents(component.children ?? []), 0);
+}
+
+function flattenComponents(components: AppComponent[]): AppComponent[] {
+  return components.flatMap((component) => [component, ...flattenComponents(component.children ?? [])]);
 }
 
 function flattenComponentProperties(
@@ -411,6 +502,21 @@ function getMobilePreviewComponent(component: AppComponent): AppMobilePreviewCom
     component_type: component.component_type,
     label: component.label ?? component.component_id
   };
+}
+
+function pushPermissionFinding(
+  findings: AppValidationFinding[],
+  permissions: Set<string>,
+  permission: string | undefined,
+  target: string
+): void {
+  if (permission && !permissions.has(permission)) {
+    findings.push({
+      message: "Permission is referenced but not declared.",
+      severity: "warning",
+      target
+    });
+  }
 }
 
 function formatActionBinding(action: AppAction): string {
