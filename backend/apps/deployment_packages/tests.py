@@ -10,7 +10,9 @@ from apps.deployment_packages.models import DeploymentPackage, DeploymentPackage
 from apps.deployment_packages.services import (
     compile_deployment_package,
     compile_deployment_package_payload,
+    package_hash,
     sign_deployment_package_payload,
+    verify_deployment_package_hash,
 )
 from apps.form_builder.models import FormDefinition, FormRevision, FormRevisionStatus
 from apps.modules.models import ModuleRegistration
@@ -75,11 +77,29 @@ class DeploymentPackageModelTests(TestCase):
         with self.assertRaises(ValidationError):
             DeploymentPackage.from_payload(self.tenant, deepcopy(self.payload)).save()
 
-        other_package = DeploymentPackage.from_payload(self.other_tenant, deepcopy(self.payload))
-        other_package.payload["tenant_id"] = "tenant_other"
+        other_payload = deepcopy(self.payload)
+        other_payload["tenant_id"] = "tenant_other"
+        other_payload["hash"] = package_hash(other_payload)
+        other_package = DeploymentPackage.from_payload(self.other_tenant, other_payload)
         other_package.save()
 
         self.assertEqual(other_package.package_id, "pkg_field_ops_001")
+
+    def test_tampered_package_payload_hash_is_rejected(self):
+        payload = deepcopy(self.payload)
+        payload["app"]["name"] = "Tampered Field Operations"
+        package = DeploymentPackage.from_payload(self.tenant, payload)
+
+        with self.assertRaises(ValidationError):
+            package.save()
+
+    def test_package_hash_metadata_must_match_payload_hash(self):
+        payload = deepcopy(self.payload)
+        payload["hash"] = "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        package = DeploymentPackage.from_payload(self.tenant, payload)
+
+        with self.assertRaises(ValidationError):
+            package.save()
 
 
 class DeploymentPackageCompilerTests(TestCase):
@@ -136,6 +156,7 @@ class DeploymentPackageCompilerTests(TestCase):
         self.assertEqual(payload["forms"], [self.form_payload])
         self.assertEqual(payload["modules"], [self.module.manifest])
         self.assertEqual(payload["created_by"], "builder")
+        self.assertTrue(verify_deployment_package_hash(payload).is_valid)
 
     def test_compiler_can_persist_package(self):
         package = compile_deployment_package(
@@ -152,6 +173,7 @@ class DeploymentPackageCompilerTests(TestCase):
 
         self.assertEqual(package.package_id, "pkg_field_ops_003")
         self.assertEqual(package.status, DeploymentPackageStatus.SIGNED)
+        self.assertTrue(package.package_hash.startswith("sha256:"))
         self.assertEqual(package.payload["forms"][0]["form_id"], "patient_intake")
 
     def test_signing_is_deterministic(self):
@@ -176,6 +198,44 @@ class DeploymentPackageCompilerTests(TestCase):
         self.assertTrue(first["hash"].startswith("sha256:"))
         self.assertTrue(first["signature"].startswith("hmac-sha256:"))
         self.assertNotEqual(first["signature"], other_key["signature"])
+        self.assertTrue(verify_deployment_package_hash(first).is_valid)
+
+    def test_hash_verification_detects_tampered_signed_payload(self):
+        payload = compile_deployment_package_payload(
+            tenant=self.tenant,
+            package_id="pkg_field_ops_006",
+            app_revision=self.app_revision,
+            theme_revision=self.theme_revision,
+            form_revisions=[self.form_revision],
+            module_registrations=[self.module],
+            runtime_min_version="0.1.0",
+            runtime_max_version="0.1.0",
+            created_by="builder",
+            signing_key="test-signing-key",
+        )
+        tampered = deepcopy(payload)
+        tampered["app"]["name"] = "Tampered Field Operations"
+
+        verification = verify_deployment_package_hash(tampered)
+
+        self.assertFalse(verification.is_valid)
+        self.assertEqual(verification.actual_hash, payload["hash"])
+        self.assertNotEqual(verification.expected_hash, payload["hash"])
+
+    def test_compiler_rejects_hash_override_that_does_not_match_payload(self):
+        with self.assertRaises(ValidationError):
+            compile_deployment_package_payload(
+                tenant=self.tenant,
+                package_id="pkg_field_ops_007",
+                app_revision=self.app_revision,
+                theme_revision=self.theme_revision,
+                form_revisions=[self.form_revision],
+                module_registrations=[self.module],
+                runtime_min_version="0.1.0",
+                runtime_max_version="0.1.0",
+                created_by="builder",
+                package_hash="sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            )
 
     def test_compiler_can_persist_signed_package(self):
         package = compile_deployment_package(
