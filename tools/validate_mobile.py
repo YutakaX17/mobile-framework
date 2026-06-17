@@ -13,11 +13,13 @@ REQUIRED_FILES = [
     "gradle/libs.versions.toml",
     "shared/build.gradle.kts",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloader.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/security/SecureTokenStore.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStore.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloaderTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/security/SecureTokenStoreTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/serialization/PackageSerializationTest.kt",
@@ -71,6 +73,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
         'supportedSchemaVersion = "v1"',
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloader.kt",
+        "interface MobilePackageDownloader",
     )
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
