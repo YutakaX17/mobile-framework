@@ -69,6 +69,7 @@ export interface Component {
   component_id: string;
   component_type: "text" | "button" | "form" | "list" | "card" | "image" | "spacer" | "custom";
   label?: string;
+  permission?: string;
   binding?: {
     data_path?: string;
     form_id?: string;

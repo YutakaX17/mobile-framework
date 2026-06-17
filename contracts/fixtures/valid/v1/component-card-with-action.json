@@ -2,6 +2,7 @@
   "component_id": "summary_card",
   "component_type": "card",
   "label": "Summary",
+  "permission": "forms.view_patient_summary",
   "binding": {
     "data_path": "patient.summary",
     "action_id": "open_summary"

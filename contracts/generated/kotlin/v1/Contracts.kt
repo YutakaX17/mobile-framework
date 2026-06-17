@@ -52,6 +52,7 @@ public data class Component(
     val component_id: String,
     val component_type: String,
     val label: String? = null,
+    val permission: String? = null,
     val binding: JsonObject? = null,
     val properties: Map<String, JsonValue>? = null,
     val children: List<Component>? = null

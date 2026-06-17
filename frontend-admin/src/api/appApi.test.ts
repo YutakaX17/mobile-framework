@@ -9,6 +9,7 @@ import {
   getAppCanvasScreens,
   getAppComponentPropertySummaries,
   getAppPayload,
+  getAppPermissionBindingSummaries,
   type AppSummary
 } from "./appApi";
 
@@ -63,6 +64,7 @@ const app: AppSummary = {
                 message: "Patient intake submitted.",
                 refresh_screen: true
               },
+              permission: "forms.submit_patient_intake",
               target: "patient_intake"
             }
           ],
@@ -73,7 +75,8 @@ const app: AppSummary = {
               },
               component_id: "intake_form",
               component_type: "form",
-              label: "Patient Intake"
+              label: "Patient Intake",
+              permission: "forms.submit_patient_intake"
             }
           ],
           display: {
@@ -90,6 +93,7 @@ const app: AppSummary = {
             sync_required: true
           },
           order: 0,
+          permission: "forms.submit_patient_intake",
           route: "/intake",
           screen_id: "intake",
           screen_type: "form"
@@ -204,7 +208,8 @@ describe("app API helpers", () => {
             },
             component_id: "intake_form",
             component_type: "form",
-            label: "Patient Intake"
+            label: "Patient Intake",
+            permission: "forms.submit_patient_intake"
           }
         ]
       }
@@ -222,6 +227,45 @@ describe("app API helpers", () => {
         screen_id: "intake",
         success: "Patient intake submitted.",
         target: "patient_intake"
+      }
+    ]);
+  });
+
+  it("extracts permission binding summaries from an app payload", () => {
+    const payload = getAppPayload(app);
+
+    expect(getAppPermissionBindingSummaries(payload)).toEqual([
+      {
+        binding_type: "navigation",
+        label: "Intake",
+        permission: "forms.submit_patient_intake",
+        permission_label: "Submit patient intake",
+        screen_id: "intake",
+        target_id: "intake"
+      },
+      {
+        binding_type: "screen",
+        label: "Patient Intake",
+        permission: "forms.submit_patient_intake",
+        permission_label: "Submit patient intake",
+        screen_id: "intake",
+        target_id: "intake"
+      },
+      {
+        binding_type: "action",
+        label: "Submit",
+        permission: "forms.submit_patient_intake",
+        permission_label: "Submit patient intake",
+        screen_id: "intake",
+        target_id: "submit_intake"
+      },
+      {
+        binding_type: "component",
+        label: "Patient Intake",
+        permission: "forms.submit_patient_intake",
+        permission_label: "Submit patient intake",
+        screen_id: "intake",
+        target_id: "intake_form"
       }
     ]);
   });
