@@ -5,16 +5,30 @@ from pathlib import Path
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from apps.app_builder.models import AppDefinition, AppRevision, AppRevisionStatus
 from apps.deployment_packages.models import DeploymentPackage, DeploymentPackageStatus
+from apps.deployment_packages.services import compile_deployment_package, compile_deployment_package_payload
+from apps.form_builder.models import FormDefinition, FormRevision, FormRevisionStatus
+from apps.modules.models import ModuleRegistration
 from apps.tenants.models import Tenant
+from apps.themes.models import Theme, ThemeRevision, ThemeRevisionStatus
 
 
 ROOT = Path(__file__).resolve().parents[3]
 VALID_PACKAGE = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "deployment-package-field-ops.json"
+VALID_APP = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "app-field-ops.json"
+VALID_FORM = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "form-patient-intake.json"
+VALID_MANIFEST = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "module-manifest-core.json"
+VALID_THEME = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "theme-basic.json"
 
 
 def load_valid_package() -> dict:
     with VALID_PACKAGE.open(encoding="utf-8-sig") as handle:
+        return json.load(handle)
+
+
+def load_json(path: Path) -> dict:
+    with path.open(encoding="utf-8-sig") as handle:
         return json.load(handle)
 
 
@@ -62,3 +76,76 @@ class DeploymentPackageModelTests(TestCase):
         other_package.save()
 
         self.assertEqual(other_package.package_id, "pkg_field_ops_001")
+
+
+class DeploymentPackageCompilerTests(TestCase):
+    def setUp(self):
+        self.tenant = Tenant.objects.create(slug="tenant_demo", name="Demo Tenant")
+        self.module = ModuleRegistration.from_manifest(load_json(VALID_MANIFEST))
+        self.module.save()
+
+        self.theme_payload = load_json(VALID_THEME)
+        self.theme = Theme.from_payload(self.tenant, self.theme_payload)
+        self.theme.save()
+        self.theme_revision = ThemeRevision.create_next(
+            self.theme,
+            deepcopy(self.theme_payload),
+            status=ThemeRevisionStatus.PUBLISHED,
+        )
+
+        self.form_payload = load_json(VALID_FORM)
+        self.form = FormDefinition.from_payload(self.tenant, self.form_payload)
+        self.form.save()
+        self.form_revision = FormRevision.create_next(
+            self.form,
+            deepcopy(self.form_payload),
+            status=FormRevisionStatus.PUBLISHED,
+        )
+
+        self.app_payload = load_json(VALID_APP)
+        self.app = AppDefinition.from_payload(self.tenant, self.app_payload)
+        self.app.save()
+        self.app_revision = AppRevision.create_next(
+            self.app,
+            deepcopy(self.app_payload),
+            status=AppRevisionStatus.PUBLISHED,
+        )
+
+    def test_compiler_builds_contract_valid_payload(self):
+        payload = compile_deployment_package_payload(
+            tenant=self.tenant,
+            package_id="pkg_field_ops_002",
+            app_revision=self.app_revision,
+            theme_revision=self.theme_revision,
+            form_revisions=[self.form_revision],
+            module_registrations=[self.module],
+            runtime_min_version="0.1.0",
+            runtime_max_version="0.1.0",
+            created_by="builder",
+        )
+
+        self.assertEqual(payload["package_id"], "pkg_field_ops_002")
+        self.assertEqual(payload["tenant_id"], "tenant_demo")
+        self.assertEqual(payload["app_id"], "field_ops_app")
+        self.assertEqual(payload["app"], self.app_payload)
+        self.assertEqual(payload["theme"], self.theme_payload)
+        self.assertEqual(payload["forms"], [self.form_payload])
+        self.assertEqual(payload["modules"], [self.module.manifest])
+        self.assertEqual(payload["created_by"], "builder")
+
+    def test_compiler_can_persist_package(self):
+        package = compile_deployment_package(
+            tenant=self.tenant,
+            package_id="pkg_field_ops_003",
+            app_revision=self.app_revision,
+            theme_revision=self.theme_revision,
+            form_revisions=[self.form_revision],
+            module_registrations=[self.module],
+            runtime_min_version="0.1.0",
+            runtime_max_version="0.1.0",
+            created_by="builder",
+        )
+
+        self.assertEqual(package.package_id, "pkg_field_ops_003")
+        self.assertEqual(package.status, DeploymentPackageStatus.SIGNED)
+        self.assertEqual(package.payload["forms"][0]["form_id"], "patient_intake")
