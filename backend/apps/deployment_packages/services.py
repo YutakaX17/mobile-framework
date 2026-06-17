@@ -90,6 +90,44 @@ def active_deployment_package(*, tenant, app_id: str, channel: str = "dev"):
     )
 
 
+def rollback_deployment_package(
+    *,
+    tenant,
+    app_id: str,
+    channel: str = "dev",
+    package_id: str | None = None,
+):
+    from .models import DeploymentPackage, DeploymentPackageStatus
+
+    validate_release_channel_name(channel)
+    with transaction.atomic():
+        packages = DeploymentPackage.objects.select_for_update().filter(
+            tenant=tenant,
+            app_id=app_id,
+            channel=channel,
+        )
+        current = packages.filter(status=DeploymentPackageStatus.ACTIVE).order_by(
+            "-updated_at",
+            "-id",
+        ).first()
+        if current is None:
+            raise ValidationError({"status": "Rollback requires an active package."})
+
+        candidates = packages.filter(status=DeploymentPackageStatus.ARCHIVED)
+        if package_id:
+            target = candidates.filter(package_id=package_id).first()
+        else:
+            target = candidates.order_by("-updated_at", "-id").first()
+        if target is None:
+            raise ValidationError({"package": "Rollback target package was not found."})
+
+        current.status = DeploymentPackageStatus.ARCHIVED
+        current.save(update_fields=["status", "updated_at"])
+        target.status = DeploymentPackageStatus.ACTIVE
+        target.save(update_fields=["status", "updated_at"])
+        return target
+
+
 @dataclass(frozen=True)
 class PackageHashVerification:
     is_valid: bool

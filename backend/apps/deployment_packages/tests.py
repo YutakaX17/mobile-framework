@@ -15,6 +15,7 @@ from apps.deployment_packages.services import (
     create_default_release_channels,
     package_hash,
     release_channel_names,
+    rollback_deployment_package,
     sign_deployment_package_payload,
     verify_deployment_package_hash,
 )
@@ -265,6 +266,85 @@ class DeploymentPackageActivationTests(TestCase):
 
         with self.assertRaises(ValidationError):
             activate_deployment_package(package)
+
+    def test_rollback_reactivates_previous_archived_package(self):
+        first = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        second = self.save_package(package_id="pkg_field_ops_003", app_version="0.3.0")
+        first_payload = deepcopy(first.payload)
+
+        activate_deployment_package(first)
+        activate_deployment_package(second)
+        rolled_back = rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="dev")
+        second.refresh_from_db()
+
+        self.assertEqual(rolled_back.pk, first.pk)
+        self.assertEqual(rolled_back.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(rolled_back.payload, first_payload)
+        self.assertEqual(second.status, DeploymentPackageStatus.ARCHIVED)
+
+    def test_rollback_can_target_specific_archived_package(self):
+        first = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        second = self.save_package(package_id="pkg_field_ops_003", app_version="0.3.0")
+        third = self.save_package(package_id="pkg_field_ops_004", app_version="0.4.0")
+
+        activate_deployment_package(first)
+        activate_deployment_package(second)
+        activate_deployment_package(third)
+        rolled_back = rollback_deployment_package(
+            tenant=self.tenant,
+            app_id="field_ops_app",
+            channel="dev",
+            package_id=first.package_id,
+        )
+        second.refresh_from_db()
+        third.refresh_from_db()
+
+        self.assertEqual(rolled_back.pk, first.pk)
+        self.assertEqual(rolled_back.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(second.status, DeploymentPackageStatus.ARCHIVED)
+        self.assertEqual(third.status, DeploymentPackageStatus.ARCHIVED)
+
+    def test_rollback_is_scoped_by_channel(self):
+        dev_first = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        dev_second = self.save_package(package_id="pkg_field_ops_003", app_version="0.3.0")
+        staging_first = self.save_package(
+            package_id="pkg_field_ops_004",
+            app_version="0.2.0",
+            channel="staging",
+        )
+        staging_second = self.save_package(
+            package_id="pkg_field_ops_005",
+            app_version="0.3.0",
+            channel="staging",
+        )
+
+        activate_deployment_package(dev_first)
+        activate_deployment_package(dev_second)
+        activate_deployment_package(staging_first)
+        activate_deployment_package(staging_second)
+        rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="staging")
+        dev_second.refresh_from_db()
+        staging_first.refresh_from_db()
+
+        self.assertEqual(dev_second.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(staging_first.status, DeploymentPackageStatus.ACTIVE)
+
+    def test_rollback_rejects_missing_active_package(self):
+        self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+
+        with self.assertRaises(ValidationError):
+            rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="dev")
+
+    def test_rollback_rejects_missing_target_package(self):
+        package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        activate_deployment_package(package)
+
+        with self.assertRaises(ValidationError):
+            rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="dev")
+
+    def test_rollback_rejects_unknown_channel(self):
+        with self.assertRaises(ValidationError):
+            rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="pilot")
 
 
 class DeploymentPackageCompilerTests(TestCase):
