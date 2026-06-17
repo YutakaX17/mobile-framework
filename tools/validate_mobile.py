@@ -15,9 +15,11 @@ REQUIRED_FILES = [
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStore.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/serialization/PackageSerializationTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStoreTest.kt",
     "composeApp/build.gradle.kts",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellState.kt",
@@ -75,6 +77,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
         "fun decodePackageManifestResponse",
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStore.kt",
+        "interface MobilePackageLocalStore",
     )
     require_contains(
         MOBILE / "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
