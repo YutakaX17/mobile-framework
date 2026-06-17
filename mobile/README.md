@@ -6,7 +6,7 @@ Kotlin Multiplatform and Compose Multiplatform runtime for rendering signed conf
 
 - `settings.gradle.kts`: Gradle project includes shared runtime, shared Compose UI, Android app, and desktop preview modules.
 - `shared`: common runtime kernel source set with baseline runtime identity metadata.
-- `composeApp`: shared Compose UI module that renders the runtime marker.
+- `composeApp`: shared Compose UI module with a testable runtime shell state and marker screen.
 - `androidApp`: Android application entry point using the shared Compose UI.
 - `desktopApp`: desktop preview entry point using the shared Compose UI.
 - `iosApp`: placeholder for the native iOS entry point.
