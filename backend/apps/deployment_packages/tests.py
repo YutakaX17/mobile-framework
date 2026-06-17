@@ -432,6 +432,54 @@ class MobilePackageManifestEndpointTests(TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    def test_package_download_endpoint_returns_active_payload(self):
+        package = self.save_active_package()
+
+        response = self.client.get(
+            f"/api/mobile/packages/{package.package_id}/download/",
+            {"tenant": "tenant_demo"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["manifest"]["package_id"], package.package_id)
+        self.assertEqual(body["manifest"]["hash"], package.package_hash)
+        self.assertEqual(body["package"], package.payload)
+        self.assertEqual(response.headers["ETag"], f'"{package.package_hash}"')
+
+    def test_package_download_endpoint_rejects_inactive_package(self):
+        payload = self.package_payload(package_id="pkg_field_ops_002", app_version="0.2.0")
+        package = DeploymentPackage.from_payload(self.tenant, payload)
+        package.save()
+
+        response = self.client.get(
+            f"/api/mobile/packages/{package.package_id}/download/",
+            {"tenant": "tenant_demo"},
+        )
+
+        self.assertEqual(response.status_code, 409)
+
+    def test_package_download_endpoint_returns_not_found_for_missing_package(self):
+        response = self.client.get(
+            "/api/mobile/packages/missing_package/download/",
+            {"tenant": "tenant_demo"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_package_download_endpoint_requires_tenant(self):
+        response = self.client.get("/api/mobile/packages/pkg_field_ops_002/download/")
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_package_download_endpoint_rejects_post(self):
+        response = self.client.post(
+            "/api/mobile/packages/pkg_field_ops_002/download/",
+            {"tenant": "tenant_demo"},
+        )
+
+        self.assertEqual(response.status_code, 405)
+
 
 class DeploymentPackageCompilerTests(TestCase):
     def setUp(self):
