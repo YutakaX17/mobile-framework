@@ -8,6 +8,8 @@ from django.test import TestCase
 from apps.app_builder.models import AppDefinition, AppRevision, AppRevisionStatus
 from apps.deployment_packages.models import DeploymentChannel, DeploymentPackage, DeploymentPackageStatus
 from apps.deployment_packages.services import (
+    activate_deployment_package,
+    active_deployment_package,
     compile_deployment_package,
     compile_deployment_package_payload,
     create_default_release_channels,
@@ -147,6 +149,122 @@ class DeploymentPackageModelTests(TestCase):
 
         with self.assertRaises(ValidationError):
             DeploymentPackage.from_payload(self.tenant, payload).save()
+
+
+class DeploymentPackageActivationTests(TestCase):
+    def setUp(self):
+        self.tenant = Tenant.objects.create(slug="tenant_demo", name="Demo Tenant")
+        self.other_tenant = Tenant.objects.create(slug="tenant_other", name="Other Tenant")
+        self.payload = load_valid_package()
+
+    def package_payload(
+        self,
+        *,
+        package_id: str,
+        app_version: str,
+        channel: str = "dev",
+        tenant_slug: str = "tenant_demo",
+    ):
+        payload = deepcopy(self.payload)
+        payload["package_id"] = package_id
+        payload["tenant_id"] = tenant_slug
+        payload["app_version"] = app_version
+        payload["channel"] = channel
+        payload["hash"] = package_hash(payload)
+        return payload
+
+    def save_package(self, *, package_id: str, app_version: str, channel: str = "dev", tenant=None):
+        tenant = tenant or self.tenant
+        payload = self.package_payload(
+            package_id=package_id,
+            app_version=app_version,
+            channel=channel,
+            tenant_slug=tenant.slug,
+        )
+        package = DeploymentPackage.from_payload(tenant, payload)
+        package.save()
+        return package
+
+    def test_signed_package_can_be_activated_without_mutating_payload(self):
+        package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        original_payload = deepcopy(package.payload)
+
+        activated = activate_deployment_package(package)
+
+        self.assertEqual(activated.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(activated.payload, original_payload)
+        self.assertEqual(
+            active_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="dev"),
+            activated,
+        )
+
+    def test_activation_archives_previous_active_package_for_same_tenant_app_channel(self):
+        first = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        second = self.save_package(package_id="pkg_field_ops_003", app_version="0.3.0")
+
+        activate_deployment_package(first)
+        activated_second = activate_deployment_package(second)
+        first.refresh_from_db()
+
+        self.assertEqual(first.status, DeploymentPackageStatus.ARCHIVED)
+        self.assertEqual(activated_second.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(
+            active_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="dev"),
+            activated_second,
+        )
+
+    def test_activation_is_scoped_by_channel_and_tenant(self):
+        dev_package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        staging_package = self.save_package(
+            package_id="pkg_field_ops_003",
+            app_version="0.2.0",
+            channel="staging",
+        )
+        other_tenant_package = self.save_package(
+            package_id="pkg_field_ops_002",
+            app_version="0.2.0",
+            tenant=self.other_tenant,
+        )
+
+        activate_deployment_package(dev_package)
+        activate_deployment_package(staging_package)
+        activate_deployment_package(other_tenant_package)
+        dev_package.refresh_from_db()
+
+        self.assertEqual(dev_package.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(
+            active_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="staging"),
+            staging_package,
+        )
+        self.assertEqual(
+            active_deployment_package(tenant=self.other_tenant, app_id="field_ops_app", channel="dev"),
+            other_tenant_package,
+        )
+
+    def test_activation_is_idempotent_for_current_active_package(self):
+        package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+
+        first = activate_deployment_package(package)
+        second = activate_deployment_package(first)
+
+        self.assertEqual(second.status, DeploymentPackageStatus.ACTIVE)
+        self.assertEqual(
+            DeploymentPackage.objects.filter(
+                tenant=self.tenant,
+                app_id="field_ops_app",
+                channel="dev",
+                status=DeploymentPackageStatus.ACTIVE,
+            ).count(),
+            1,
+        )
+
+    def test_archived_package_cannot_be_activated(self):
+        package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        package.status = DeploymentPackageStatus.ARCHIVED
+        package.save()
+
+        with self.assertRaises(ValidationError):
+            activate_deployment_package(package)
 
 
 class DeploymentPackageCompilerTests(TestCase):
