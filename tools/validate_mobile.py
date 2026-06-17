@@ -18,6 +18,7 @@ REQUIRED_FILES = [
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/security/SecureTokenStore.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/screen/RuntimeScreenRenderer.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStore.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/theme/RuntimeThemeMapper.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/verifier/PackageVerifier.kt",
@@ -27,6 +28,7 @@ REQUIRED_FILES = [
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/security/SecureTokenStoreTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/serialization/PackageSerializationTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/screen/RuntimeScreenRendererTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStoreTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/theme/RuntimeThemeMapperTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/verifier/PackageVerifierTest.kt",
@@ -99,6 +101,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
         "fun decodePackageManifestResponse",
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/screen/RuntimeScreenRenderer.kt",
+        "fun decodeRuntimeScreenFromPackagePayload",
     )
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStore.kt",
