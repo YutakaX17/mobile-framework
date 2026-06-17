@@ -50,7 +50,7 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.form_builder apps.app_builder apps.audit tests --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.form_builder apps.app_builder apps.deployment_packages apps.audit tests --settings=config.settings.test
 ```
 
 Local development uses SQLite by default. To point development settings at the Compose PostgreSQL service, start the service and set:
