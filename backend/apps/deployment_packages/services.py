@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
+import json
 from typing import Any
 
 from django.utils import timezone
@@ -13,6 +16,29 @@ PLACEHOLDER_PACKAGE_SIGNATURE = "compiler-placeholder-signature-v1-000"
 
 def validate_deployment_package_payload(payload: dict[str, Any]) -> None:
     validate_configuration_payload("deployment_package", payload)
+
+
+def canonical_unsigned_package_json(payload: dict[str, Any]) -> str:
+    unsigned_payload = {key: value for key, value in payload.items() if key not in {"hash", "signature"}}
+    return json.dumps(unsigned_payload, separators=(",", ":"), sort_keys=True)
+
+
+def package_hash(payload: dict[str, Any]) -> str:
+    digest = hashlib.sha256(canonical_unsigned_package_json(payload).encode("utf-8")).hexdigest()
+    return f"sha256:{digest}"
+
+
+def package_signature(package_hash_value: str, signing_key: str) -> str:
+    digest = hmac.new(signing_key.encode("utf-8"), package_hash_value.encode("utf-8"), hashlib.sha256).hexdigest()
+    return f"hmac-sha256:{digest}"
+
+
+def sign_deployment_package_payload(payload: dict[str, Any], signing_key: str) -> dict[str, Any]:
+    signed_payload = dict(payload)
+    signed_payload["hash"] = package_hash(signed_payload)
+    signed_payload["signature"] = package_signature(signed_payload["hash"], signing_key)
+    validate_deployment_package_payload(signed_payload)
+    return signed_payload
 
 
 def compile_deployment_package_payload(
@@ -30,6 +56,7 @@ def compile_deployment_package_payload(
     created_by: str = "system",
     package_hash: str = PLACEHOLDER_PACKAGE_HASH,
     signature: str = PLACEHOLDER_PACKAGE_SIGNATURE,
+    signing_key: str | None = None,
 ) -> dict[str, Any]:
     payload = {
         "schema_version": "v1",
@@ -52,6 +79,8 @@ def compile_deployment_package_payload(
         "hash": package_hash,
         "signature": signature,
     }
+    if signing_key:
+        payload = sign_deployment_package_payload(payload, signing_key)
     validate_deployment_package_payload(payload)
     return payload
 
