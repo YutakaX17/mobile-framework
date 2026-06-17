@@ -17,6 +17,7 @@ REQUIRED_FILES = [
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/form/RuntimeFormRenderer.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/navigation/RuntimeNavigationRenderer.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/outbox/OfflineOutbox.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/security/SecureTokenStore.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/screen/RuntimeScreenRenderer.kt",
@@ -29,6 +30,7 @@ REQUIRED_FILES = [
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/form/RuntimeFormRendererTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/navigation/RuntimeNavigationRendererTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/outbox/OfflineOutboxTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/security/SecureTokenStoreTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/serialization/PackageSerializationTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/screen/RuntimeScreenRendererTest.kt",
@@ -101,6 +103,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
         "interface MobileRuntimeNetworkClient",
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/outbox/OfflineOutbox.kt",
+        "interface OfflineOutboxStore",
     )
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/security/SecureTokenStore.kt",

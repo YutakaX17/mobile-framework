@@ -57,7 +57,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
 - `[x]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow baselines are complete.
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
-- `[~]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, and form renderer baselines are complete; offline outbox, sync engine, and mobile tests remain pending.
+- `[~]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, form renderer, and offline outbox baselines are complete; sync engine and mobile tests remain pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -162,6 +162,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#229` completed: mobile screen renderer baseline added.
 - `[x]` Task `#231` completed: mobile widget registry baseline added.
 - `[x]` Task `#233` completed: mobile form renderer baseline added.
+- `[x]` Task `#235` completed: mobile offline outbox baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
