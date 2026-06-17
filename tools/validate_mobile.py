@@ -22,6 +22,7 @@ REQUIRED_FILES = [
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStore.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/theme/RuntimeThemeMapper.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/verifier/PackageVerifier.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/widget/RuntimeWidgetRegistry.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloaderTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/navigation/RuntimeNavigationRendererTest.kt",
@@ -32,6 +33,7 @@ REQUIRED_FILES = [
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/storage/PackageLocalStoreTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/theme/RuntimeThemeMapperTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/verifier/PackageVerifierTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/widget/RuntimeWidgetRegistryTest.kt",
     "composeApp/build.gradle.kts",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellState.kt",
@@ -117,6 +119,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/verifier/PackageVerifier.kt",
         "interface MobilePackageVerifier",
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/widget/RuntimeWidgetRegistry.kt",
+        "interface RuntimeWidgetRegistry",
     )
     require_contains(
         MOBILE / "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
