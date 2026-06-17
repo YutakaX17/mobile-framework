@@ -61,6 +61,7 @@ def activate_deployment_package(package):
         if package.status == DeploymentPackageStatus.ARCHIVED:
             raise ValidationError({"status": "Archived packages cannot be activated."})
 
+        was_already_active = package.status == DeploymentPackageStatus.ACTIVE
         DeploymentPackage.objects.select_for_update().filter(
             tenant=package.tenant,
             app_id=package.app_id,
@@ -71,6 +72,11 @@ def activate_deployment_package(package):
         if package.status != DeploymentPackageStatus.ACTIVE:
             package.status = DeploymentPackageStatus.ACTIVE
             package.save(update_fields=["status", "updated_at"])
+        if not was_already_active:
+            record_deployment_package_audit(
+                package,
+                action="deployment-package-activated",
+            )
         return package
 
 
@@ -125,7 +131,44 @@ def rollback_deployment_package(
         current.save(update_fields=["status", "updated_at"])
         target.status = DeploymentPackageStatus.ACTIVE
         target.save(update_fields=["status", "updated_at"])
+        record_deployment_package_audit(
+            target,
+            action="deployment-package-rolled-back",
+            metadata={"previous_active_package_id": current.package_id},
+        )
         return target
+
+
+def record_deployment_package_audit(
+    package,
+    *,
+    action: str,
+    actor=None,
+    metadata: dict[str, Any] | None = None,
+):
+    from apps.audit.models import AuditEvent, AuditEventType, AuditSeverity
+
+    event_metadata = {
+        "app_id": package.app_id,
+        "app_version": package.app_version,
+        "channel": package.channel,
+        "package_hash": package.package_hash,
+        "runtime_max_version": package.runtime_max_version,
+        "runtime_min_version": package.runtime_min_version,
+    }
+    if metadata:
+        event_metadata.update(metadata)
+    return AuditEvent.objects.create(
+        tenant=package.tenant,
+        actor=actor,
+        event_type=AuditEventType.DEPLOYMENT,
+        severity=AuditSeverity.INFO,
+        action=action,
+        target_type="deployment_package",
+        target_id=package.package_id,
+        target_repr=str(package),
+        metadata=event_metadata,
+    )
 
 
 @dataclass(frozen=True)

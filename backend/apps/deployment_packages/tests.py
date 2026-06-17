@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from apps.app_builder.models import AppDefinition, AppRevision, AppRevisionStatus
+from apps.audit.models import AuditEvent, AuditEventType
 from apps.deployment_packages.models import DeploymentChannel, DeploymentPackage, DeploymentPackageStatus
 from apps.deployment_packages.services import (
     activate_deployment_package,
@@ -258,6 +259,13 @@ class DeploymentPackageActivationTests(TestCase):
             ).count(),
             1,
         )
+        self.assertEqual(
+            AuditEvent.objects.filter(
+                action="deployment-package-activated",
+                target_id=package.package_id,
+            ).count(),
+            1,
+        )
 
     def test_archived_package_cannot_be_activated(self):
         package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
@@ -345,6 +353,36 @@ class DeploymentPackageActivationTests(TestCase):
     def test_rollback_rejects_unknown_channel(self):
         with self.assertRaises(ValidationError):
             rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="pilot")
+
+    def test_activation_records_deployment_audit_event(self):
+        package = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+
+        activate_deployment_package(package)
+
+        event = AuditEvent.objects.get(action="deployment-package-activated")
+        self.assertEqual(event.tenant, self.tenant)
+        self.assertEqual(event.event_type, AuditEventType.DEPLOYMENT)
+        self.assertEqual(event.target_type, "deployment_package")
+        self.assertEqual(event.target_id, package.package_id)
+        self.assertEqual(event.metadata["app_id"], "field_ops_app")
+        self.assertEqual(event.metadata["app_version"], "0.2.0")
+        self.assertEqual(event.metadata["channel"], "dev")
+        self.assertEqual(event.metadata["package_hash"], package.package_hash)
+
+    def test_rollback_records_deployment_audit_event(self):
+        first = self.save_package(package_id="pkg_field_ops_002", app_version="0.2.0")
+        second = self.save_package(package_id="pkg_field_ops_003", app_version="0.3.0")
+
+        activate_deployment_package(first)
+        activate_deployment_package(second)
+        rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="dev")
+
+        event = AuditEvent.objects.get(action="deployment-package-rolled-back")
+        self.assertEqual(event.tenant, self.tenant)
+        self.assertEqual(event.event_type, AuditEventType.DEPLOYMENT)
+        self.assertEqual(event.target_id, first.package_id)
+        self.assertEqual(event.metadata["previous_active_package_id"], second.package_id)
+        self.assertEqual(event.metadata["app_version"], "0.2.0")
 
 
 class MobilePackageManifestEndpointTests(TestCase):
