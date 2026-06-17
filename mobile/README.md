@@ -5,7 +5,7 @@ Kotlin Multiplatform and Compose Multiplatform runtime for rendering signed conf
 ## Current Scaffold
 
 - `settings.gradle.kts`: Gradle project includes shared runtime, shared Compose UI, Android app, and desktop preview modules.
-- `shared`: common runtime kernel source set with baseline runtime identity metadata, package networking contracts, secure token storage contracts, package response serialization DTOs, package local store contracts, package downloader orchestration, package verification policy, and theme token mapping.
+- `shared`: common runtime kernel source set with baseline runtime identity metadata, package networking contracts, secure token storage contracts, package response serialization DTOs, package local store contracts, package downloader orchestration, package verification policy, theme token mapping, and navigation graph rendering.
 - `composeApp`: shared Compose UI module with a testable runtime shell state and marker screen.
 - `androidApp`: Android application entry point using the shared Compose UI.
 - `desktopApp`: desktop preview entry point using the shared Compose UI.

@@ -14,6 +14,7 @@ REQUIRED_FILES = [
     "shared/build.gradle.kts",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloader.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/navigation/RuntimeNavigationRenderer.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/security/SecureTokenStore.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
@@ -22,6 +23,7 @@ REQUIRED_FILES = [
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/verifier/PackageVerifier.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloaderTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/navigation/RuntimeNavigationRendererTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/security/SecureTokenStoreTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/serialization/PackageSerializationTest.kt",
@@ -81,6 +83,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/downloader/PackageDownloader.kt",
         "interface MobilePackageDownloader",
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/navigation/RuntimeNavigationRenderer.kt",
+        "fun decodeRuntimeNavigationGraphFromPackagePayload",
     )
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
