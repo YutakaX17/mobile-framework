@@ -347,6 +347,92 @@ class DeploymentPackageActivationTests(TestCase):
             rollback_deployment_package(tenant=self.tenant, app_id="field_ops_app", channel="pilot")
 
 
+class MobilePackageManifestEndpointTests(TestCase):
+    def setUp(self):
+        self.tenant = Tenant.objects.create(slug="tenant_demo", name="Demo Tenant")
+        self.payload = load_valid_package()
+
+    def package_payload(self, *, package_id: str, app_version: str, channel: str = "dev"):
+        payload = deepcopy(self.payload)
+        payload["package_id"] = package_id
+        payload["app_version"] = app_version
+        payload["channel"] = channel
+        payload["hash"] = package_hash(payload)
+        return payload
+
+    def save_active_package(
+        self,
+        *,
+        package_id: str = "pkg_field_ops_002",
+        app_version: str = "0.2.0",
+        channel: str = "dev",
+    ):
+        package = DeploymentPackage.from_payload(
+            self.tenant,
+            self.package_payload(package_id=package_id, app_version=app_version, channel=channel),
+        )
+        package.save()
+        return activate_deployment_package(package)
+
+    def test_active_manifest_endpoint_returns_package_metadata(self):
+        package = self.save_active_package()
+
+        response = self.client.get(
+            "/api/mobile/packages/manifest/",
+            {"tenant": "tenant_demo", "app_id": "field_ops_app", "channel": "dev"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        manifest = response.json()["manifest"]
+        self.assertEqual(manifest["package_id"], package.package_id)
+        self.assertEqual(manifest["app_id"], "field_ops_app")
+        self.assertEqual(manifest["app_version"], "0.2.0")
+        self.assertEqual(manifest["channel"], "dev")
+        self.assertEqual(manifest["hash"], package.package_hash)
+        self.assertEqual(manifest["signature"], package.signature)
+        self.assertNotIn("payload", manifest)
+
+    def test_active_manifest_endpoint_defaults_to_dev_channel(self):
+        package = self.save_active_package()
+
+        response = self.client.get(
+            "/api/mobile/packages/manifest/",
+            {"tenant": "tenant_demo", "app_id": "field_ops_app"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["manifest"]["package_id"], package.package_id)
+
+    def test_active_manifest_endpoint_returns_not_found_without_active_package(self):
+        response = self.client.get(
+            "/api/mobile/packages/manifest/",
+            {"tenant": "tenant_demo", "app_id": "field_ops_app"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_active_manifest_endpoint_requires_app_id(self):
+        response = self.client.get("/api/mobile/packages/manifest/", {"tenant": "tenant_demo"})
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_active_manifest_endpoint_rejects_unknown_channel(self):
+        response = self.client.get(
+            "/api/mobile/packages/manifest/",
+            {"tenant": "tenant_demo", "app_id": "field_ops_app", "channel": "pilot"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_active_manifest_endpoint_rejects_post(self):
+        response = self.client.post(
+            "/api/mobile/packages/manifest/",
+            {"tenant": "tenant_demo", "app_id": "field_ops_app"},
+        )
+
+        self.assertEqual(response.status_code, 405)
+
+
 class DeploymentPackageCompilerTests(TestCase):
     def setUp(self):
         self.tenant = Tenant.objects.create(slug="tenant_demo", name="Demo Tenant")
