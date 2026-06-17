@@ -1,0 +1,12 @@
+{
+  "action_id": "submit_intake",
+  "action_type": "submit_form",
+  "label": "Submit",
+  "target": "patient_intake",
+  "binding": {
+    "source": "component",
+    "event": "double_tap",
+    "component_id": "intake_form",
+    "payload_path": "forms.patient_intake"
+  }
+}

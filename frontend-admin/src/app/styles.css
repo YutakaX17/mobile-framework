@@ -722,6 +722,32 @@ input:focus-visible,
   color: var(--mf-color-text-muted);
 }
 
+.action-binding-rule {
+  align-items: start;
+}
+
+.action-binding-meta {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  margin: 0;
+}
+
+.action-binding-meta div {
+  display: grid;
+  gap: 2px;
+}
+
+.action-binding-meta dt {
+  color: var(--mf-color-text-muted);
+  font-size: 0.78rem;
+  font-weight: var(--mf-font-weight-bold);
+}
+
+.action-binding-meta dd {
+  margin: 0;
+}
+
 .logic-rule code {
   background: var(--mf-color-surface-subtle);
   border: 1px solid var(--mf-color-border);

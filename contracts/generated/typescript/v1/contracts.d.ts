@@ -12,10 +12,26 @@ export interface Action {
   label?: string;
   target?: string;
   parameters?: Record<string, string | number | boolean | null>;
+  binding?: {
+    source: "screen" | "component" | "form" | "navigation";
+    event: "load" | "tap" | "submit" | "change";
+    component_id?: string;
+    payload_path?: string;
+    result_path?: string;
+  };
   permission?: string;
   confirm?: {
     title: string;
     message: string;
+  };
+  on_success?: {
+    message?: string;
+    navigate_to?: string;
+    refresh_screen?: boolean;
+  };
+  on_error?: {
+    message?: string;
+    retry_allowed?: boolean;
   };
   extensions?: Record<string, JsonValue>;
 }

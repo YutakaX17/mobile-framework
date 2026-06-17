@@ -4,7 +4,10 @@
     "action": {
       "schema": "schemas/v1/action.schema.json",
       "valid": ["fixtures/valid/v1/action-navigate-home.json"],
-      "invalid": ["fixtures/invalid/v1/action-unknown-type.json"]
+      "invalid": [
+        "fixtures/invalid/v1/action-unknown-type.json",
+        "fixtures/invalid/v1/action-invalid-binding-event.json"
+      ]
     },
     "app": {
       "schema": "schemas/v1/app.schema.json",

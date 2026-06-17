@@ -52,7 +52,26 @@
           "action_id": "submit_intake",
           "action_type": "submit_form",
           "label": "Submit",
-          "target": "patient_intake"
+          "target": "patient_intake",
+          "binding": {
+            "source": "component",
+            "event": "submit",
+            "component_id": "intake_form",
+            "payload_path": "forms.patient_intake",
+            "result_path": "submissions.patient_intake"
+          },
+          "confirm": {
+            "title": "Submit intake",
+            "message": "Submit this patient intake form?"
+          },
+          "on_success": {
+            "message": "Patient intake submitted.",
+            "refresh_screen": true
+          },
+          "on_error": {
+            "message": "Patient intake could not be submitted.",
+            "retry_allowed": true
+          }
         }
       ]
     }

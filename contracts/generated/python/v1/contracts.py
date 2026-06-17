@@ -15,8 +15,11 @@ class Action(TypedDict):
     label: NotRequired[str]
     target: NotRequired[str]
     parameters: NotRequired[dict[str, str | int | float | bool | None]]
+    binding: NotRequired[dict[str, JsonValue]]
     permission: NotRequired[str]
     confirm: NotRequired[dict[str, JsonValue]]
+    on_success: NotRequired[dict[str, JsonValue]]
+    on_error: NotRequired[dict[str, JsonValue]]
     extensions: NotRequired[dict[str, JsonValue]]
 
 class AppDefinition(TypedDict):
