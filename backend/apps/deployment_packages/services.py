@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.utils import timezone
 
 from apps.configurations.services import validate_configuration_payload
@@ -47,6 +48,46 @@ def create_default_release_channels(tenant):
         )
         channels.append(deployment_channel)
     return channels
+
+
+def activate_deployment_package(package):
+    from .models import DeploymentPackage, DeploymentPackageStatus
+
+    if not package.pk:
+        raise ValidationError({"package": "Package must be saved before activation."})
+
+    with transaction.atomic():
+        package = DeploymentPackage.objects.select_for_update().get(pk=package.pk)
+        if package.status == DeploymentPackageStatus.ARCHIVED:
+            raise ValidationError({"status": "Archived packages cannot be activated."})
+
+        DeploymentPackage.objects.select_for_update().filter(
+            tenant=package.tenant,
+            app_id=package.app_id,
+            channel=package.channel,
+            status=DeploymentPackageStatus.ACTIVE,
+        ).exclude(pk=package.pk).update(status=DeploymentPackageStatus.ARCHIVED)
+
+        if package.status != DeploymentPackageStatus.ACTIVE:
+            package.status = DeploymentPackageStatus.ACTIVE
+            package.save(update_fields=["status", "updated_at"])
+        return package
+
+
+def active_deployment_package(*, tenant, app_id: str, channel: str = "dev"):
+    from .models import DeploymentPackage, DeploymentPackageStatus
+
+    validate_release_channel_name(channel)
+    return (
+        DeploymentPackage.objects.filter(
+            tenant=tenant,
+            app_id=app_id,
+            channel=channel,
+            status=DeploymentPackageStatus.ACTIVE,
+        )
+        .order_by("-updated_at", "-id")
+        .first()
+    )
 
 
 @dataclass(frozen=True)

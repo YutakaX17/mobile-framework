@@ -22,7 +22,7 @@ The backend includes a minimal Django project:
 - `apps/app_builder`: initial tenant-scoped app definition, revision baseline, shared app schema validation, and read-only API baseline.
 - `apps/themes`: initial tenant-scoped theme model, revision baseline, shared theme schema validation, read-only API baseline, draft editing action baseline, publish action baseline, and rollback action baseline.
 - `apps/form_builder`: initial tenant-scoped form definition, revision baseline, shared form schema validation, read-only API baseline, and submission endpoint baseline.
-- `apps/deployment_packages`: initial tenant-scoped package model, compiler, signing, hash verification, and release channel baseline.
+- `apps/deployment_packages`: initial tenant-scoped package model, compiler, signing, hash verification, release channel, and activation baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 - `rust_ext`: initial PyO3/maturin scaffold for bounded native helpers.
 
@@ -81,7 +81,7 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/form_builder`: form definitions, fields, validation, submissions. Initial form model, revision, read-only API, and submission endpoint baselines exist.
 - `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation.
 - `apps/themes`: design tokens, theme validation, preview, publishing. Initial theme model, revision, and read-only API baselines exist.
-- `apps/deployment_packages`: immutable package compilation, signing, channels, rollback. Initial package model, compiler, signing, hash verification, and release channel baselines exist.
+- `apps/deployment_packages`: immutable package compilation, signing, channels, rollback. Initial package model, compiler, signing, hash verification, release channel, and activation baselines exist.
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
 - `apps/audit`: mutation logs, config revisions, admin and sync audit events. Initial audit event model baseline exists.
 - `rust_ext`: bounded PyO3/maturin helpers. Initial scaffold exists; helper implementations remain pending.
