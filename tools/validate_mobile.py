@@ -14,8 +14,10 @@ REQUIRED_FILES = [
     "shared/build.gradle.kts",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/serialization/PackageSerializationTest.kt",
     "composeApp/build.gradle.kts",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellState.kt",
@@ -60,6 +62,7 @@ def main() -> int:
     require_contains(version_catalog, 'kotlin = "2.4.0"')
     require_contains(version_catalog, 'compose = "1.11.1"')
     require_contains(version_catalog, 'agp = "9.2.0"')
+    require_contains(version_catalog, 'serialization = "1.11.0"')
 
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
@@ -68,6 +71,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
         "interface MobileRuntimeNetworkClient",
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/serialization/PackageSerialization.kt",
+        "fun decodePackageManifestResponse",
     )
     require_contains(
         MOBILE / "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",

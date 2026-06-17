@@ -57,7 +57,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
 - `[x]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow baselines are complete.
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
-- `[~]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, and networking contract baselines are complete; serialization, local store, secure storage, package downloader, verifier, renderers, offline outbox, sync engine, and mobile tests remain pending.
+- `[~]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, and serialization baselines are complete; local store, secure storage, package downloader, verifier, renderers, offline outbox, sync engine, and mobile tests remain pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -152,6 +152,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#209` completed: Kotlin Multiplatform mobile project scaffold baseline added.
 - `[x]` Task `#211` completed: shared Compose runtime shell baseline added.
 - `[x]` Task `#213` completed: mobile networking contract baseline added.
+- `[x]` Task `#215` completed: mobile package serialization baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
