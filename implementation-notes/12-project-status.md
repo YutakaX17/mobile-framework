@@ -45,7 +45,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-05 Admin Frontend Shell.
 - `[x]` EPIC-06 Theme Builder.
 - `[x]` EPIC-07 Form Builder.
-- `[~]` EPIC-08 App And Screen Builder.
+- `[x]` EPIC-08 App And Screen Builder.
 - `[ ]` EPIC-09 Deployment Packages.
 - `[ ]` EPIC-10 Mobile Runtime.
 - `[ ]` EPIC-11 Workflow Builder.
@@ -55,7 +55,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 ## Active Work
 
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
-- `[~]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, and app validation baselines are complete; publish draft flow remains pending.
+- `[x]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow baselines are complete.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -134,6 +134,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#181` completed: permission binding baseline added.
 - `[x]` Task `#183` completed: mobile preview baseline added.
 - `[x]` Task `#185` completed: app validation baseline added.
+- `[x]` Task `#187` completed: app publish draft flow baseline added.
+- `[x]` EPIC-08 App And Screen Builder completed: app definition API, admin app list, screen builder, component registry, property editor, navigation and screen schemas, action and permission bindings, mobile preview, validation, and publish flow baselines are in place.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.

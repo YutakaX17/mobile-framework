@@ -12,6 +12,7 @@ import {
   getAppPayload,
   getAppPermissionBindingSummaries,
   getAppValidationFindings,
+  publishAppRevision,
   type AppPayload,
   type AppSummary
 } from "./appApi";
@@ -179,6 +180,37 @@ describe("app API helpers", () => {
     });
 
     await expect(fetchAppDetail("field_ops_app", client, "demo")).rejects.toThrow("app object");
+  });
+
+  it("publishes an app revision", async () => {
+    let requestedUrl = "";
+    let requestedMethod = "";
+    const publishedApp: AppSummary = {
+      ...app,
+      current_revision: app.current_revision
+        ? {
+            ...app.current_revision,
+            status: "published"
+          }
+        : null
+    };
+    const client = createAdminApiClient({
+      baseUrl: "/api",
+      fetcher: async (input, init) => {
+        requestedUrl = String(input);
+        requestedMethod = init?.method ?? "";
+        return new Response(JSON.stringify({ app: publishedApp }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200
+        });
+      }
+    });
+
+    const result = await publishAppRevision("field_ops_app", 1, client, "demo");
+
+    expect(requestedUrl).toBe("/api/apps/field_ops_app/revisions/1/publish/?tenant=demo");
+    expect(requestedMethod).toBe("POST");
+    expect(result.current_revision?.status).toBe("published");
   });
 
   it("counts apps by current revision status", () => {

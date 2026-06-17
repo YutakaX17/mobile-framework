@@ -199,6 +199,10 @@ type AppDetailResponse = {
   app: AppDetail;
 };
 
+type AppPublishResponse = {
+  app: AppDetail;
+};
+
 export async function fetchAppSummaries(
   client: AdminApiClient = adminApiClient,
   tenant = "demo"
@@ -223,6 +227,25 @@ export async function fetchAppDetail(
 
   if (!result.data || !isRecord(result.data.app)) {
     throw new Error("App detail response did not include an app object.");
+  }
+
+  return result.data.app;
+}
+
+export async function publishAppRevision(
+  appId: string,
+  revision: number,
+  client: AdminApiClient = adminApiClient,
+  tenant = "demo"
+): Promise<AppDetail> {
+  const result = await client.post<AppPublishResponse, Record<string, never>>(
+    `/apps/${encodeURIComponent(appId)}/revisions/${revision}/publish/`,
+    {},
+    { query: { tenant } }
+  );
+
+  if (!result.data || !isRecord(result.data.app)) {
+    throw new Error("App publish response did not include an app object.");
   }
 
   return result.data.app;
