@@ -22,7 +22,9 @@ CONFIGURATION_SCHEMA_FILES = {
     "deployment_package": "deployment-package.schema.json",
     "field": "field.schema.json",
     "form": "form.schema.json",
+    "module_manifest": "module-manifest.schema.json",
     "screen": "screen.schema.json",
+    "sync_rule": "sync-rule.schema.json",
     "theme": "theme.schema.json",
 }
 

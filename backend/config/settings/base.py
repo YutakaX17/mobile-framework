@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "apps.themes",
     "apps.form_builder",
     "apps.app_builder",
+    "apps.deployment_packages",
     "apps.audit",
 ]
 
