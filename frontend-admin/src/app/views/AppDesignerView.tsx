@@ -11,6 +11,7 @@ import {
   getAppPayload,
   getAppPermissionBindingSummaries,
   getAppValidationFindings,
+  publishAppRevision,
   type AppActionSummary,
   type AppCanvasScreen,
   type AppComponent,
@@ -31,6 +32,7 @@ type AppDesignerState =
 export function AppDesignerView() {
   const { appId = "" } = useParams();
   const [state, setState] = useState<AppDesignerState>({ app: null, status: "loading" });
+  const [publishStatus, setPublishStatus] = useState("");
 
   const loadApp = useCallback(async () => {
     if (!appId) {
@@ -51,6 +53,21 @@ export function AppDesignerView() {
     }
   }, [appId]);
 
+  const publishCurrentRevision = useCallback(async () => {
+    if (state.status !== "loaded" || !state.app.current_revision) {
+      return;
+    }
+
+    setPublishStatus("Publishing");
+    try {
+      const app = await publishAppRevision(state.app.app_id, state.app.current_revision.revision);
+      setState({ app, status: "loaded" });
+      setPublishStatus("Published");
+    } catch (error) {
+      setPublishStatus(error instanceof Error ? error.message : "Publish failed");
+    }
+  }, [state]);
+
   useEffect(() => {
     void loadApp();
   }, [loadApp]);
@@ -63,6 +80,14 @@ export function AppDesignerView() {
   const permissionBindings = useMemo(() => getAppPermissionBindingSummaries(payload), [payload]);
   const validationFindings = useMemo(() => getAppValidationFindings(payload), [payload]);
   const componentToolboxItems = useMemo(() => getComponentToolboxItems(payload), [payload]);
+  const validationErrorCount = validationFindings.filter((finding) => finding.severity === "error").length;
+  const currentRevision = state.app?.current_revision;
+  const canPublish =
+    state.status === "loaded" &&
+    currentRevision !== null &&
+    currentRevision !== undefined &&
+    currentRevision.status !== "published" &&
+    validationErrorCount === 0;
 
   return (
     <section className="app-designer-view" aria-labelledby="app-designer-title">
@@ -75,11 +100,15 @@ export function AppDesignerView() {
           <Link className="button-link" to="/apps">
             Back to apps
           </Link>
+          <button type="button" disabled={!canPublish} onClick={publishCurrentRevision}>
+            Publish revision
+          </button>
           <button type="button" onClick={loadApp}>
             Refresh
           </button>
         </div>
       </div>
+      {publishStatus ? <p aria-live="polite">{publishStatus}</p> : null}
 
       {state.status === "loading" ? (
         <section className="empty-state" aria-live="polite">

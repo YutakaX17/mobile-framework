@@ -6,6 +6,7 @@ from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_r
 from apps.tenants.models import Tenant
 
 from .models import AppDefinition, AppRevision
+from .services import publish_app_revision
 
 
 def _method_not_allowed(allowed_method: str) -> JsonResponse:
@@ -124,6 +125,43 @@ def app_detail(request: HttpRequest, app_id: str) -> JsonResponse:
             )
         )
 
+    data = _serialize_app_summary(app)
+    data["current_revision"] = _serialize_revision(app.current_revision, include_payload=True)
+    return JsonResponse({"app": data})
+
+
+def app_revision_publish(request: HttpRequest, app_id: str, revision: int) -> JsonResponse:
+    if request.method != "POST":
+        return _method_not_allowed("POST")
+
+    tenant = _tenant_from_request(request)
+    if isinstance(tenant, JsonResponse):
+        return tenant
+
+    try:
+        app = AppDefinition.objects.select_related("current_revision").get(tenant=tenant, app_id=app_id)
+    except AppDefinition.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"App `{app_id}` was not found.",
+                status_code=404,
+            )
+        )
+
+    try:
+        revision_obj = app.revisions.get(revision=revision)
+    except AppRevision.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"App revision `{revision}` was not found.",
+                status_code=404,
+            )
+        )
+
+    publish_app_revision(app, revision_obj)
+    app.refresh_from_db()
     data = _serialize_app_summary(app)
     data["current_revision"] = _serialize_revision(app.current_revision, include_payload=True)
     return JsonResponse({"app": data})
