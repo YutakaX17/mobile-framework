@@ -31,6 +31,36 @@
         "type": ["string", "number", "boolean", "null"]
       }
     },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "event"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["screen", "component", "form", "navigation"]
+        },
+        "event": {
+          "type": "string",
+          "enum": ["load", "tap", "submit", "change"]
+        },
+        "component_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        },
+        "payload_path": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)*$",
+          "maxLength": 160
+        },
+        "result_path": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)*$",
+          "maxLength": 160
+        }
+      }
+    },
     "permission": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
@@ -50,6 +80,41 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 300
+        }
+      }
+    },
+    "on_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "navigate_to": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "maxLength": 80
+        },
+        "refresh_screen": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "on_error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "retry_allowed": {
+          "type": "boolean",
+          "default": false
         }
       }
     },

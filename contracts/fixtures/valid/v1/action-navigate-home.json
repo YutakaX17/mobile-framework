@@ -3,5 +3,16 @@
   "action_type": "navigate",
   "label": "Home",
   "target": "home",
-  "permission": "core.view_dashboard"
+  "permission": "core.view_dashboard",
+  "binding": {
+    "source": "navigation",
+    "event": "tap"
+  },
+  "on_success": {
+    "navigate_to": "home"
+  },
+  "on_error": {
+    "message": "Unable to open Home.",
+    "retry_allowed": true
+  }
 }

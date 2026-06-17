@@ -47,7 +47,27 @@ export type AppComponent = {
 export type AppAction = {
   action_id: string;
   action_type: string;
+  binding?: {
+    component_id?: string;
+    event: "load" | "tap" | "submit" | "change";
+    payload_path?: string;
+    result_path?: string;
+    source: "screen" | "component" | "form" | "navigation";
+  };
+  confirm?: {
+    message: string;
+    title: string;
+  };
   label?: string;
+  on_error?: {
+    message?: string;
+    retry_allowed?: boolean;
+  };
+  on_success?: {
+    message?: string;
+    navigate_to?: string;
+    refresh_screen?: boolean;
+  };
   permission?: string;
   target?: string;
 };
@@ -109,8 +129,14 @@ export type AppCanvasScreen = {
 export type AppActionSummary = {
   action_id: string;
   action_type: string;
+  binding: string;
+  confirm: string;
+  error: string;
   label: string;
+  payload_path: string;
+  result_path: string;
   screen_id: string;
+  success: string;
   target: string;
 };
 
@@ -205,8 +231,14 @@ export function getAppActionSummaries(payload: AppPayload | undefined): AppActio
     (screen.actions ?? []).map((action) => ({
       action_id: action.action_id,
       action_type: action.action_type,
+      binding: formatActionBinding(action),
+      confirm: action.confirm?.title ?? "none",
+      error: formatActionError(action),
       label: action.label ?? action.action_id,
+      payload_path: action.binding?.payload_path ?? "not set",
+      result_path: action.binding?.result_path ?? "not set",
       screen_id: screen.screen_id,
+      success: formatActionSuccess(action),
       target: action.target ?? "not set"
     }))
   );
@@ -261,6 +293,30 @@ function formatPropertyValue(value: string | number | boolean | null): string {
   }
 
   return String(value);
+}
+
+function formatActionBinding(action: AppAction): string {
+  if (!action.binding) {
+    return "unbound";
+  }
+
+  return `${action.binding.source}:${action.binding.event}`;
+}
+
+function formatActionSuccess(action: AppAction): string {
+  if (!action.on_success) {
+    return "none";
+  }
+
+  return action.on_success.message ?? action.on_success.navigate_to ?? "configured";
+}
+
+function formatActionError(action: AppAction): string {
+  if (!action.on_error) {
+    return "none";
+  }
+
+  return action.on_error.message ?? (action.on_error.retry_allowed ? "retry allowed" : "configured");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

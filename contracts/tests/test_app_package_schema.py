@@ -32,7 +32,10 @@ VALID_FIXTURES = {
 }
 
 INVALID_FIXTURES = {
-    "action.schema.json": [FIXTURES / "invalid" / "v1" / "action-unknown-type.json"],
+    "action.schema.json": [
+        FIXTURES / "invalid" / "v1" / "action-unknown-type.json",
+        FIXTURES / "invalid" / "v1" / "action-invalid-binding-event.json",
+    ],
     "component.schema.json": [
         FIXTURES / "invalid" / "v1" / "component-missing-component-id.json",
         FIXTURES / "invalid" / "v1" / "component-unknown-type.json",

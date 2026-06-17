@@ -358,13 +358,42 @@ function ActionPanel({ actions }: ActionPanelProps) {
       {actions.length > 0 ? (
         <div className="validation-rule-list">
           {actions.map((action) => (
-            <article className="validation-rule" key={`${action.screen_id}-${action.action_id}`}>
+            <article className="validation-rule action-binding-rule" key={`${action.screen_id}-${action.action_id}`}>
               <div>
                 <p className="eyebrow">{action.screen_id}</p>
                 <h4>{action.label}</h4>
               </div>
               <strong>{action.action_type}</strong>
-              <span>{action.target}</span>
+              <dl className="action-binding-meta">
+                <div>
+                  <dt>Target</dt>
+                  <dd>{action.target}</dd>
+                </div>
+                <div>
+                  <dt>Binding</dt>
+                  <dd>{action.binding}</dd>
+                </div>
+                <div>
+                  <dt>Payload</dt>
+                  <dd>{action.payload_path}</dd>
+                </div>
+                <div>
+                  <dt>Result</dt>
+                  <dd>{action.result_path}</dd>
+                </div>
+                <div>
+                  <dt>Confirm</dt>
+                  <dd>{action.confirm}</dd>
+                </div>
+                <div>
+                  <dt>Success</dt>
+                  <dd>{action.success}</dd>
+                </div>
+                <div>
+                  <dt>Error</dt>
+                  <dd>{action.error}</dd>
+                </div>
+              </dl>
             </article>
           ))}
         </div>

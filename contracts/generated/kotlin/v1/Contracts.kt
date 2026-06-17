@@ -11,8 +11,11 @@ public data class Action(
     val label: String? = null,
     val target: String? = null,
     val parameters: Map<String, JsonValue>? = null,
+    val binding: JsonObject? = null,
     val permission: String? = null,
     val confirm: JsonObject? = null,
+    val on_success: JsonObject? = null,
+    val on_error: JsonObject? = null,
     val extensions: JsonObject? = null
 )
 

@@ -43,7 +43,26 @@ const app: AppSummary = {
             {
               action_id: "submit_intake",
               action_type: "submit_form",
+              binding: {
+                component_id: "intake_form",
+                event: "submit",
+                payload_path: "forms.patient_intake",
+                result_path: "submissions.patient_intake",
+                source: "component"
+              },
+              confirm: {
+                message: "Submit this patient intake form?",
+                title: "Submit intake"
+              },
               label: "Submit",
+              on_error: {
+                message: "Patient intake could not be submitted.",
+                retry_allowed: true
+              },
+              on_success: {
+                message: "Patient intake submitted.",
+                refresh_screen: true
+              },
               target: "patient_intake"
             }
           ],
@@ -194,8 +213,14 @@ describe("app API helpers", () => {
       {
         action_id: "submit_intake",
         action_type: "submit_form",
+        binding: "component:submit",
+        confirm: "Submit intake",
+        error: "Patient intake could not be submitted.",
         label: "Submit",
+        payload_path: "forms.patient_intake",
+        result_path: "submissions.patient_intake",
         screen_id: "intake",
+        success: "Patient intake submitted.",
         target: "patient_intake"
       }
     ]);
