@@ -13,7 +13,9 @@ REQUIRED_FILES = [
     "gradle/libs.versions.toml",
     "shared/build.gradle.kts",
     "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
+    "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
     "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarkerTest.kt",
+    "shared/src/commonTest/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContractsTest.kt",
     "composeApp/build.gradle.kts",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
     "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/RuntimeShellState.kt",
@@ -62,6 +64,10 @@ def main() -> int:
     require_contains(
         MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/MobileRuntimeMarker.kt",
         'supportedSchemaVersion = "v1"',
+    )
+    require_contains(
+        MOBILE / "shared/src/commonMain/kotlin/org/khodola/mobile/runtime/network/PackageNetworkContracts.kt",
+        "interface MobileRuntimeNetworkClient",
     )
     require_contains(
         MOBILE / "composeApp/src/commonMain/kotlin/org/khodola/mobile/runtime/compose/MobileRuntimeApp.kt",
