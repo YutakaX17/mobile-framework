@@ -3,8 +3,10 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+from dataclasses import dataclass
 from typing import Any
 
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from apps.configurations.services import validate_configuration_payload
@@ -12,6 +14,13 @@ from apps.configurations.services import validate_configuration_payload
 
 PLACEHOLDER_PACKAGE_HASH = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
 PLACEHOLDER_PACKAGE_SIGNATURE = "compiler-placeholder-signature-v1-000"
+
+
+@dataclass(frozen=True)
+class PackageHashVerification:
+    is_valid: bool
+    expected_hash: str
+    actual_hash: str | None
 
 
 def validate_deployment_package_payload(payload: dict[str, Any]) -> None:
@@ -23,9 +32,37 @@ def canonical_unsigned_package_json(payload: dict[str, Any]) -> str:
     return json.dumps(unsigned_payload, separators=(",", ":"), sort_keys=True)
 
 
-def package_hash(payload: dict[str, Any]) -> str:
+def calculate_package_hash(payload: dict[str, Any]) -> str:
     digest = hashlib.sha256(canonical_unsigned_package_json(payload).encode("utf-8")).hexdigest()
     return f"sha256:{digest}"
+
+
+def package_hash(payload: dict[str, Any]) -> str:
+    return calculate_package_hash(payload)
+
+
+def verify_deployment_package_hash(payload: dict[str, Any]) -> PackageHashVerification:
+    actual_hash = payload.get("hash")
+    expected_hash = calculate_package_hash(payload)
+    is_valid = isinstance(actual_hash, str) and hmac.compare_digest(actual_hash, expected_hash)
+    return PackageHashVerification(
+        is_valid=is_valid,
+        expected_hash=expected_hash,
+        actual_hash=actual_hash if isinstance(actual_hash, str) else None,
+    )
+
+
+def assert_deployment_package_hash(payload: dict[str, Any]) -> None:
+    verification = verify_deployment_package_hash(payload)
+    if not verification.is_valid:
+        raise ValidationError(
+            {
+                "hash": (
+                    "Must match canonical unsigned package payload hash "
+                    f"`{verification.expected_hash}`."
+                )
+            }
+        )
 
 
 def package_signature(package_hash_value: str, signing_key: str) -> str:
@@ -35,9 +72,10 @@ def package_signature(package_hash_value: str, signing_key: str) -> str:
 
 def sign_deployment_package_payload(payload: dict[str, Any], signing_key: str) -> dict[str, Any]:
     signed_payload = dict(payload)
-    signed_payload["hash"] = package_hash(signed_payload)
+    signed_payload["hash"] = calculate_package_hash(signed_payload)
     signed_payload["signature"] = package_signature(signed_payload["hash"], signing_key)
     validate_deployment_package_payload(signed_payload)
+    assert_deployment_package_hash(signed_payload)
     return signed_payload
 
 
@@ -54,7 +92,7 @@ def compile_deployment_package_payload(
     channel: str = "dev",
     platform_version: str = "0.1.0",
     created_by: str = "system",
-    package_hash: str = PLACEHOLDER_PACKAGE_HASH,
+    package_hash: str | None = None,
     signature: str = PLACEHOLDER_PACKAGE_SIGNATURE,
     signing_key: str | None = None,
 ) -> dict[str, Any]:
@@ -76,12 +114,15 @@ def compile_deployment_package_payload(
         "sync_rules": [],
         "created_at": timezone.now().isoformat(),
         "created_by": created_by,
-        "hash": package_hash,
+        "hash": package_hash or PLACEHOLDER_PACKAGE_HASH,
         "signature": signature,
     }
     if signing_key:
         payload = sign_deployment_package_payload(payload, signing_key)
+    elif package_hash is None:
+        payload["hash"] = calculate_package_hash(payload)
     validate_deployment_package_payload(payload)
+    assert_deployment_package_hash(payload)
     return payload
 
 

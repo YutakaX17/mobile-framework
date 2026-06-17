@@ -370,6 +370,6 @@
                    ],
     "created_at":  "2026-06-05T12:00:00Z",
     "created_by":  "system",
-    "hash":  "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "hash":  "sha256:04ed31c609bc5df9ddafcfe8a35c49f796e07055d77c6512f2f2178fd321610a",
     "signature":  "placeholder_signature_for_contract_fixture"
 }

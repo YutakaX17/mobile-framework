@@ -5,7 +5,7 @@ from django.db import models
 
 from apps.tenants.models import TenantScopedModel
 
-from .services import validate_deployment_package_payload
+from .services import assert_deployment_package_hash, validate_deployment_package_payload
 
 
 class DeploymentPackageStatus(models.TextChoices):
@@ -61,6 +61,7 @@ class DeploymentPackage(TenantScopedModel):
     def clean(self) -> None:
         super().clean()
         validate_deployment_package_payload(self.payload)
+        assert_deployment_package_hash(self.payload)
         expected_values = {
             "tenant_id": self.tenant.slug if self.tenant_id else None,
             "package_id": self.package_id,
