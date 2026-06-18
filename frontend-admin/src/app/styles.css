@@ -445,6 +445,7 @@ input:focus-visible,
 .form-designer-view,
 .app-designer-view,
 .app-list-view,
+.workflow-editor-view,
 .theme-list-view {
   display: grid;
   gap: 18px;
@@ -650,9 +651,17 @@ input:focus-visible,
 }
 
 .app-screen-canvas,
+.workflow-canvas,
 .app-component-stack {
   display: grid;
   gap: 10px;
+}
+
+.workflow-editor-grid {
+  align-items: start;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(210px, 0.28fr) minmax(0, 1fr) minmax(240px, 0.34fr);
 }
 
 .app-screen-card {
@@ -662,6 +671,29 @@ input:focus-visible,
   display: grid;
   gap: 14px;
   padding: 18px;
+}
+
+.workflow-state-card {
+  background: var(--mf-color-surface);
+  border: 1px solid var(--mf-color-border);
+  border-left: 5px solid var(--mf-color-border-strong);
+  border-radius: var(--mf-radius-md);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.workflow-state-start {
+  border-left-color: var(--mf-color-good);
+}
+
+.workflow-state-approval,
+.workflow-state-task {
+  border-left-color: var(--mf-color-warning);
+}
+
+.workflow-state-end {
+  border-left-color: var(--mf-color-accent);
 }
 
 .screen-card-footer {
@@ -1094,6 +1126,7 @@ input:focus-visible,
   }
 
   .app-designer-grid,
+  .workflow-editor-grid,
   .form-designer-grid {
     grid-template-columns: 1fr;
   }

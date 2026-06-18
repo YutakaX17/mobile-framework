@@ -50,6 +50,10 @@ describe("admin shell model", () => {
     expect(findAdminRoute("/apps/field_ops_app")?.path).toBe("/apps");
   });
 
+  it("routes workflows to a dedicated workspace", () => {
+    expect(findAdminRoute("/workflows")?.summary).toBe("Approval and automation workspace");
+  });
+
   it("defines shell actions and user menu labels", () => {
     expect(shellActions.map((action) => action.id)).toEqual(["validate", "publish-review"]);
     expect(shellActions.map((action) => action.notification.title)).toEqual([

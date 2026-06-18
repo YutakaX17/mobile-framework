@@ -14,6 +14,7 @@ import { PlaceholderView } from "./views/PlaceholderView";
 import { ThemeDetailView } from "./views/ThemeDetailView";
 import { ThemeListView } from "./views/ThemeListView";
 import { UnauthorizedView } from "./views/UnauthorizedView";
+import { WorkflowEditorView } from "./views/WorkflowEditorView";
 
 export type AdminRoute = {
   path: string;
@@ -123,6 +124,10 @@ function getRouteView(route: AdminRoute): ReactNode {
 
   if (route.path === "/themes") {
     return <ThemeListView />;
+  }
+
+  if (route.path === "/workflows") {
+    return <WorkflowEditorView />;
   }
 
   return <PlaceholderView route={route} />;
