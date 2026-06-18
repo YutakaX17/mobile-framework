@@ -4,8 +4,11 @@ import {
   getWorkflowAssignmentSummaries,
   getWorkflowCanvasStates,
   getWorkflowEditorMetrics,
+  getWorkflowInboxSummary,
+  getWorkflowInboxTasksForWorkflow,
   getWorkflowTransitionSummaries,
   simulateWorkflowPath,
+  workflowInboxTasks,
   workflowEditorPayload
 } from "./workflowEditorModel";
 
@@ -66,6 +69,18 @@ describe("workflow editor model", () => {
           trigger: "manual_approval"
         }
       ]
+    });
+  });
+
+  it("summarizes workflow inbox tasks", () => {
+    const workflowTasks = getWorkflowInboxTasksForWorkflow(workflowInboxTasks, "patient_intake_approval");
+
+    expect(workflowTasks).toHaveLength(3);
+    expect(getWorkflowInboxSummary(workflowTasks)).toEqual({
+      active_count: 2,
+      completed_count: 1,
+      overdue_count: 1,
+      total_count: 3
     });
   });
 });

@@ -2,11 +2,16 @@ import {
   getWorkflowAssignmentSummaries,
   getWorkflowCanvasStates,
   getWorkflowEditorMetrics,
+  getWorkflowInboxSummary,
+  getWorkflowInboxTasksForWorkflow,
   getWorkflowTransitionSummaries,
   simulateWorkflowPath,
+  workflowInboxTasks,
   workflowEditorPayload,
   type WorkflowAssignmentSummary,
   type WorkflowCanvasState,
+  type WorkflowInboxSummary,
+  type WorkflowInboxTask,
   type WorkflowSimulationResult,
   type WorkflowTransitionSummary,
   type WorkflowTrigger
@@ -19,6 +24,8 @@ export function WorkflowEditorView() {
   const transitions = getWorkflowTransitionSummaries(payload);
   const assignments = getWorkflowAssignmentSummaries(payload);
   const simulation = simulateWorkflowPath(payload);
+  const inboxTasks = getWorkflowInboxTasksForWorkflow(workflowInboxTasks, payload.workflow_id);
+  const inboxSummary = getWorkflowInboxSummary(inboxTasks);
 
   return (
     <section className="workflow-editor-view" aria-labelledby="workflow-editor-title">
@@ -82,6 +89,7 @@ export function WorkflowEditorView() {
 
       <TransitionPanel transitions={transitions} />
       <SimulationPanel simulation={simulation} />
+      <TaskInboxPanel summary={inboxSummary} tasks={inboxTasks} />
     </section>
   );
 }
@@ -234,6 +242,61 @@ function SimulationPanel({ simulation }: SimulationPanelProps) {
               <div>
                 <dt>Guard</dt>
                 <dd>{step.guard}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+type TaskInboxPanelProps = {
+  summary: WorkflowInboxSummary;
+  tasks: WorkflowInboxTask[];
+};
+
+function TaskInboxPanel({ summary, tasks }: TaskInboxPanelProps) {
+  return (
+    <section className="validation-panel" aria-label="Task inbox">
+      <div className="preview-panel-heading">
+        <h3>Task inbox</h3>
+        <span className="queue-count">{summary.active_count} active</span>
+      </div>
+      <section className="metrics-grid" aria-label="Task inbox summary">
+        <article className="metric">
+          <span>Total</span>
+          <strong>{summary.total_count}</strong>
+        </article>
+        <article className="metric metric-good">
+          <span>Completed</span>
+          <strong>{summary.completed_count}</strong>
+        </article>
+        <article className="metric metric-warning">
+          <span>Overdue</span>
+          <strong>{summary.overdue_count}</strong>
+        </article>
+      </section>
+      <div className="validation-rule-list">
+        {tasks.map((task) => (
+          <article className="validation-rule action-binding-rule" key={task.task_key}>
+            <div>
+              <p className="eyebrow">{task.task_key}</p>
+              <h4>{task.subject}</h4>
+            </div>
+            <strong>{task.status}</strong>
+            <dl className="action-binding-meta">
+              <div>
+                <dt>Assigned</dt>
+                <dd>{task.assigned_to}</dd>
+              </div>
+              <div>
+                <dt>State</dt>
+                <dd>{task.current_state}</dd>
+              </div>
+              <div>
+                <dt>Due</dt>
+                <dd>{task.due_label}</dd>
               </div>
             </dl>
           </article>

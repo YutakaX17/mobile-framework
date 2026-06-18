@@ -16,4 +16,5 @@ test("signs in and renders the dashboard shell", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Patient intake approval" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Workflow canvas" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Workflow simulator" })).toBeVisible();
+  await expect(page.getByRole("region", { exact: true, name: "Task inbox" })).toBeVisible();
 });
