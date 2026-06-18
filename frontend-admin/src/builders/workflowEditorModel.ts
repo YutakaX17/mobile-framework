@@ -78,6 +78,23 @@ export type WorkflowSimulationResult = {
   steps: WorkflowSimulationStep[];
 };
 
+export type WorkflowInboxTask = {
+  assigned_to: string;
+  current_state: string;
+  due_label: string;
+  status: "open" | "in_progress" | "completed" | "cancelled";
+  subject: string;
+  task_key: string;
+  workflow_id: string;
+};
+
+export type WorkflowInboxSummary = {
+  active_count: number;
+  completed_count: number;
+  overdue_count: number;
+  total_count: number;
+};
+
 export const workflowEditorPayload: WorkflowEditorPayload = {
   initial_state: "submitted",
   name: "Patient intake approval",
@@ -136,6 +153,36 @@ export const workflowEditorPayload: WorkflowEditorPayload = {
     }
   ]
 };
+
+export const workflowInboxTasks: WorkflowInboxTask[] = [
+  {
+    assigned_to: "clinical.triage",
+    current_state: "triage_review",
+    due_label: "Today",
+    status: "open",
+    subject: "Review patient intake",
+    task_key: "patient_123_triage",
+    workflow_id: "patient_intake_approval"
+  },
+  {
+    assigned_to: "clinical.triage",
+    current_state: "triage_review",
+    due_label: "Overdue",
+    status: "in_progress",
+    subject: "Review duplicate insurance record",
+    task_key: "patient_119_triage",
+    workflow_id: "patient_intake_approval"
+  },
+  {
+    assigned_to: "clinical.supervisor",
+    current_state: "approved",
+    due_label: "Completed",
+    status: "completed",
+    subject: "Confirm approved intake",
+    task_key: "patient_117_confirm",
+    workflow_id: "patient_intake_approval"
+  }
+];
 
 export function getWorkflowCanvasStates(payload: WorkflowEditorPayload): WorkflowCanvasState[] {
   const transitions = payload.transitions ?? [];
@@ -216,4 +263,20 @@ export function simulateWorkflowPath(payload: WorkflowEditorPayload): WorkflowSi
     is_complete: finalState?.state_type === "end",
     steps
   };
+}
+
+export function getWorkflowInboxSummary(tasks: WorkflowInboxTask[]): WorkflowInboxSummary {
+  return {
+    active_count: tasks.filter((task) => task.status === "open" || task.status === "in_progress").length,
+    completed_count: tasks.filter((task) => task.status === "completed").length,
+    overdue_count: tasks.filter((task) => task.due_label.toLowerCase() === "overdue").length,
+    total_count: tasks.length
+  };
+}
+
+export function getWorkflowInboxTasksForWorkflow(
+  tasks: WorkflowInboxTask[],
+  workflowId: string
+): WorkflowInboxTask[] {
+  return tasks.filter((task) => task.workflow_id === workflowId);
 }
