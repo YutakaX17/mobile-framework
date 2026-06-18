@@ -59,6 +59,62 @@ class WorkflowDefinitionTests(TestCase):
         with self.assertRaises(ValidationError):
             WorkflowRevision.create_next(self.workflow, payload)
 
+    def test_initial_state_must_reference_defined_state(self):
+        payload = deepcopy(self.payload)
+        payload["initial_state"] = "missing_state"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_initial_state_must_be_start_state(self):
+        payload = deepcopy(self.payload)
+        payload["initial_state"] = "triage_review"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_workflow_allows_only_one_start_state(self):
+        payload = deepcopy(self.payload)
+        payload["states"][1]["state_type"] = "start"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_duplicate_state_ids_are_rejected(self):
+        payload = deepcopy(self.payload)
+        payload["states"][1]["state_id"] = "submitted"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_transition_from_state_must_exist(self):
+        payload = deepcopy(self.payload)
+        payload["transitions"][0]["from_state"] = "missing_state"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_transition_to_state_must_exist(self):
+        payload = deepcopy(self.payload)
+        payload["transitions"][0]["to_state"] = "missing_state"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_transition_trigger_must_exist(self):
+        payload = deepcopy(self.payload)
+        payload["transitions"][0]["trigger"] = "missing_trigger"
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
+    def test_unreachable_state_is_rejected(self):
+        payload = deepcopy(self.payload)
+        payload["transitions"] = []
+
+        with self.assertRaises(ValidationError):
+            WorkflowRevision.create_next(self.workflow, payload)
+
     def test_workflow_id_is_unique_per_tenant(self):
         with self.assertRaises(ValidationError):
             WorkflowDefinition.from_payload(self.tenant, self.payload).save()
