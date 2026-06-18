@@ -30,6 +30,15 @@ class WorkflowTaskAssignmentType(models.TextChoices):
     EXPRESSION = "expression", "Expression"
 
 
+class WorkflowExecutionEventType(models.TextChoices):
+    WORKFLOW_STARTED = "workflow_started", "Workflow started"
+    TASK_CREATED = "task_created", "Task created"
+    TASK_ASSIGNED = "task_assigned", "Task assigned"
+    TRANSITION_APPLIED = "transition_applied", "Transition applied"
+    TASK_COMPLETED = "task_completed", "Task completed"
+    WORKFLOW_COMPLETED = "workflow_completed", "Workflow completed"
+
+
 class WorkflowDefinition(TenantScopedModel):
     workflow_id = models.SlugField(max_length=80)
     name = models.CharField(max_length=160)
@@ -342,3 +351,60 @@ class WorkflowTrigger(TenantScopedModel):
 
     def __str__(self) -> str:
         return f"{self.workflow}:{self.trigger_id}"
+
+
+class WorkflowExecutionLog(TenantScopedModel):
+    workflow = models.ForeignKey(WorkflowDefinition, related_name="execution_logs", on_delete=models.PROTECT)
+    revision = models.ForeignKey(WorkflowRevision, related_name="execution_logs", on_delete=models.PROTECT)
+    task = models.ForeignKey(
+        WorkflowTask,
+        null=True,
+        blank=True,
+        related_name="execution_logs",
+        on_delete=models.PROTECT,
+    )
+    event_type = models.CharField(max_length=32, choices=WorkflowExecutionEventType.choices, db_index=True)
+    state_id = models.SlugField(max_length=80, blank=True)
+    transition_id = models.SlugField(max_length=80, blank=True)
+    actor = models.CharField(max_length=160, blank=True)
+    message = models.CharField(max_length=240)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ["tenant__slug", "-created_at", "-id"]
+
+    @classmethod
+    def record(cls, revision: WorkflowRevision, event_type: str, message: str, **kwargs):
+        return cls.objects.create(
+            tenant=revision.tenant,
+            workflow=revision.workflow,
+            revision=revision,
+            event_type=event_type,
+            message=message,
+            **kwargs,
+        )
+
+    def clean(self) -> None:
+        super().clean()
+        if self.workflow_id and self.tenant_id != self.workflow.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow definition tenant."})
+        if self.revision_id and self.tenant_id != self.revision.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow revision tenant."})
+        if self.workflow_id and self.revision_id and self.revision.workflow_id != self.workflow_id:
+            raise ValidationError({"revision": "Must belong to the workflow definition."})
+        if self.task_id:
+            if self.tenant_id != self.task.tenant_id:
+                raise ValidationError({"task": "Must match the execution log tenant."})
+            if self.workflow_id and self.task.workflow_id != self.workflow_id:
+                raise ValidationError({"task": "Must belong to the workflow definition."})
+            if self.revision_id and self.task.revision_id != self.revision_id:
+                raise ValidationError({"task": "Must belong to the workflow revision."})
+        if not isinstance(self.metadata, dict):
+            raise ValidationError({"metadata": "Must be a JSON object."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.workflow}:{self.event_type}:{self.message}"
