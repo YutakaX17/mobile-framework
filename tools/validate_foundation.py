@@ -19,6 +19,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/epic.md",
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
+    ".github/workflows/python-lint-test.yml",
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/adr/ADR-0000-template.md",
@@ -55,6 +56,7 @@ REQUIRED_FILES = [
     "backend/apps/audit/migrations/0001_initial.py",
     "backend/requirements.txt",
     "tools/validate_backend.py",
+    "tools/validate_python.py",
     "tools/validate_workflow_builder.py",
     "infra/compose/docker-compose.yml",
 ]
@@ -147,12 +149,27 @@ def validate_workflow_replaced_placeholder() -> None:
             fail(f"ci-foundation.yml is missing: {snippet}")
 
 
+def validate_python_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "python-lint-test.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Python Lint And Tests",
+        "python tools/validate_python.py",
+        "python contracts/validate_contracts.py",
+        "python tools/validate_backend.py",
+        "python tools/validate_workflow_builder.py",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"python-lint-test.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
         validate_json_files,
         validate_gitignore,
         validate_workflow_replaced_placeholder,
+        validate_python_workflow,
     ]
     try:
         for check in checks:
