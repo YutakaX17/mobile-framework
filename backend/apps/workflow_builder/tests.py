@@ -8,6 +8,8 @@ from django.test import TestCase
 from apps.tenants.models import Tenant
 from apps.workflow_builder.models import (
     WorkflowDefinition,
+    WorkflowExecutionEventType,
+    WorkflowExecutionLog,
     WorkflowRevision,
     WorkflowRevisionStatus,
     WorkflowTask,
@@ -466,3 +468,105 @@ class WorkflowDefinitionTests(TestCase):
 
         with self.assertRaises(ValidationError):
             trigger.full_clean()
+
+    def test_workflow_execution_log_can_be_recorded_for_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+
+        log = WorkflowExecutionLog.record(
+            revision,
+            WorkflowExecutionEventType.WORKFLOW_STARTED,
+            "Workflow started",
+            actor="system",
+            metadata={"source": "form_submission"},
+            state_id="submitted",
+        )
+
+        self.assertEqual(log.workflow, self.workflow)
+        self.assertEqual(log.revision, revision)
+        self.assertIsNone(log.task)
+        self.assertEqual(log.event_type, WorkflowExecutionEventType.WORKFLOW_STARTED)
+        self.assertEqual(log.metadata["source"], "form_submission")
+        self.assertEqual(str(log), "demo:patient_intake_approval:workflow_started:Workflow started")
+
+    def test_workflow_execution_log_can_reference_task(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="logged_task",
+            subject="Logged task",
+        )
+
+        log = WorkflowExecutionLog.record(
+            revision,
+            WorkflowExecutionEventType.TASK_CREATED,
+            "Task created",
+            task=task,
+            state_id="triage_review",
+        )
+
+        self.assertEqual(log.task, task)
+        self.assertEqual(log.state_id, "triage_review")
+
+    def test_workflow_execution_log_revision_must_belong_to_workflow(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        other_payload = deepcopy(self.payload)
+        other_payload["workflow_id"] = "other_workflow"
+        other_payload["name"] = "Other workflow"
+        other_workflow = WorkflowDefinition.from_payload(self.tenant, other_payload)
+        other_workflow.save()
+
+        log = WorkflowExecutionLog(
+            tenant=self.tenant,
+            workflow=other_workflow,
+            revision=revision,
+            event_type=WorkflowExecutionEventType.WORKFLOW_STARTED,
+            message="Wrong workflow",
+        )
+
+        with self.assertRaises(ValidationError):
+            log.full_clean()
+
+    def test_workflow_execution_log_task_must_match_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        next_revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            next_revision,
+            task_key="wrong_log_revision",
+            subject="Wrong log revision",
+        )
+
+        log = WorkflowExecutionLog(
+            tenant=self.tenant,
+            workflow=self.workflow,
+            revision=revision,
+            task=task,
+            event_type=WorkflowExecutionEventType.TASK_CREATED,
+            message="Wrong task revision",
+        )
+
+        with self.assertRaises(ValidationError):
+            log.full_clean()
+
+    def test_workflow_execution_log_tenant_must_match_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        log = WorkflowExecutionLog(
+            tenant=self.other_tenant,
+            workflow=self.workflow,
+            revision=revision,
+            event_type=WorkflowExecutionEventType.WORKFLOW_STARTED,
+            message="Wrong tenant",
+        )
+
+        with self.assertRaises(ValidationError):
+            log.full_clean()
+
+    def test_workflow_execution_log_metadata_must_be_json_object(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+
+        with self.assertRaises(ValidationError):
+            WorkflowExecutionLog.record(
+                revision,
+                WorkflowExecutionEventType.WORKFLOW_STARTED,
+                "Bad metadata",
+                metadata=["not", "an", "object"],
+            )
