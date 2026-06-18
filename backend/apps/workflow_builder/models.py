@@ -272,3 +272,73 @@ class WorkflowTaskAssignment(TenantScopedModel):
 
     def __str__(self) -> str:
         return f"{self.task}:{self.assignment_type}:{self.target}"
+
+
+class WorkflowTrigger(TenantScopedModel):
+    workflow = models.ForeignKey(WorkflowDefinition, related_name="triggers", on_delete=models.CASCADE)
+    revision = models.ForeignKey(WorkflowRevision, related_name="triggers", on_delete=models.CASCADE)
+    trigger_id = models.SlugField(max_length=80)
+    trigger_type = models.CharField(max_length=32)
+    source = models.CharField(max_length=160, blank=True)
+    parameters = models.JSONField(default=dict, blank=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        ordering = ["tenant__slug", "workflow_id", "trigger_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["revision", "trigger_id"],
+                name="unique_workflow_trigger_id_per_revision",
+            ),
+        ]
+
+    @classmethod
+    def from_revision_payload(cls, revision: WorkflowRevision, trigger_id: str, **kwargs):
+        trigger = next(
+            trigger
+            for trigger in revision.payload.get("triggers", [])
+            if trigger["trigger_id"] == trigger_id
+        )
+        return cls.objects.create(
+            tenant=revision.tenant,
+            workflow=revision.workflow,
+            revision=revision,
+            trigger_id=trigger["trigger_id"],
+            trigger_type=trigger["trigger_type"],
+            source=trigger.get("source", ""),
+            parameters=trigger.get("parameters", {}),
+            **kwargs,
+        )
+
+    def clean(self) -> None:
+        super().clean()
+        if self.workflow_id and self.tenant_id != self.workflow.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow definition tenant."})
+        if self.revision_id and self.tenant_id != self.revision.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow revision tenant."})
+        if self.workflow_id and self.revision_id and self.revision.workflow_id != self.workflow_id:
+            raise ValidationError({"revision": "Must belong to the workflow definition."})
+        if not isinstance(self.parameters, dict):
+            raise ValidationError({"parameters": "Must be a JSON object."})
+        if self.revision_id:
+            triggers_by_id = {
+                trigger["trigger_id"]: trigger
+                for trigger in self.revision.payload.get("triggers", [])
+            }
+            if self.trigger_id not in triggers_by_id:
+                raise ValidationError({"trigger_id": "Must reference a workflow revision trigger."})
+            payload_trigger = triggers_by_id[self.trigger_id]
+            expected_values = {
+                "trigger_type": payload_trigger["trigger_type"],
+                "source": payload_trigger.get("source", ""),
+            }
+            for key, expected in expected_values.items():
+                if getattr(self, key) != expected:
+                    raise ValidationError({key: f"Must match payload trigger field `{key}`."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.workflow}:{self.trigger_id}"

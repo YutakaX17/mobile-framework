@@ -14,6 +14,7 @@ from apps.workflow_builder.models import (
     WorkflowTaskAssignment,
     WorkflowTaskAssignmentType,
     WorkflowTaskStatus,
+    WorkflowTrigger,
 )
 
 
@@ -363,3 +364,105 @@ class WorkflowDefinitionTests(TestCase):
 
         with self.assertRaises(ValidationError):
             assignment.full_clean()
+
+    def test_workflow_trigger_can_be_created_from_revision_payload(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+
+        trigger = WorkflowTrigger.from_revision_payload(revision, "intake_submitted")
+
+        self.assertEqual(trigger.workflow, self.workflow)
+        self.assertEqual(trigger.revision, revision)
+        self.assertEqual(trigger.trigger_id, "intake_submitted")
+        self.assertEqual(trigger.trigger_type, "form_submitted")
+        self.assertEqual(trigger.source, "patient_intake")
+        self.assertEqual(trigger.parameters, {})
+        self.assertTrue(trigger.is_active)
+        self.assertEqual(str(trigger), "demo:patient_intake_approval:intake_submitted")
+
+    def test_workflow_trigger_id_is_unique_per_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        WorkflowTrigger.from_revision_payload(revision, "intake_submitted")
+
+        with self.assertRaises(ValidationError):
+            WorkflowTrigger.from_revision_payload(revision, "intake_submitted")
+
+        next_revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        trigger = WorkflowTrigger.from_revision_payload(next_revision, "intake_submitted")
+
+        self.assertEqual(trigger.revision, next_revision)
+
+    def test_workflow_trigger_must_reference_revision_payload_trigger(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        trigger = WorkflowTrigger(
+            tenant=self.tenant,
+            workflow=self.workflow,
+            revision=revision,
+            trigger_id="missing_trigger",
+            trigger_type="manual",
+        )
+
+        with self.assertRaises(ValidationError):
+            trigger.full_clean()
+
+    def test_workflow_trigger_fields_must_match_payload_trigger(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        trigger = WorkflowTrigger(
+            tenant=self.tenant,
+            workflow=self.workflow,
+            revision=revision,
+            trigger_id="intake_submitted",
+            trigger_type="manual",
+            source="patient_intake",
+        )
+
+        with self.assertRaises(ValidationError):
+            trigger.full_clean()
+
+    def test_workflow_trigger_revision_must_belong_to_workflow(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        other_payload = deepcopy(self.payload)
+        other_payload["workflow_id"] = "other_workflow"
+        other_payload["name"] = "Other workflow"
+        other_workflow = WorkflowDefinition.from_payload(self.tenant, other_payload)
+        other_workflow.save()
+
+        trigger = WorkflowTrigger(
+            tenant=self.tenant,
+            workflow=other_workflow,
+            revision=revision,
+            trigger_id="intake_submitted",
+            trigger_type="form_submitted",
+            source="patient_intake",
+        )
+
+        with self.assertRaises(ValidationError):
+            trigger.full_clean()
+
+    def test_workflow_trigger_tenant_must_match_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        trigger = WorkflowTrigger(
+            tenant=self.other_tenant,
+            workflow=self.workflow,
+            revision=revision,
+            trigger_id="intake_submitted",
+            trigger_type="form_submitted",
+            source="patient_intake",
+        )
+
+        with self.assertRaises(ValidationError):
+            trigger.full_clean()
+
+    def test_workflow_trigger_parameters_must_be_json_object(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        trigger = WorkflowTrigger(
+            tenant=self.tenant,
+            workflow=self.workflow,
+            revision=revision,
+            trigger_id="intake_submitted",
+            trigger_type="form_submitted",
+            source="patient_intake",
+            parameters=["not", "an", "object"],
+        )
+
+        with self.assertRaises(ValidationError):
+            trigger.full_clean()
