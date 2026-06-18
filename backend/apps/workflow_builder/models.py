@@ -24,6 +24,12 @@ class WorkflowTaskStatus(models.TextChoices):
     CANCELLED = "cancelled", "Cancelled"
 
 
+class WorkflowTaskAssignmentType(models.TextChoices):
+    ROLE = "role", "Role"
+    USER = "user", "User"
+    EXPRESSION = "expression", "Expression"
+
+
 class WorkflowDefinition(TenantScopedModel):
     workflow_id = models.SlugField(max_length=80)
     name = models.CharField(max_length=160)
@@ -190,3 +196,79 @@ class WorkflowTask(TenantScopedModel):
 
     def __str__(self) -> str:
         return f"{self.workflow}:{self.task_key}"
+
+
+class WorkflowTaskAssignment(TenantScopedModel):
+    task = models.ForeignKey(WorkflowTask, related_name="assignments", on_delete=models.CASCADE)
+    assignment_type = models.CharField(max_length=16, choices=WorkflowTaskAssignmentType.choices)
+    role = models.CharField(max_length=120, blank=True)
+    user_id = models.CharField(max_length=120, blank=True)
+    expression = models.CharField(max_length=500, blank=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        ordering = ["tenant__slug", "task_id", "assignment_type", "id"]
+
+    @classmethod
+    def assign_role(cls, task: WorkflowTask, role: str, **kwargs):
+        return cls.objects.create(
+            tenant=task.tenant,
+            task=task,
+            assignment_type=WorkflowTaskAssignmentType.ROLE,
+            role=role,
+            **kwargs,
+        )
+
+    @classmethod
+    def assign_user(cls, task: WorkflowTask, user_id: str, **kwargs):
+        return cls.objects.create(
+            tenant=task.tenant,
+            task=task,
+            assignment_type=WorkflowTaskAssignmentType.USER,
+            user_id=user_id,
+            **kwargs,
+        )
+
+    @classmethod
+    def assign_expression(cls, task: WorkflowTask, expression: str, **kwargs):
+        return cls.objects.create(
+            tenant=task.tenant,
+            task=task,
+            assignment_type=WorkflowTaskAssignmentType.EXPRESSION,
+            expression=expression,
+            **kwargs,
+        )
+
+    @property
+    def target(self) -> str:
+        if self.assignment_type == WorkflowTaskAssignmentType.ROLE:
+            return self.role
+        if self.assignment_type == WorkflowTaskAssignmentType.USER:
+            return self.user_id
+        return self.expression
+
+    def clean(self) -> None:
+        super().clean()
+        if self.task_id and self.tenant_id != self.task.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow task tenant."})
+
+        required_fields = {
+            WorkflowTaskAssignmentType.ROLE: "role",
+            WorkflowTaskAssignmentType.USER: "user_id",
+            WorkflowTaskAssignmentType.EXPRESSION: "expression",
+        }
+        required_field = required_fields.get(self.assignment_type)
+        if required_field and not getattr(self, required_field):
+            raise ValidationError({required_field: "Required for this assignment type."})
+
+        inactive_fields = set(required_fields.values()) - {required_field}
+        for field_name in inactive_fields:
+            if getattr(self, field_name):
+                raise ValidationError({field_name: "Must be blank for this assignment type."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.task}:{self.assignment_type}:{self.target}"

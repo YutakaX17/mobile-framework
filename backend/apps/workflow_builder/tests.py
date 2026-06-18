@@ -11,6 +11,8 @@ from apps.workflow_builder.models import (
     WorkflowRevision,
     WorkflowRevisionStatus,
     WorkflowTask,
+    WorkflowTaskAssignment,
+    WorkflowTaskAssignmentType,
     WorkflowTaskStatus,
 )
 
@@ -263,3 +265,101 @@ class WorkflowDefinitionTests(TestCase):
                 subject="Bad context",
                 context=["not", "an", "object"],
             )
+
+    def test_workflow_task_can_be_assigned_to_role(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="role_assignment",
+            subject="Role assignment",
+        )
+
+        assignment = WorkflowTaskAssignment.assign_role(task, "clinical.triage")
+
+        self.assertEqual(assignment.assignment_type, WorkflowTaskAssignmentType.ROLE)
+        self.assertEqual(assignment.role, "clinical.triage")
+        self.assertEqual(assignment.target, "clinical.triage")
+        self.assertTrue(assignment.is_active)
+        self.assertEqual(str(assignment), "demo:patient_intake_approval:role_assignment:role:clinical.triage")
+
+    def test_workflow_task_can_be_assigned_to_user(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="user_assignment",
+            subject="User assignment",
+        )
+
+        assignment = WorkflowTaskAssignment.assign_user(task, "user_123")
+
+        self.assertEqual(assignment.assignment_type, WorkflowTaskAssignmentType.USER)
+        self.assertEqual(assignment.user_id, "user_123")
+        self.assertEqual(assignment.target, "user_123")
+
+    def test_workflow_task_can_be_assigned_by_expression(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="expression_assignment",
+            subject="Expression assignment",
+        )
+
+        assignment = WorkflowTaskAssignment.assign_expression(task, "patient.region.owner")
+
+        self.assertEqual(assignment.assignment_type, WorkflowTaskAssignmentType.EXPRESSION)
+        self.assertEqual(assignment.expression, "patient.region.owner")
+        self.assertEqual(assignment.target, "patient.region.owner")
+
+    def test_assignment_requires_target_for_type(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="missing_target",
+            subject="Missing target",
+        )
+
+        assignment = WorkflowTaskAssignment(
+            tenant=self.tenant,
+            task=task,
+            assignment_type=WorkflowTaskAssignmentType.ROLE,
+        )
+
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()
+
+    def test_assignment_rejects_inactive_target_fields(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="mixed_target",
+            subject="Mixed target",
+        )
+
+        assignment = WorkflowTaskAssignment(
+            tenant=self.tenant,
+            task=task,
+            assignment_type=WorkflowTaskAssignmentType.USER,
+            role="clinical.triage",
+            user_id="user_123",
+        )
+
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()
+
+    def test_assignment_tenant_must_match_task(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="wrong_assignment_tenant",
+            subject="Wrong assignment tenant",
+        )
+
+        assignment = WorkflowTaskAssignment(
+            tenant=self.other_tenant,
+            task=task,
+            assignment_type=WorkflowTaskAssignmentType.ROLE,
+            role="clinical.triage",
+        )
+
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()
