@@ -78,3 +78,21 @@ jobs:
 
       - name: Validate frontend admin
         run: python tools/validate_frontend_admin.py
+
+  validate-mobile-runtime:
+    name: Validate Mobile Runtime
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate mobile scaffold
+        run: python tools/validate_mobile.py
+
+      - name: Validate mobile runtime test coverage
+        run: python tools/validate_mobile_tests.py
