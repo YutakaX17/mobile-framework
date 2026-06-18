@@ -49,7 +49,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-09 Deployment Packages.
 - `[x]` EPIC-10 Mobile Runtime.
 - `[x]` EPIC-11 Workflow Builder.
-- `[ ]` EPIC-12 CI/CD, Security, And Release.
+- `[~]` EPIC-12 CI/CD, Security, And Release.
 - `[ ]` EPIC-13 Documentation And Maintenance.
 
 ## Active Work
@@ -59,6 +59,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
 - `[x]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, form renderer, offline outbox, sync engine, and mobile test coverage baselines are complete.
 - `[x]` EPIC-11 Workflow Builder: workflow schema, definition model, state-machine validator, task model, task assignment model, workflow trigger model, visual editor, simulator, task inbox, execution log, and test coverage validation baselines are complete.
+- `[~]` EPIC-12 CI/CD, Security, And Release: Python lint/test workflow baseline is complete; Rust lint/test workflow remains pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -178,6 +179,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#257` completed: workflow execution log baseline added.
 - `[x]` Task `#259` completed: workflow builder test coverage validation added.
 - `[x]` EPIC-11 Workflow Builder completed: workflow schemas, backend task/workflow models, graph validation, admin editor, simulator, task inbox, execution logs, and CI-backed validation are in place.
+- `[x]` Task `#261` completed: Python lint/test workflow baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
