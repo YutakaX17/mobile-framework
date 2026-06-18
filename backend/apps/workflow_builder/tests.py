@@ -10,6 +10,8 @@ from apps.workflow_builder.models import (
     WorkflowDefinition,
     WorkflowRevision,
     WorkflowRevisionStatus,
+    WorkflowTask,
+    WorkflowTaskStatus,
 )
 
 
@@ -162,3 +164,102 @@ class WorkflowDefinitionTests(TestCase):
 
         with self.assertRaises(ValidationError):
             revision.full_clean()
+
+    def test_workflow_task_can_be_created_for_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+
+        task = WorkflowTask.create_for_revision(
+            revision,
+            task_key="patient_123_triage",
+            subject="Review patient intake",
+            context={"patient_id": "patient_123"},
+        )
+
+        self.assertEqual(task.workflow, self.workflow)
+        self.assertEqual(task.revision, revision)
+        self.assertEqual(task.current_state, "submitted")
+        self.assertEqual(task.status, WorkflowTaskStatus.OPEN)
+        self.assertEqual(task.context_size, 1)
+        self.assertEqual(str(task), "demo:patient_intake_approval:patient_123_triage")
+
+    def test_workflow_task_key_is_unique_per_tenant(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        WorkflowTask.create_for_revision(
+            revision,
+            task_key="patient_123_triage",
+            subject="Review patient intake",
+        )
+
+        with self.assertRaises(ValidationError):
+            WorkflowTask.create_for_revision(
+                revision,
+                task_key="patient_123_triage",
+                subject="Duplicate",
+            )
+
+        other_tenant_workflow = WorkflowDefinition.from_payload(self.other_tenant, self.payload)
+        other_tenant_workflow.save()
+        other_revision = WorkflowRevision.create_next(other_tenant_workflow, deepcopy(self.payload))
+        task = WorkflowTask.create_for_revision(
+            other_revision,
+            task_key="patient_123_triage",
+            subject="Other tenant review",
+        )
+
+        self.assertEqual(task.tenant, self.other_tenant)
+
+    def test_workflow_task_state_must_exist_in_revision_payload(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+
+        with self.assertRaises(ValidationError):
+            WorkflowTask.create_for_revision(
+                revision,
+                task_key="bad_state",
+                subject="Bad state",
+                current_state="missing_state",
+            )
+
+    def test_workflow_task_revision_must_belong_to_workflow(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        other_payload = deepcopy(self.payload)
+        other_payload["workflow_id"] = "other_workflow"
+        other_payload["name"] = "Other workflow"
+        other_workflow = WorkflowDefinition.from_payload(self.tenant, other_payload)
+        other_workflow.save()
+
+        task = WorkflowTask(
+            tenant=self.tenant,
+            workflow=other_workflow,
+            revision=revision,
+            task_key="wrong_revision",
+            subject="Wrong revision",
+            current_state="submitted",
+        )
+
+        with self.assertRaises(ValidationError):
+            task.full_clean()
+
+    def test_workflow_task_tenant_must_match_revision(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+        task = WorkflowTask(
+            tenant=self.other_tenant,
+            workflow=self.workflow,
+            revision=revision,
+            task_key="wrong_tenant",
+            subject="Wrong tenant",
+            current_state="submitted",
+        )
+
+        with self.assertRaises(ValidationError):
+            task.full_clean()
+
+    def test_workflow_task_context_must_be_json_object(self):
+        revision = WorkflowRevision.create_next(self.workflow, deepcopy(self.payload))
+
+        with self.assertRaises(ValidationError):
+            WorkflowTask.create_for_revision(
+                revision,
+                task_key="bad_context",
+                subject="Bad context",
+                context=["not", "an", "object"],
+            )

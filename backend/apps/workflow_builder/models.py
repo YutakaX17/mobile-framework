@@ -17,6 +17,13 @@ class WorkflowRevisionStatus(models.TextChoices):
     ARCHIVED = "archived", "Archived"
 
 
+class WorkflowTaskStatus(models.TextChoices):
+    OPEN = "open", "Open"
+    IN_PROGRESS = "in_progress", "In progress"
+    COMPLETED = "completed", "Completed"
+    CANCELLED = "cancelled", "Cancelled"
+
+
 class WorkflowDefinition(TenantScopedModel):
     workflow_id = models.SlugField(max_length=80)
     name = models.CharField(max_length=160)
@@ -122,3 +129,64 @@ class WorkflowRevision(TenantScopedModel):
 
     def __str__(self) -> str:
         return f"{self.workflow}#{self.revision}"
+
+
+class WorkflowTask(TenantScopedModel):
+    workflow = models.ForeignKey(WorkflowDefinition, related_name="tasks", on_delete=models.PROTECT)
+    revision = models.ForeignKey(WorkflowRevision, related_name="tasks", on_delete=models.PROTECT)
+    task_key = models.SlugField(max_length=120)
+    subject = models.CharField(max_length=200)
+    current_state = models.SlugField(max_length=80)
+    status = models.CharField(
+        max_length=16,
+        choices=WorkflowTaskStatus.choices,
+        default=WorkflowTaskStatus.OPEN,
+        db_index=True,
+    )
+    context = models.JSONField(default=dict, blank=True)
+    due_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["tenant__slug", "status", "due_at", "task_key"]
+        constraints = [
+            models.UniqueConstraint(fields=["tenant", "task_key"], name="unique_workflow_task_key_per_tenant"),
+        ]
+
+    @classmethod
+    def create_for_revision(cls, revision: WorkflowRevision, task_key: str, subject: str, **kwargs):
+        return cls.objects.create(
+            tenant=revision.tenant,
+            workflow=revision.workflow,
+            revision=revision,
+            task_key=task_key,
+            subject=subject,
+            current_state=kwargs.pop("current_state", revision.payload["initial_state"]),
+            **kwargs,
+        )
+
+    @property
+    def context_size(self) -> int:
+        return len(self.context) if isinstance(self.context, dict) else 0
+
+    def clean(self) -> None:
+        super().clean()
+        if self.workflow_id and self.tenant_id != self.workflow.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow definition tenant."})
+        if self.revision_id and self.tenant_id != self.revision.tenant_id:
+            raise ValidationError({"tenant": "Must match the workflow revision tenant."})
+        if self.workflow_id and self.revision_id and self.revision.workflow_id != self.workflow_id:
+            raise ValidationError({"revision": "Must belong to the workflow definition."})
+        if not isinstance(self.context, dict):
+            raise ValidationError({"context": "Must be a JSON object."})
+        if self.revision_id:
+            state_ids = {state["state_id"] for state in self.revision.payload.get("states", [])}
+            if self.current_state not in state_ids:
+                raise ValidationError({"current_state": "Must reference a workflow revision state."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.workflow}:{self.task_key}"
