@@ -23,10 +23,13 @@ The runtime must never execute arbitrary downloaded code. It should render only 
 
 ## Local Validation
 
+See `TESTING.md` for the current mobile runtime coverage baseline.
+
 Run scaffold validation from the repository root:
 
 ```powershell
 python tools/validate_mobile.py
+python tools/validate_mobile_tests.py
 ```
 
 Gradle build/test execution will be wired into CI in the mobile Gradle test workflow task.
