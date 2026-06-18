@@ -79,7 +79,7 @@ $env:WORKER_BROKER_URL = "redis://localhost:6379/0"
 - `apps/configurations`: tenant-scoped definitions, revisions, status workflow, and schema validation. Initial configuration registry baseline exists.
 - `apps/app_builder`: app definitions, navigation, screens, actions, publish states. Initial app model, revision, and read-only API baselines exist.
 - `apps/form_builder`: form definitions, fields, validation, submissions. Initial form model, revision, read-only API, and submission endpoint baselines exist.
-- `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation.
+- `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation. Initial workflow definition model baseline exists.
 - `apps/themes`: design tokens, theme validation, preview, publishing. Initial theme model, revision, and read-only API baselines exist.
 - `apps/deployment_packages`: immutable package compilation, signing, channels, rollback. Initial package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and deployment audit event baselines exist.
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
