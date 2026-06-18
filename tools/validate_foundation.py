@@ -55,6 +55,7 @@ REQUIRED_FILES = [
     "backend/apps/audit/migrations/0001_initial.py",
     "backend/requirements.txt",
     "tools/validate_backend.py",
+    "tools/validate_workflow_builder.py",
     "infra/compose/docker-compose.yml",
 ]
 
@@ -139,6 +140,7 @@ def validate_workflow_replaced_placeholder() -> None:
         "python tools/validate_foundation.py",
         "python contracts/validate_contracts.py",
         "python tools/validate_backend.py",
+        "python tools/validate_workflow_builder.py",
     ]
     for snippet in required_snippets:
         if snippet not in workflow:

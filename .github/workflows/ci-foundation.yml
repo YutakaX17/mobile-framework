@@ -34,6 +34,9 @@ jobs:
       - name: Validate backend scaffold
         run: python tools/validate_backend.py
 
+      - name: Validate workflow builder coverage
+        run: python tools/validate_workflow_builder.py
+
   validate-rust-extension:
     name: Validate Rust Extension
     runs-on: ubuntu-latest
