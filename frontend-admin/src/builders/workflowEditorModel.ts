@@ -62,6 +62,22 @@ export type WorkflowEditorMetric = {
   value: string;
 };
 
+export type WorkflowSimulationStep = {
+  from_label: string;
+  guard: string;
+  step: number;
+  to_label: string;
+  transition_id: string;
+  trigger: string;
+};
+
+export type WorkflowSimulationResult = {
+  final_state: string;
+  final_state_label: string;
+  is_complete: boolean;
+  steps: WorkflowSimulationStep[];
+};
+
 export const workflowEditorPayload: WorkflowEditorPayload = {
   initial_state: "submitted",
   name: "Patient intake approval",
@@ -164,4 +180,40 @@ export function getWorkflowEditorMetrics(payload: WorkflowEditorPayload): Workfl
     { label: "Transitions", value: String(payload.transitions?.length ?? 0) },
     { label: "Triggers", value: String(payload.triggers.length) }
   ];
+}
+
+export function simulateWorkflowPath(payload: WorkflowEditorPayload): WorkflowSimulationResult {
+  const statesById = new Map(payload.states.map((state) => [state.state_id, state]));
+  const transitions = payload.transitions ?? [];
+  const steps: WorkflowSimulationStep[] = [];
+  const visitedStates = new Set<string>();
+  let currentState = payload.initial_state;
+
+  while (!visitedStates.has(currentState)) {
+    visitedStates.add(currentState);
+    const transition = transitions.find((candidate) => candidate.from_state === currentState);
+    if (!transition) {
+      break;
+    }
+
+    const fromState = statesById.get(transition.from_state);
+    const toState = statesById.get(transition.to_state);
+    steps.push({
+      from_label: fromState?.label ?? transition.from_state,
+      guard: transition.guard ?? "none",
+      step: steps.length + 1,
+      to_label: toState?.label ?? transition.to_state,
+      transition_id: transition.transition_id,
+      trigger: transition.trigger
+    });
+    currentState = transition.to_state;
+  }
+
+  const finalState = statesById.get(currentState);
+  return {
+    final_state: currentState,
+    final_state_label: finalState?.label ?? currentState,
+    is_complete: finalState?.state_type === "end",
+    steps
+  };
 }
