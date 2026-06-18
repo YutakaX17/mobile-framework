@@ -5,6 +5,7 @@ import {
   getWorkflowCanvasStates,
   getWorkflowEditorMetrics,
   getWorkflowTransitionSummaries,
+  simulateWorkflowPath,
   workflowEditorPayload
 } from "./workflowEditorModel";
 
@@ -40,5 +41,31 @@ describe("workflow editor model", () => {
       "2",
       "2"
     ]);
+  });
+
+  it("simulates the default workflow path to a terminal state", () => {
+    expect(simulateWorkflowPath(workflowEditorPayload)).toEqual({
+      final_state: "approved",
+      final_state_label: "Approved",
+      is_complete: true,
+      steps: [
+        {
+          from_label: "Submitted",
+          guard: "none",
+          step: 1,
+          to_label: "Triage review",
+          transition_id: "submit_for_review",
+          trigger: "intake_submitted"
+        },
+        {
+          from_label: "Triage review",
+          guard: "approval.decision == 'approved'",
+          step: 2,
+          to_label: "Approved",
+          transition_id: "approve_intake",
+          trigger: "manual_approval"
+        }
+      ]
+    });
   });
 });

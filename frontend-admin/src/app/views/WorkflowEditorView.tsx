@@ -3,9 +3,11 @@ import {
   getWorkflowCanvasStates,
   getWorkflowEditorMetrics,
   getWorkflowTransitionSummaries,
+  simulateWorkflowPath,
   workflowEditorPayload,
   type WorkflowAssignmentSummary,
   type WorkflowCanvasState,
+  type WorkflowSimulationResult,
   type WorkflowTransitionSummary,
   type WorkflowTrigger
 } from "../../builders/workflowEditorModel";
@@ -16,6 +18,7 @@ export function WorkflowEditorView() {
   const states = getWorkflowCanvasStates(payload);
   const transitions = getWorkflowTransitionSummaries(payload);
   const assignments = getWorkflowAssignmentSummaries(payload);
+  const simulation = simulateWorkflowPath(payload);
 
   return (
     <section className="workflow-editor-view" aria-labelledby="workflow-editor-title">
@@ -78,6 +81,7 @@ export function WorkflowEditorView() {
       </section>
 
       <TransitionPanel transitions={transitions} />
+      <SimulationPanel simulation={simulation} />
     </section>
   );
 }
@@ -188,6 +192,48 @@ function TransitionPanel({ transitions }: TransitionPanelProps) {
               <div>
                 <dt>Guard</dt>
                 <dd>{transition.guard ?? "none"}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+type SimulationPanelProps = {
+  simulation: WorkflowSimulationResult;
+};
+
+function SimulationPanel({ simulation }: SimulationPanelProps) {
+  return (
+    <section className="validation-panel" aria-label="Workflow simulator">
+      <div className="preview-panel-heading">
+        <h3>Simulator</h3>
+        <span className={simulation.is_complete ? "status status-ready" : "status status-draft"}>
+          {simulation.final_state_label}
+        </span>
+      </div>
+      <div className="validation-rule-list">
+        {simulation.steps.map((step) => (
+          <article className="validation-rule action-binding-rule" key={step.transition_id}>
+            <div>
+              <p className="eyebrow">Step {step.step}</p>
+              <h4>{step.transition_id}</h4>
+            </div>
+            <strong>{step.trigger}</strong>
+            <dl className="action-binding-meta">
+              <div>
+                <dt>From</dt>
+                <dd>{step.from_label}</dd>
+              </div>
+              <div>
+                <dt>To</dt>
+                <dd>{step.to_label}</dd>
+              </div>
+              <div>
+                <dt>Guard</dt>
+                <dd>{step.guard}</dd>
               </div>
             </dl>
           </article>
