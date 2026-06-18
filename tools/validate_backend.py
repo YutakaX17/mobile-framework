@@ -30,6 +30,7 @@ def main() -> int:
             "apps.themes",
             "apps.form_builder",
             "apps.app_builder",
+            "apps.workflow_builder",
             "apps.deployment_packages",
             "apps.audit",
             "tests",
