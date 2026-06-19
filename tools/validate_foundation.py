@@ -20,6 +20,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
     ".github/workflows/contract-tests.yml",
+    ".github/workflows/dependency-scan.yml",
     ".github/workflows/frontend-lint-test-build.yml",
     ".github/workflows/mobile-gradle-tests.yml",
     ".github/workflows/playwright-e2e.yml",
@@ -245,12 +246,27 @@ def validate_playwright_workflow() -> None:
             fail(f"playwright-e2e.yml is missing: {snippet}")
 
 
+def validate_dependency_scan_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "dependency-scan.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Dependency Scan",
+        "pull_request:",
+        "pull-requests: read",
+        "actions/dependency-review-action@v4",
+        "fail-on-severity: high",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"dependency-scan.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
         validate_json_files,
         validate_gitignore,
         validate_contract_workflow,
+        validate_dependency_scan_workflow,
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
         validate_mobile_gradle_workflow,
