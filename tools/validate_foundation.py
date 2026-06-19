@@ -20,6 +20,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
     ".github/workflows/python-lint-test.yml",
+    ".github/workflows/rust-lint-test.yml",
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/adr/ADR-0000-template.md",
@@ -163,6 +164,19 @@ def validate_python_workflow() -> None:
             fail(f"python-lint-test.yml is missing: {snippet}")
 
 
+def validate_rust_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "rust-lint-test.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Rust Lint And Tests",
+        "rustc --version",
+        "cargo --version",
+        "python tools/validate_rust_ext.py --include-python-wrapper",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"rust-lint-test.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -170,6 +184,7 @@ def main() -> int:
         validate_gitignore,
         validate_workflow_replaced_placeholder,
         validate_python_workflow,
+        validate_rust_workflow,
     ]
     try:
         for check in checks:
