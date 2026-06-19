@@ -62,7 +62,7 @@ class RuntimeSyncEngineTest {
         val outbox = InMemoryOfflineOutboxStore()
         outbox.enqueueSubmission(submission("local-0001"), 100)
         repeat(5) { attempt ->
-            outbox.markFailed("local-0001", error = "attempt-$attempt", updatedAtEpochMillis = 200 + attempt)
+            outbox.markFailed("local-0001", error = "attempt-$attempt", updatedAtEpochMillis = 200L + attempt)
         }
 
         val plan = DefaultRuntimeSyncEngine().planPush(rule, outbox)

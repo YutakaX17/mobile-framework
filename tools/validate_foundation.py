@@ -20,6 +20,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
     ".github/workflows/frontend-lint-test-build.yml",
+    ".github/workflows/mobile-gradle-tests.yml",
     ".github/workflows/python-lint-test.yml",
     ".github/workflows/rust-lint-test.yml",
     "implementation-notes/README.md",
@@ -193,6 +194,23 @@ def validate_frontend_workflow() -> None:
             fail(f"frontend-lint-test-build.yml is missing: {snippet}")
 
 
+def validate_mobile_gradle_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "mobile-gradle-tests.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Mobile Gradle Tests",
+        "actions/setup-java@v4",
+        "android-actions/setup-android@v3",
+        "gradle/actions/setup-gradle@v4",
+        'gradle-version: "9.5.0"',
+        "python tools/validate_mobile.py",
+        "python tools/validate_mobile_tests.py",
+        "gradle :shared:desktopTest :composeApp:desktopTest --stacktrace",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"mobile-gradle-tests.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -200,6 +218,7 @@ def main() -> int:
         validate_gitignore,
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
+        validate_mobile_gradle_workflow,
         validate_python_workflow,
         validate_rust_workflow,
     ]

@@ -1,8 +1,8 @@
 [versions]
-agp = "9.2.0"
-android-compile-sdk = "37"
+agp = "8.13.0"
+android-compile-sdk = "36"
 android-min-sdk = "21"
-android-target-sdk = "37"
+android-target-sdk = "36"
 compose = "1.11.1"
 kotlin = "2.4.0"
 serialization = "1.11.0"

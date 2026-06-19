@@ -83,7 +83,9 @@ def main() -> int:
     version_catalog = MOBILE / "gradle/libs.versions.toml"
     require_contains(version_catalog, 'kotlin = "2.4.0"')
     require_contains(version_catalog, 'compose = "1.11.1"')
-    require_contains(version_catalog, 'agp = "9.2.0"')
+    require_contains(version_catalog, 'agp = "8.13.0"')
+    require_contains(version_catalog, 'android-compile-sdk = "36"')
+    require_contains(version_catalog, 'android-target-sdk = "36"')
     require_contains(version_catalog, 'serialization = "1.11.0"')
 
     require_contains(
