@@ -19,6 +19,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/epic.md",
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
+    ".github/workflows/contract-tests.yml",
     ".github/workflows/frontend-lint-test-build.yml",
     ".github/workflows/mobile-gradle-tests.yml",
     ".github/workflows/python-lint-test.yml",
@@ -211,11 +212,28 @@ def validate_mobile_gradle_workflow() -> None:
             fail(f"mobile-gradle-tests.yml is missing: {snippet}")
 
 
+def validate_contract_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "contract-tests.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Contract Tests",
+        'python-version: "3.11"',
+        "python -m pip install -r contracts/requirements.txt",
+        "python contracts/generate_types.py --target typescript --check",
+        "python contracts/generate_types.py --target python --check",
+        "python contracts/generate_types.py --target kotlin --check",
+        "python contracts/validate_contracts.py",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"contract-tests.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
         validate_json_files,
         validate_gitignore,
+        validate_contract_workflow,
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
         validate_mobile_gradle_workflow,
