@@ -6,7 +6,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.isString
 import org.khodola.mobile.runtime.serialization.MobileRuntimeJson
 
 data class RuntimeScreen(
@@ -245,7 +244,7 @@ private data class RuntimeActionBindingDto(
 }
 
 private fun JsonPrimitive.toRuntimePropertyValue(): RuntimePropertyValue =
-    if (isString) {
+    if (toString().startsWith("\"")) {
         RuntimePropertyValue.Text(content)
     } else {
         booleanOrNull?.let { RuntimePropertyValue.Flag(it) }
