@@ -19,6 +19,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/epic.md",
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
+    ".github/workflows/frontend-lint-test-build.yml",
     ".github/workflows/python-lint-test.yml",
     ".github/workflows/rust-lint-test.yml",
     "implementation-notes/README.md",
@@ -177,12 +178,28 @@ def validate_rust_workflow() -> None:
             fail(f"rust-lint-test.yml is missing: {snippet}")
 
 
+def validate_frontend_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "frontend-lint-test-build.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Frontend Lint Test And Build",
+        'node-version: "24"',
+        "cache-dependency-path: frontend-admin/package-lock.json",
+        "npm ci",
+        "npx playwright install --with-deps chromium",
+        "python tools/validate_frontend_admin.py",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"frontend-lint-test-build.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
         validate_json_files,
         validate_gitignore,
         validate_workflow_replaced_placeholder,
+        validate_frontend_workflow,
         validate_python_workflow,
         validate_rust_workflow,
     ]
