@@ -22,6 +22,7 @@ REQUIRED_FILES = [
     ".github/workflows/contract-tests.yml",
     ".github/workflows/frontend-lint-test-build.yml",
     ".github/workflows/mobile-gradle-tests.yml",
+    ".github/workflows/playwright-e2e.yml",
     ".github/workflows/python-lint-test.yml",
     ".github/workflows/rust-lint-test.yml",
     "implementation-notes/README.md",
@@ -228,6 +229,22 @@ def validate_contract_workflow() -> None:
             fail(f"contract-tests.yml is missing: {snippet}")
 
 
+def validate_playwright_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "playwright-e2e.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Playwright E2E",
+        'node-version: "24"',
+        "cache-dependency-path: frontend-admin/package-lock.json",
+        "npm ci",
+        "npx playwright install --with-deps chromium",
+        "npm run build",
+        "npm run smoke",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"playwright-e2e.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -237,6 +254,7 @@ def main() -> int:
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
         validate_mobile_gradle_workflow,
+        validate_playwright_workflow,
         validate_python_workflow,
         validate_rust_workflow,
     ]
