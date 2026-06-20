@@ -36,6 +36,7 @@ REQUIRED_FILES = [
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/adr/ADR-0000-template.md",
+    "docs/developer/GETTING_STARTED.md",
     "docs/site.json",
     "contracts/README.md",
     "contracts/SCHEMA_CONVENTIONS.md",
@@ -372,6 +373,9 @@ def validate_docs_site() -> None:
             fail(f"docs/site.json is missing required nav path: {path}")
     required_script_snippets = [
         "Docs site validation",
+        "REQUIRED_DOCUMENT_PATHS",
+        "REQUIRED_README_LINKS",
+        "developer/GETTING_STARTED.md",
         "REQUIRED_NAV_PATHS",
         "docs/site.json",
         "mobile-runtime/README.md",
