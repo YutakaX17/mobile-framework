@@ -25,6 +25,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "developer/BACKEND_MODULES.md",
     "developer/FRONTEND_MODULES.md",
     "developer/GETTING_STARTED.md",
+    "mobile-runtime/RUNTIME_GUIDE.md",
 ]
 
 REQUIRED_README_LINKS = {
@@ -33,6 +34,9 @@ REQUIRED_README_LINKS = {
         "FRONTEND_MODULES.md",
         "GETTING_STARTED.md",
         "LOCAL_SETUP.md",
+    ],
+    "mobile-runtime/README.md": [
+        "RUNTIME_GUIDE.md",
     ],
 }
 
