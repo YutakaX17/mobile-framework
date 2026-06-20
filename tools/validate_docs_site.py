@@ -26,6 +26,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "developer/FRONTEND_MODULES.md",
     "developer/GETTING_STARTED.md",
     "mobile-runtime/RUNTIME_GUIDE.md",
+    "plugin-sdk/PLUGIN_SDK_GUIDE.md",
 ]
 
 REQUIRED_README_LINKS = {
@@ -37,6 +38,9 @@ REQUIRED_README_LINKS = {
     ],
     "mobile-runtime/README.md": [
         "RUNTIME_GUIDE.md",
+    ],
+    "plugin-sdk/README.md": [
+        "PLUGIN_SDK_GUIDE.md",
     ],
 }
 
