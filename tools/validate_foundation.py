@@ -19,6 +19,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/epic.md",
     ".github/ISSUE_TEMPLATE/task.md",
     ".github/workflows/ci-foundation.yml",
+    ".github/workflows/codeql.yml",
     ".github/workflows/contract-tests.yml",
     ".github/workflows/dependency-scan.yml",
     ".github/workflows/frontend-lint-test-build.yml",
@@ -260,11 +261,28 @@ def validate_dependency_scan_workflow() -> None:
             fail(f"dependency-scan.yml is missing: {snippet}")
 
 
+def validate_codeql_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "codeql.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: CodeQL",
+        "security-events: write",
+        "github/codeql-action/init@v4",
+        "github/codeql-action/analyze@v4",
+        "language: python",
+        "language: javascript-typescript",
+        "build-mode: none",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"codeql.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
         validate_json_files,
         validate_gitignore,
+        validate_codeql_workflow,
         validate_contract_workflow,
         validate_dependency_scan_workflow,
         validate_workflow_replaced_placeholder,
