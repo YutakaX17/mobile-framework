@@ -28,6 +28,7 @@ REQUIRED_FILES = [
     ".github/workflows/mobile-gradle-tests.yml",
     ".github/workflows/playwright-e2e.yml",
     ".github/workflows/python-lint-test.yml",
+    ".github/workflows/release.yml",
     ".github/workflows/rust-lint-test.yml",
     ".github/workflows/sbom-generation.yml",
     ".github/workflows/secret-scan.yml",
@@ -69,6 +70,7 @@ REQUIRED_FILES = [
     "backend/requirements.txt",
     "backend/.dockerignore",
     "backend/Dockerfile",
+    "tools/generate_release_manifest.py",
     "tools/generate_sbom.py",
     "tools/generate_staging_deployment_plan.py",
     "tools/validate_backend.py",
@@ -422,6 +424,37 @@ def validate_staging_deployment_workflow() -> None:
             fail(f"generate_staging_deployment_plan.py is missing: {snippet}")
 
 
+def validate_release_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8-sig")
+    script = (ROOT / "tools" / "generate_release_manifest.py").read_text(encoding="utf-8-sig")
+    required_workflow_snippets = [
+        "name: Release",
+        "workflow_dispatch:",
+        "version:",
+        "RELEASE_VERSION:",
+        "python tools/generate_release_manifest.py --version",
+        "actions/upload-artifact@v4",
+        "release-manifest",
+    ]
+    required_script_snippets = [
+        "release-manifest.v1",
+        "release_version",
+        "Docker Build",
+        "SBOM Generation",
+        "Image Signing",
+        "Staging Deployment",
+        "mobile-framework-spdx-sbom",
+        "backend-image-signing-bundle",
+        "frontend-admin-image-signing-bundle",
+    ]
+    for snippet in required_workflow_snippets:
+        if snippet not in workflow:
+            fail(f"release.yml is missing: {snippet}")
+    for snippet in required_script_snippets:
+        if snippet not in script:
+            fail(f"generate_release_manifest.py is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -437,6 +470,7 @@ def main() -> int:
         validate_mobile_gradle_workflow,
         validate_playwright_workflow,
         validate_python_workflow,
+        validate_release_workflow,
         validate_rust_workflow,
         validate_sbom_generation_workflow,
         validate_secret_scan_workflow,
