@@ -35,6 +35,7 @@ REQUIRED_FILES = [
     ".github/workflows/staging-deployment.yml",
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
+    "docs/admin/ADMIN_USER_GUIDE.md",
     "docs/adr/ADR-0000-template.md",
     "docs/developer/BACKEND_MODULES.md",
     "docs/developer/FRONTEND_MODULES.md",
@@ -377,6 +378,7 @@ def validate_docs_site() -> None:
             fail(f"docs/site.json is missing required nav path: {path}")
     required_script_snippets = [
         "Docs site validation",
+        "admin/ADMIN_USER_GUIDE.md",
         "developer/BACKEND_MODULES.md",
         "developer/FRONTEND_MODULES.md",
         "mobile-runtime/RUNTIME_GUIDE.md",
