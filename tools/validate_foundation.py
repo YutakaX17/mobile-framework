@@ -22,6 +22,7 @@ REQUIRED_FILES = [
     ".github/workflows/codeql.yml",
     ".github/workflows/contract-tests.yml",
     ".github/workflows/dependency-scan.yml",
+    ".github/workflows/docker-build.yml",
     ".github/workflows/frontend-lint-test-build.yml",
     ".github/workflows/mobile-gradle-tests.yml",
     ".github/workflows/playwright-e2e.yml",
@@ -63,11 +64,16 @@ REQUIRED_FILES = [
     "backend/apps/audit/models.py",
     "backend/apps/audit/migrations/0001_initial.py",
     "backend/requirements.txt",
+    "backend/.dockerignore",
+    "backend/Dockerfile",
     "tools/validate_backend.py",
     "tools/validate_python.py",
     "tools/validate_secret_scan.py",
     "tools/validate_workflow_builder.py",
     "infra/compose/docker-compose.yml",
+    "frontend-admin/.dockerignore",
+    "frontend-admin/Dockerfile",
+    "frontend-admin/nginx.conf",
 ]
 
 REQUIRED_DIRECTORIES = [
@@ -303,6 +309,42 @@ def validate_secret_scan_workflow() -> None:
             fail(f"validate_secret_scan.py is missing: {snippet}")
 
 
+def validate_docker_build_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "docker-build.yml").read_text(encoding="utf-8-sig")
+    backend_dockerfile = (ROOT / "backend" / "Dockerfile").read_text(encoding="utf-8-sig")
+    frontend_dockerfile = (ROOT / "frontend-admin" / "Dockerfile").read_text(encoding="utf-8-sig")
+    required_workflow_snippets = [
+        "name: Docker Build",
+        "docker/setup-buildx-action@v3",
+        "docker/build-push-action@v6",
+        "mobile-framework-backend",
+        "mobile-framework-frontend-admin",
+        "push: false",
+    ]
+    required_backend_snippets = [
+        "FROM python:3.13-slim",
+        "COPY requirements.txt",
+        "python -m pip install --no-cache-dir -r requirements.txt",
+        'CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]',
+    ]
+    required_frontend_snippets = [
+        "FROM node:24-alpine AS build",
+        "npm ci",
+        "npm run build",
+        "FROM nginx:1.27-alpine",
+        "COPY nginx.conf /etc/nginx/conf.d/default.conf",
+    ]
+    for snippet in required_workflow_snippets:
+        if snippet not in workflow:
+            fail(f"docker-build.yml is missing: {snippet}")
+    for snippet in required_backend_snippets:
+        if snippet not in backend_dockerfile:
+            fail(f"backend/Dockerfile is missing: {snippet}")
+    for snippet in required_frontend_snippets:
+        if snippet not in frontend_dockerfile:
+            fail(f"frontend-admin/Dockerfile is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -311,6 +353,7 @@ def main() -> int:
         validate_codeql_workflow,
         validate_contract_workflow,
         validate_dependency_scan_workflow,
+        validate_docker_build_workflow,
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
         validate_mobile_gradle_workflow,
