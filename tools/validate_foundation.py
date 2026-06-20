@@ -31,6 +31,7 @@ REQUIRED_FILES = [
     ".github/workflows/rust-lint-test.yml",
     ".github/workflows/sbom-generation.yml",
     ".github/workflows/secret-scan.yml",
+    ".github/workflows/staging-deployment.yml",
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/adr/ADR-0000-template.md",
@@ -69,6 +70,7 @@ REQUIRED_FILES = [
     "backend/.dockerignore",
     "backend/Dockerfile",
     "tools/generate_sbom.py",
+    "tools/generate_staging_deployment_plan.py",
     "tools/validate_backend.py",
     "tools/validate_python.py",
     "tools/validate_secret_scan.py",
@@ -392,6 +394,34 @@ def validate_image_signing_workflow() -> None:
             fail(f"image-signing.yml is missing: {snippet}")
 
 
+def validate_staging_deployment_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "staging-deployment.yml").read_text(encoding="utf-8-sig")
+    script = (ROOT / "tools" / "generate_staging_deployment_plan.py").read_text(encoding="utf-8-sig")
+    required_workflow_snippets = [
+        "name: Staging Deployment",
+        "workflow_dispatch:",
+        "environment:",
+        "name: staging",
+        "python tools/generate_staging_deployment_plan.py --output build/deploy/staging-plan.json",
+        "actions/upload-artifact@v4",
+        "staging-deployment-plan",
+    ]
+    required_script_snippets = [
+        "staging-deployment-plan.v1",
+        "Docker Build",
+        "Image Signing",
+        "SBOM Generation",
+        "mobile-framework-backend",
+        "mobile-framework-frontend-admin",
+    ]
+    for snippet in required_workflow_snippets:
+        if snippet not in workflow:
+            fail(f"staging-deployment.yml is missing: {snippet}")
+    for snippet in required_script_snippets:
+        if snippet not in script:
+            fail(f"generate_staging_deployment_plan.py is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -410,6 +440,7 @@ def main() -> int:
         validate_rust_workflow,
         validate_sbom_generation_workflow,
         validate_secret_scan_workflow,
+        validate_staging_deployment_workflow,
     ]
     try:
         for check in checks:
