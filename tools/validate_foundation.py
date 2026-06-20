@@ -36,6 +36,7 @@ REQUIRED_FILES = [
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/adr/ADR-0000-template.md",
+    "docs/site.json",
     "contracts/README.md",
     "contracts/SCHEMA_CONVENTIONS.md",
     "contracts/COMPATIBILITY_MATRIX.md",
@@ -74,6 +75,7 @@ REQUIRED_FILES = [
     "tools/generate_sbom.py",
     "tools/generate_staging_deployment_plan.py",
     "tools/validate_backend.py",
+    "tools/validate_docs_site.py",
     "tools/validate_python.py",
     "tools/validate_secret_scan.py",
     "tools/validate_workflow_builder.py",
@@ -351,6 +353,35 @@ def validate_docker_build_workflow() -> None:
             fail(f"frontend-admin/Dockerfile is missing: {snippet}")
 
 
+def validate_docs_site() -> None:
+    config = json.loads((ROOT / "docs" / "site.json").read_text(encoding="utf-8-sig"))
+    script = (ROOT / "tools" / "validate_docs_site.py").read_text(encoding="utf-8-sig")
+    required_nav_paths = [
+        "README.md",
+        "product/README.md",
+        "developer/README.md",
+        "admin/README.md",
+        "mobile-runtime/README.md",
+        "plugin-sdk/README.md",
+        "operations/README.md",
+        "adr/README.md",
+    ]
+    nav_paths = {entry.get("path") for entry in config.get("nav", []) if isinstance(entry, dict)}
+    for path in required_nav_paths:
+        if path not in nav_paths:
+            fail(f"docs/site.json is missing required nav path: {path}")
+    required_script_snippets = [
+        "Docs site validation",
+        "REQUIRED_NAV_PATHS",
+        "docs/site.json",
+        "mobile-runtime/README.md",
+        "plugin-sdk/README.md",
+    ]
+    for snippet in required_script_snippets:
+        if snippet not in script:
+            fail(f"validate_docs_site.py is missing: {snippet}")
+
+
 def validate_sbom_generation_workflow() -> None:
     workflow = (ROOT / ".github" / "workflows" / "sbom-generation.yml").read_text(encoding="utf-8-sig")
     script = (ROOT / "tools" / "generate_sbom.py").read_text(encoding="utf-8-sig")
@@ -464,6 +495,7 @@ def main() -> int:
         validate_contract_workflow,
         validate_dependency_scan_workflow,
         validate_docker_build_workflow,
+        validate_docs_site,
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
         validate_image_signing_workflow,

@@ -50,7 +50,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-10 Mobile Runtime.
 - `[x]` EPIC-11 Workflow Builder.
 - `[x]` EPIC-12 CI/CD, Security, And Release.
-- `[ ]` EPIC-13 Documentation And Maintenance.
+- `[~]` EPIC-13 Documentation And Maintenance.
 
 ## Active Work
 
@@ -60,6 +60,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, form renderer, offline outbox, sync engine, and mobile test coverage baselines are complete.
 - `[x]` EPIC-11 Workflow Builder: workflow schema, definition model, state-machine validator, task model, task assignment model, workflow trigger model, visual editor, simulator, task inbox, execution log, and test coverage validation baselines are complete.
 - `[x]` EPIC-12 CI/CD, Security, And Release: Python, Rust, frontend lint/test/build, mobile Gradle test, contract test, Playwright E2E, dependency scan, CodeQL, secret scanning, Docker build, SBOM generation, image signing, staging deployment, and release workflow baselines are complete.
+- `[~]` EPIC-13 Documentation And Maintenance: docs site baseline is complete; remaining documentation and maintenance guides are pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -194,6 +195,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#285` completed: staging deployment workflow baseline added.
 - `[x]` Task `#287` completed: release workflow baseline added.
 - `[x]` EPIC-12 CI/CD, Security, And Release completed: validation, test, security, container, SBOM, signing, staging deployment, and release dry-run workflow baselines are in place.
+- `[x]` Task `#289` completed: docs site baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.

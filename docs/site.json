@@ -1,0 +1,38 @@
+{
+  "description": "Documentation navigation for the mobile framework.",
+  "nav": [
+    {
+      "path": "README.md",
+      "title": "Documentation Home"
+    },
+    {
+      "path": "product/README.md",
+      "title": "Product"
+    },
+    {
+      "path": "developer/README.md",
+      "title": "Developer"
+    },
+    {
+      "path": "admin/README.md",
+      "title": "Admin"
+    },
+    {
+      "path": "mobile-runtime/README.md",
+      "title": "Mobile Runtime"
+    },
+    {
+      "path": "plugin-sdk/README.md",
+      "title": "Plugin SDK"
+    },
+    {
+      "path": "operations/README.md",
+      "title": "Operations"
+    },
+    {
+      "path": "adr/README.md",
+      "title": "Architecture Decisions"
+    }
+  ],
+  "site_name": "Mobile Framework Docs"
+}
