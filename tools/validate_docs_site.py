@@ -22,11 +22,13 @@ REQUIRED_NAV_PATHS = [
 ]
 
 REQUIRED_DOCUMENT_PATHS = [
+    "developer/BACKEND_MODULES.md",
     "developer/GETTING_STARTED.md",
 ]
 
 REQUIRED_README_LINKS = {
     "developer/README.md": [
+        "BACKEND_MODULES.md",
         "GETTING_STARTED.md",
         "LOCAL_SETUP.md",
     ],
