@@ -21,6 +21,17 @@ REQUIRED_NAV_PATHS = [
     "adr/README.md",
 ]
 
+REQUIRED_DOCUMENT_PATHS = [
+    "developer/GETTING_STARTED.md",
+]
+
+REQUIRED_README_LINKS = {
+    "developer/README.md": [
+        "GETTING_STARTED.md",
+        "LOCAL_SETUP.md",
+    ],
+}
+
 
 def fail(message: str) -> None:
     raise AssertionError(message)
@@ -82,13 +93,38 @@ def validate_site_config() -> None:
             fail(f"docs/site.json is missing required nav path: docs/{required_path}")
 
 
+def validate_required_documents() -> None:
+    for required_path in REQUIRED_DOCUMENT_PATHS:
+        target = DOCS_ROOT / required_path
+        if not target.is_file():
+            fail(f"Missing required docs page: docs/{required_path}")
+        if target.stat().st_size == 0:
+            fail(f"Required docs page is empty: docs/{required_path}")
+
+
+def validate_readme_links() -> None:
+    for readme_path, links in REQUIRED_README_LINKS.items():
+        readme = DOCS_ROOT / readme_path
+        if not readme.is_file():
+            fail(f"Missing docs README: docs/{readme_path}")
+        content = readme.read_text(encoding="utf-8-sig")
+        for link in links:
+            if f"]({link})" not in content:
+                fail(f"docs/{readme_path} is missing link to {link}")
+
+
 def main() -> int:
     try:
         validate_site_config()
+        validate_required_documents()
+        validate_readme_links()
     except AssertionError as exc:
         print(f"Docs site validation failed: {exc}", file=sys.stderr)
         return 1
-    print(f"Docs site validation passed for {len(REQUIRED_NAV_PATHS)} required pages.")
+    print(
+        "Docs site validation passed for "
+        f"{len(REQUIRED_NAV_PATHS)} nav pages and {len(REQUIRED_DOCUMENT_PATHS)} required docs pages."
+    )
     return 0
 
 
