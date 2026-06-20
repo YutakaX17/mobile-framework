@@ -24,6 +24,7 @@ REQUIRED_FILES = [
     ".github/workflows/dependency-scan.yml",
     ".github/workflows/docker-build.yml",
     ".github/workflows/frontend-lint-test-build.yml",
+    ".github/workflows/image-signing.yml",
     ".github/workflows/mobile-gradle-tests.yml",
     ".github/workflows/playwright-e2e.yml",
     ".github/workflows/python-lint-test.yml",
@@ -373,6 +374,24 @@ def validate_sbom_generation_workflow() -> None:
             fail(f"generate_sbom.py is missing: {snippet}")
 
 
+def validate_image_signing_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "image-signing.yml").read_text(encoding="utf-8-sig")
+    required_snippets = [
+        "name: Image Signing",
+        "id-token: write",
+        "docker build --tag",
+        "docker image inspect --format",
+        "sigstore/cosign-installer@v3",
+        "cosign sign-blob",
+        "actions/upload-artifact@v4",
+        "mobile-framework-backend",
+        "mobile-framework-frontend-admin",
+    ]
+    for snippet in required_snippets:
+        if snippet not in workflow:
+            fail(f"image-signing.yml is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -384,6 +403,7 @@ def main() -> int:
         validate_docker_build_workflow,
         validate_workflow_replaced_placeholder,
         validate_frontend_workflow,
+        validate_image_signing_workflow,
         validate_mobile_gradle_workflow,
         validate_playwright_workflow,
         validate_python_workflow,
