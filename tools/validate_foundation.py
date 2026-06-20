@@ -28,6 +28,7 @@ REQUIRED_FILES = [
     ".github/workflows/playwright-e2e.yml",
     ".github/workflows/python-lint-test.yml",
     ".github/workflows/rust-lint-test.yml",
+    ".github/workflows/sbom-generation.yml",
     ".github/workflows/secret-scan.yml",
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
@@ -66,6 +67,7 @@ REQUIRED_FILES = [
     "backend/requirements.txt",
     "backend/.dockerignore",
     "backend/Dockerfile",
+    "tools/generate_sbom.py",
     "tools/validate_backend.py",
     "tools/validate_python.py",
     "tools/validate_secret_scan.py",
@@ -315,11 +317,10 @@ def validate_docker_build_workflow() -> None:
     frontend_dockerfile = (ROOT / "frontend-admin" / "Dockerfile").read_text(encoding="utf-8-sig")
     required_workflow_snippets = [
         "name: Docker Build",
-        "docker/setup-buildx-action@v3",
-        "docker/build-push-action@v6",
+        "docker build --tag",
         "mobile-framework-backend",
         "mobile-framework-frontend-admin",
-        "push: false",
+        "${{ matrix.context }}",
     ]
     required_backend_snippets = [
         "FROM python:3.13-slim",
@@ -345,6 +346,33 @@ def validate_docker_build_workflow() -> None:
             fail(f"frontend-admin/Dockerfile is missing: {snippet}")
 
 
+def validate_sbom_generation_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "sbom-generation.yml").read_text(encoding="utf-8-sig")
+    script = (ROOT / "tools" / "generate_sbom.py").read_text(encoding="utf-8-sig")
+    required_workflow_snippets = [
+        "name: SBOM Generation",
+        'python-version: "3.11"',
+        "python tools/generate_sbom.py --output build/sbom/mobile-framework.spdx.json",
+        "actions/upload-artifact@v4",
+        "mobile-framework-spdx-sbom",
+    ]
+    required_script_snippets = [
+        "spdxVersion",
+        "SPDX-2.3",
+        '"backend"',
+        '"requirements.txt"',
+        '"contracts"',
+        "frontend-admin",
+        "package-lock.json",
+    ]
+    for snippet in required_workflow_snippets:
+        if snippet not in workflow:
+            fail(f"sbom-generation.yml is missing: {snippet}")
+    for snippet in required_script_snippets:
+        if snippet not in script:
+            fail(f"generate_sbom.py is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -360,6 +388,7 @@ def main() -> int:
         validate_playwright_workflow,
         validate_python_workflow,
         validate_rust_workflow,
+        validate_sbom_generation_workflow,
         validate_secret_scan_workflow,
     ]
     try:
