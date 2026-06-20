@@ -4,6 +4,7 @@ This area contains setup and workflow guidance for contributors.
 
 ## Documents
 
+- [Backend module guide](BACKEND_MODULES.md)
 - [Developer getting started](GETTING_STARTED.md)
 - [Local environment setup](LOCAL_SETUP.md)
 
