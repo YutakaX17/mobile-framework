@@ -6,6 +6,7 @@ This area contains setup and workflow guidance for contributors.
 
 - [Backend module guide](BACKEND_MODULES.md)
 - [Developer getting started](GETTING_STARTED.md)
+- [Frontend module guide](FRONTEND_MODULES.md)
 - [Local environment setup](LOCAL_SETUP.md)
 
 ## Current Baseline
