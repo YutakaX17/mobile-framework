@@ -1,0 +1,56 @@
+name: Image Signing
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  image-signing:
+    name: Image Signing (${{ matrix.image }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: mobile-framework-backend
+            context: backend
+            artifact: backend
+          - image: mobile-framework-frontend-admin
+            context: frontend-admin
+            artifact: frontend-admin
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build --tag ${{ matrix.image }}:ci ${{ matrix.context }}
+
+      - name: Write image digest
+        run: |
+          mkdir -p build/image-signing
+          docker image inspect --format '{{.Id}}' "${{ matrix.image }}:ci" > "build/image-signing/${{ matrix.artifact }}.digest"
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image digest
+        run: |
+          cosign sign-blob \
+            --yes \
+            --bundle "build/image-signing/${{ matrix.artifact }}.sigstore.json" \
+            "build/image-signing/${{ matrix.artifact }}.digest"
+
+      - name: Upload signing bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}-image-signing-bundle
+          path: |
+            build/image-signing/${{ matrix.artifact }}.digest
+            build/image-signing/${{ matrix.artifact }}.sigstore.json
+          if-no-files-found: error
