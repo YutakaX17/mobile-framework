@@ -59,7 +59,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
 - `[x]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, form renderer, offline outbox, sync engine, and mobile test coverage baselines are complete.
 - `[x]` EPIC-11 Workflow Builder: workflow schema, definition model, state-machine validator, task model, task assignment model, workflow trigger model, visual editor, simulator, task inbox, execution log, and test coverage validation baselines are complete.
-- `[~]` EPIC-12 CI/CD, Security, And Release: Python, Rust, frontend lint/test/build, mobile Gradle test, contract test, Playwright E2E, dependency scan, and CodeQL workflow baselines are complete; secret scanning remains pending.
+- `[~]` EPIC-12 CI/CD, Security, And Release: Python, Rust, frontend lint/test/build, mobile Gradle test, contract test, Playwright E2E, dependency scan, CodeQL, and secret scanning workflow baselines are complete; Docker build workflow remains pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -187,6 +187,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#271` completed: Playwright E2E workflow baseline added.
 - `[x]` Task `#273` completed: dependency scan workflow baseline added.
 - `[x]` Task `#275` completed: CodeQL workflow baseline added.
+- `[x]` Task `#277` completed: secret scanning workflow baseline added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
