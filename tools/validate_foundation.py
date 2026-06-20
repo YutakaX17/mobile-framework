@@ -27,6 +27,7 @@ REQUIRED_FILES = [
     ".github/workflows/playwright-e2e.yml",
     ".github/workflows/python-lint-test.yml",
     ".github/workflows/rust-lint-test.yml",
+    ".github/workflows/secret-scan.yml",
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/adr/ADR-0000-template.md",
@@ -64,6 +65,7 @@ REQUIRED_FILES = [
     "backend/requirements.txt",
     "tools/validate_backend.py",
     "tools/validate_python.py",
+    "tools/validate_secret_scan.py",
     "tools/validate_workflow_builder.py",
     "infra/compose/docker-compose.yml",
 ]
@@ -277,6 +279,30 @@ def validate_codeql_workflow() -> None:
             fail(f"codeql.yml is missing: {snippet}")
 
 
+def validate_secret_scan_workflow() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "secret-scan.yml").read_text(encoding="utf-8-sig")
+    script = (ROOT / "tools" / "validate_secret_scan.py").read_text(encoding="utf-8-sig")
+    required_workflow_snippets = [
+        "name: Secret Scan",
+        "pull_request:",
+        'python-version: "3.11"',
+        "python tools/validate_secret_scan.py",
+    ]
+    required_script_snippets = [
+        "SECRET_PATTERNS",
+        "git",
+        "ls-files",
+        "private-key-block",
+        "long-secret-assignment",
+    ]
+    for snippet in required_workflow_snippets:
+        if snippet not in workflow:
+            fail(f"secret-scan.yml is missing: {snippet}")
+    for snippet in required_script_snippets:
+        if snippet not in script:
+            fail(f"validate_secret_scan.py is missing: {snippet}")
+
+
 def main() -> int:
     checks = [
         validate_required_paths,
@@ -291,6 +317,7 @@ def main() -> int:
         validate_playwright_workflow,
         validate_python_workflow,
         validate_rust_workflow,
+        validate_secret_scan_workflow,
     ]
     try:
         for check in checks:
