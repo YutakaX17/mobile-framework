@@ -41,6 +41,14 @@ Remote GitHub issues are the source of truth. Before creating a new task, search
 gh issue list --state all --search "EPIC-13 developer guide"
 ```
 
+For the practical end-to-end MVP vertical slice, use the remote tracking set created for that flow:
+
+- Epic: `#320` Practical end-to-end MVP vertical slice.
+- Tasks: `#321` through `#328`, one per practical MVP milestone.
+- Milestones: `Practical MVP M1 Local Runnable Demo Seed` through `Practical MVP M8 Production Hardening Backlog`.
+
+Before starting a practical MVP milestone, confirm the matching remote task exists and is not already covered by an open PR. Create missing task issues or milestones first, then mirror the issue numbers in `implementation-notes/12-project-status.md`.
+
 For implementation work, use one branch per issue:
 
 ```powershell
@@ -84,6 +92,15 @@ Backend changes:
 python tools/validate_backend.py
 python tools/validate_python.py
 ```
+
+For the local runnable MVP demo seed:
+
+```powershell
+python backend/manage.py migrate
+python backend/manage.py seed_demo_mvp
+```
+
+The seeded local credentials are `demo-admin` / `demo-admin-password` unless `DEMO_MVP_ADMIN_PASSWORD` is set before running the command.
 
 Mobile runtime changes:
 
