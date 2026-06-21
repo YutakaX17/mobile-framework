@@ -45,7 +45,7 @@ For the practical end-to-end MVP vertical slice, use the remote tracking set cre
 
 - Epic: `#320` Practical end-to-end MVP vertical slice.
 - Tasks: `#321` through `#328`, one per practical MVP milestone.
-- Milestones: `Practical MVP M1 Local Runnable Demo Seed` through `Practical MVP M8 Production Hardening Backlog`.
+- Milestones: `Practical MVP M1 Local Runnable Demo Seed` through `Practical MVP M8 End-To-End Smoke Test`.
 
 Before starting a practical MVP milestone, confirm the matching remote task exists and is not already covered by an open PR. Create missing task issues or milestones first, then mirror the issue numbers in `implementation-notes/12-project-status.md`.
 
@@ -101,6 +101,8 @@ python backend/manage.py seed_demo_mvp
 ```
 
 The seeded local credentials are `demo-admin` / `demo-admin-password` unless `DEMO_MVP_ADMIN_PASSWORD` is set before running the command.
+
+The seed also registers the built-in `field_ops` plugin/module and includes its manifest in the active demo package.
 
 Mobile runtime changes:
 

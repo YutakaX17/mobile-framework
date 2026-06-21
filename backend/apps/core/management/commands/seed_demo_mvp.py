@@ -12,6 +12,7 @@ from django.db import transaction
 
 from apps.app_builder.models import AppDefinition, AppRevision, AppRevisionStatus
 from apps.app_builder.services import publish_app_revision
+from apps.audit.models import AuditEvent, AuditEventType, AuditSeverity
 from apps.deployment_packages.models import DeploymentPackage, DeploymentPackageStatus
 from apps.deployment_packages.services import (
     activate_deployment_package,
@@ -114,7 +115,26 @@ class Command(BaseCommand):
         roles = self.seed_roles(tenant, permissions)
         self.seed_admin_assignment(tenant, admin, roles["admin"])
         channels = create_default_release_channels(tenant)
-        module = self.seed_module(load_fixture("module-manifest-core.json"))
+        self.record_seed_audit(
+            tenant=tenant,
+            actor=admin,
+            event_type=AuditEventType.SYSTEM,
+            action="demo-seed-tenant-upserted",
+            target_type="tenant",
+            target_id=tenant.slug,
+            metadata={"tenant_slug": tenant.slug},
+        )
+        self.record_seed_audit(
+            tenant=tenant,
+            actor=admin,
+            event_type=AuditEventType.IDENTITY,
+            action="demo-seed-admin-upserted",
+            target_type="user",
+            target_id=admin.username,
+            metadata={"username": admin.username},
+        )
+        core_module = self.seed_module(load_fixture("module-manifest-core.json"))
+        field_ops_module = self.seed_module(load_fixture("module-manifest-field-ops.json"))
         theme_revision = self.seed_theme(tenant, load_fixture("theme-basic.json"), admin)
         form_revision = self.seed_form(tenant, load_fixture("form-patient-intake.json"), admin)
         app_revision = self.seed_app(tenant, load_fixture("app-field-ops.json"), admin)
@@ -124,7 +144,7 @@ class Command(BaseCommand):
             app_revision=app_revision,
             theme_revision=theme_revision,
             form_revision=form_revision,
-            module=module,
+            modules=[core_module, field_ops_module],
             signing_key=options["signing_key"],
         )
 
@@ -132,7 +152,8 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 "Seeded demo MVP tenant "
                 f"`{tenant.slug}` with admin `{admin.username}`, "
-                f"{len(channels)} release channels, and active package `{package.package_id}`."
+                f"Field Ops plugin, {len(channels)} release channels, "
+                f"and active package `{package.package_id}`."
             )
         )
 
@@ -240,6 +261,18 @@ class Command(BaseCommand):
             module.manifest = manifest
             module.status = ModuleRegistrationStatus.ENABLED
             module.save()
+        self.record_seed_audit(
+            tenant=None,
+            actor=None,
+            event_type=AuditEventType.MODULE,
+            action="demo-seed-plugin-upserted",
+            target_type="module_registration",
+            target_id=module.module_id,
+            metadata={
+                "module_id": module.module_id,
+                "version": module.version,
+            },
+        )
         return module
 
     def seed_theme(self, tenant: Tenant, payload: dict[str, Any], admin) -> ThemeRevision:
@@ -265,6 +298,15 @@ class Command(BaseCommand):
                 status=ThemeRevisionStatus.VALIDATED,
             )
         publish_theme_revision(theme, revision)
+        self.record_seed_audit(
+            tenant=tenant,
+            actor=admin,
+            event_type=AuditEventType.CONFIGURATION,
+            action="demo-seed-theme-upserted",
+            target_type="theme",
+            target_id=theme.theme_id,
+            metadata={"revision": revision.revision, "version": revision.version},
+        )
         return revision
 
     def matching_theme_revision(self, theme: Theme, payload: dict[str, Any]) -> ThemeRevision | None:
@@ -314,6 +356,15 @@ class Command(BaseCommand):
         if form.current_revision_id != revision.id:
             form.current_revision = revision
             form.save(update_fields=["current_revision", "updated_at"])
+        self.record_seed_audit(
+            tenant=tenant,
+            actor=admin,
+            event_type=AuditEventType.CONFIGURATION,
+            action="demo-seed-form-upserted",
+            target_type="form",
+            target_id=form.form_id,
+            metadata={"revision": revision.revision, "version": revision.version},
+        )
         return revision
 
     def matching_form_revision(self, form: FormDefinition, payload: dict[str, Any]) -> FormRevision | None:
@@ -345,6 +396,15 @@ class Command(BaseCommand):
                 status=AppRevisionStatus.REVIEWED,
             )
         publish_app_revision(app, revision)
+        self.record_seed_audit(
+            tenant=tenant,
+            actor=admin,
+            event_type=AuditEventType.CONFIGURATION,
+            action="demo-seed-app-upserted",
+            target_type="app",
+            target_id=app.app_id,
+            metadata={"revision": revision.revision, "version": revision.version},
+        )
         return revision
 
     def matching_app_revision(self, app: AppDefinition, payload: dict[str, Any]) -> AppRevision | None:
@@ -361,7 +421,7 @@ class Command(BaseCommand):
         app_revision: AppRevision,
         theme_revision: ThemeRevision,
         form_revision: FormRevision,
-        module: ModuleRegistration,
+        modules: list[ModuleRegistration],
         signing_key: str,
     ) -> DeploymentPackage:
         package = DeploymentPackage.objects.filter(tenant=tenant, package_id=DEMO_PACKAGE_ID).first()
@@ -372,7 +432,7 @@ class Command(BaseCommand):
                 app_revision=app_revision,
                 theme_revision=theme_revision,
                 form_revisions=[form_revision],
-                module_registrations=[module],
+                module_registrations=modules,
                 runtime_min_version="0.1.0",
                 runtime_max_version="0.1.0",
                 channel="dev",
@@ -384,4 +444,45 @@ class Command(BaseCommand):
         if package.status == DeploymentPackageStatus.ARCHIVED:
             package.status = DeploymentPackageStatus.SIGNED
             package.save(update_fields=["status", "updated_at"])
-        return activate_deployment_package(package)
+        package = activate_deployment_package(package)
+        self.record_seed_audit(
+            tenant=tenant,
+            actor=admin,
+            event_type=AuditEventType.DEPLOYMENT,
+            action="demo-seed-package-upserted",
+            target_type="deployment_package",
+            target_id=package.package_id,
+            metadata={
+                "app_id": package.app_id,
+                "app_version": package.app_version,
+                "channel": package.channel,
+                "package_hash": package.package_hash,
+            },
+        )
+        return package
+
+    def record_seed_audit(
+        self,
+        *,
+        tenant: Tenant | None,
+        actor,
+        event_type: AuditEventType,
+        action: str,
+        target_type: str,
+        target_id: str,
+        metadata: dict[str, Any],
+    ) -> AuditEvent:
+        event, _created = AuditEvent.objects.get_or_create(
+            tenant=tenant,
+            action=action,
+            target_type=target_type,
+            target_id=target_id,
+            defaults={
+                "actor": actor,
+                "event_type": event_type,
+                "severity": AuditSeverity.INFO,
+                "target_repr": target_id,
+                "metadata": metadata,
+            },
+        )
+        return event

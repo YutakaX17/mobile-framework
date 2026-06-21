@@ -47,7 +47,7 @@ class SeedDemoMvpCommandTests(TestCase):
         package = DeploymentPackage.objects.get(tenant=tenant, package_id="pkg_demo_field_ops_001")
 
         self.assertIn("Seeded demo MVP tenant `demo`", first_output)
-        self.assertIn("Seeded demo MVP tenant `demo`", second_output)
+        self.assertIn("Field Ops plugin", second_output)
         self.assertEqual(tenant.name, "Demo Tenant")
         self.assertEqual(tenant.status, TenantStatus.ACTIVE)
         self.assertTrue(admin.is_staff)
@@ -63,9 +63,17 @@ class SeedDemoMvpCommandTests(TestCase):
             set(release_channel_names()),
         )
 
-        self.assertEqual(ModuleRegistration.objects.count(), 1)
-        module = ModuleRegistration.objects.get(module_id="core", version="0.1.0")
-        self.assertEqual(module.status, ModuleRegistrationStatus.ENABLED)
+        self.assertEqual(ModuleRegistration.objects.count(), 2)
+        core_module = ModuleRegistration.objects.get(module_id="core", version="0.1.0")
+        field_ops_module = ModuleRegistration.objects.get(module_id="field_ops", version="0.1.0")
+        self.assertEqual(core_module.status, ModuleRegistrationStatus.ENABLED)
+        self.assertEqual(field_ops_module.status, ModuleRegistrationStatus.ENABLED)
+        self.assertEqual(field_ops_module.plugin_api_version, 0)
+        self.assertEqual(field_ops_module.platform_min_version, "0.1.0")
+        self.assertEqual(field_ops_module.platform_max_version, "0.1.0")
+        self.assertEqual(field_ops_module.manifest["runtime_min_version"], "0.1.0")
+        self.assertEqual(field_ops_module.manifest["runtime_max_version"], "0.1.0")
+        self.assertEqual(field_ops_module.manifest["extensions"]["templates"]["forms"][0]["form_id"], "patient_intake")
 
         self.assertEqual(ThemeRevision.objects.filter(theme=theme).count(), 1)
         self.assertEqual(theme.current_revision.status, ThemeRevisionStatus.PUBLISHED)
@@ -87,6 +95,7 @@ class SeedDemoMvpCommandTests(TestCase):
         self.assertEqual(package.payload["theme"]["theme_id"], "field_ops")
         self.assertEqual(package.payload["forms"][0]["form_id"], "patient_intake")
         self.assertEqual(package.payload["app"]["app_id"], "field_ops_app")
+        self.assertEqual([module["module_id"] for module in package.payload["modules"]], ["core", "field_ops"])
         self.assertTrue(package.package_hash.startswith("sha256:"))
         self.assertTrue(package.signature.startswith("hmac-sha256:"))
         self.assertTrue(verify_deployment_package_hash(package.payload).is_valid)
@@ -101,6 +110,14 @@ class SeedDemoMvpCommandTests(TestCase):
         )
         self.assertEqual(
             AuditEvent.objects.filter(action="deployment-package-activated", target_id=package.package_id).count(),
+            1,
+        )
+        self.assertEqual(AuditEvent.objects.filter(action="demo-seed-plugin-upserted", target_id="field_ops").count(), 1)
+        self.assertEqual(AuditEvent.objects.filter(action="demo-seed-theme-upserted", target_id="field_ops").count(), 1)
+        self.assertEqual(AuditEvent.objects.filter(action="demo-seed-form-upserted", target_id="patient_intake").count(), 1)
+        self.assertEqual(AuditEvent.objects.filter(action="demo-seed-app-upserted", target_id="field_ops_app").count(), 1)
+        self.assertEqual(
+            AuditEvent.objects.filter(action="demo-seed-package-upserted", target_id=package.package_id).count(),
             1,
         )
 

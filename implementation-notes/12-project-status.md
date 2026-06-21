@@ -40,14 +40,14 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 Remote GitHub tracking for the practical user-friendly MVP vertical slice is now separate from the baseline foundation milestones:
 
 - `[~]` Epic `#320`: Practical end-to-end MVP vertical slice.
-- `[x]` Task `#321` / PR `#329` / remote milestone `Practical MVP M1 Local Runnable Demo Seed`: idempotent local seed for tenant, admin, RBAC, channels, theme, form, app, and active dev package.
+- `[x]` Task `#321` / PR `#329` / remote milestone `Practical MVP M1 Local Runnable Demo Seed`: idempotent local seed for tenant, admin, RBAC, channels, built-in Field Ops plugin registration, theme, form, app, seed audit events, and active dev package.
 - `[ ]` Task `#322` / remote milestone `Practical MVP M2 Real Backend Auth And Tenant Context`.
 - `[ ]` Task `#323` / remote milestone `Practical MVP M3 Practical Builder APIs`.
 - `[ ]` Task `#324` / remote milestone `Practical MVP M4 Frontend Real Workflow`.
 - `[ ]` Task `#325` / remote milestone `Practical MVP M5 Sync Backend`.
 - `[ ]` Task `#326` / remote milestone `Practical MVP M6 Mobile Practical Runtime`.
-- `[ ]` Task `#327` / remote milestone `Practical MVP M7 End-To-End Validation`.
-- `[ ]` Task `#328` / remote milestone `Practical MVP M8 Production Hardening Backlog`.
+- `[ ]` Task `#327` / remote milestone `Practical MVP M7 Release Tags And Assets`.
+- `[ ]` Task `#328` / remote milestone `Practical MVP M8 End-To-End Smoke Test`.
 
 Working rule: before coding each practical MVP milestone, confirm the remote issue/milestone exists, check for open PRs or issues that already cover the scope, and mirror progress here after local validation.
 
@@ -70,7 +70,7 @@ Working rule: before coding each practical MVP milestone, confirm the remote iss
 
 ## Active Work
 
-- `[x]` Practical MVP M1 / `#321` / PR `#329`: `seed_demo_mvp` management command, repeat-run tests, backend README, and developer getting started updates are validated locally.
+- `[x]` Practical MVP M1 / `#321` / PR `#329`: `seed_demo_mvp` includes built-in Field Ops plugin registration, package inclusion, seed audit events, repeat-run tests, backend README, and developer getting started updates; validation passes locally.
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
 - `[x]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow baselines are complete.
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.

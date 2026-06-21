@@ -10,10 +10,16 @@ from apps.modules.models import ModuleRegistration, ModuleRegistrationStatus
 
 ROOT = Path(__file__).resolve().parents[3]
 VALID_MANIFEST = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "module-manifest-core.json"
+FIELD_OPS_MANIFEST = ROOT / "contracts" / "fixtures" / "valid" / "v1" / "module-manifest-field-ops.json"
 
 
 def load_valid_manifest() -> dict:
     with VALID_MANIFEST.open(encoding="utf-8-sig") as handle:
+        return json.load(handle)
+
+
+def load_field_ops_manifest() -> dict:
+    with FIELD_OPS_MANIFEST.open(encoding="utf-8-sig") as handle:
         return json.load(handle)
 
 
@@ -136,6 +142,24 @@ class ModuleRegistrationTests(TestCase):
         registration.save()
 
         self.assertEqual(registration.module_id, "reports")
+
+    def test_built_in_field_ops_plugin_can_be_enabled_with_core_dependency(self):
+        ModuleRegistration.from_manifest(load_valid_manifest()).save()
+        manifest = load_field_ops_manifest()
+
+        registration = ModuleRegistration.from_manifest(manifest)
+        registration.status = ModuleRegistrationStatus.ENABLED
+        registration.save()
+
+        self.assertEqual(registration.module_id, "field_ops")
+        self.assertEqual(registration.version, "0.1.0")
+        self.assertEqual(registration.plugin_api_version, 0)
+        self.assertEqual(registration.platform_min_version, "0.1.0")
+        self.assertEqual(registration.platform_max_version, "0.1.0")
+        self.assertEqual(registration.manifest["runtime_min_version"], "0.1.0")
+        self.assertEqual(registration.manifest["runtime_max_version"], "0.1.0")
+        self.assertEqual(registration.manifest["surfaces"]["mobile"]["sync_handlers"], ["field_ops_outbox"])
+        self.assertEqual(registration.manifest["extensions"]["templates"]["forms"][0]["form_id"], "patient_intake")
 
     def test_missing_required_dependency_is_rejected(self):
         manifest = load_valid_manifest()

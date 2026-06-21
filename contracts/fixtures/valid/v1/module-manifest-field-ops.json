@@ -1,0 +1,94 @@
+{
+  "schema_version": "v1",
+  "module_id": "field_ops",
+  "name": "Field Ops",
+  "description": "Built-in MVP reference plugin for offline field intake workflows.",
+  "version": "0.1.0",
+  "platform_min_version": "0.1.0",
+  "platform_max_version": "0.1.0",
+  "runtime_min_version": "0.1.0",
+  "runtime_max_version": "0.1.0",
+  "plugin_api_version": 0,
+  "dependencies": [
+    {
+      "module_id": "core",
+      "version_constraint": ">=0.1.0,<1.0.0"
+    }
+  ],
+  "surfaces": {
+    "backend": {
+      "django_app": "apps.form_builder",
+      "api_schema": "apps.form_builder.schema",
+      "jobs": ["field_ops_package_seed"],
+      "events": ["fieldops.submission_received"]
+    },
+    "frontend_admin": {
+      "routes": [
+        {
+          "path": "/setup/field_ops",
+          "component": "FieldOpsSetupWizard",
+          "permission": "builder.app.manage"
+        },
+        {
+          "path": "/plugins/field_ops",
+          "component": "FieldOpsPluginStatus",
+          "permission": "builder.app.manage"
+        }
+      ],
+      "menus": [
+        {
+          "label": "Field Ops Setup",
+          "route": "/setup/field_ops",
+          "permission": "builder.app.manage"
+        }
+      ],
+      "translations": ["en"]
+    },
+    "mobile": {
+      "widgets": ["text", "number", "select", "form"],
+      "actions": ["navigate", "submit_form"],
+      "sync_handlers": ["field_ops_outbox"]
+    }
+  },
+  "configuration_schemas": [
+    {
+      "name": "field_ops_form_template",
+      "schema_id": "https://schemas.mobile-framework.local/v1/form.schema.json"
+    },
+    {
+      "name": "field_ops_app_template",
+      "schema_id": "https://schemas.mobile-framework.local/v1/app.schema.json"
+    }
+  ],
+  "permissions": [
+    {
+      "code": "forms.submit_patient_intake",
+      "label": "Submit patient intake",
+      "description": "Allows a mobile user to submit the Field Ops patient intake form."
+    },
+    {
+      "code": "builder.app.manage",
+      "label": "Manage Field Ops app",
+      "description": "Allows a configurator to customize the Field Ops app template."
+    }
+  ],
+  "extensions": {
+    "plugin_type": "built_in",
+    "templates": {
+      "forms": [
+        {
+          "template_id": "field_ops_patient_intake",
+          "form_id": "patient_intake",
+          "fixture": "form-patient-intake.json"
+        }
+      ],
+      "apps": [
+        {
+          "template_id": "field_ops_app",
+          "app_id": "field_ops_app",
+          "fixture": "app-field-ops.json"
+        }
+      ]
+    }
+  }
+}

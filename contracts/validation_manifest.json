@@ -56,7 +56,10 @@
     },
     "module_manifest": {
       "schema": "schemas/v1/module-manifest.schema.json",
-      "valid": ["fixtures/valid/v1/module-manifest-core.json"],
+      "valid": [
+        "fixtures/valid/v1/module-manifest-core.json",
+        "fixtures/valid/v1/module-manifest-field-ops.json"
+      ],
       "invalid": [
         "fixtures/invalid/v1/module-manifest-invalid-version.json",
         "fixtures/invalid/v1/module-manifest-missing-module-id.json",
