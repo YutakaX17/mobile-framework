@@ -33,6 +33,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "mobile-runtime/RUNTIME_GUIDE.md",
     "operations/BACKUP_RESTORE_GUIDE.md",
     "operations/DEPLOYMENT_AND_RELEASE_GUIDE.md",
+    "operations/UPGRADE_GUIDE.md",
     "plugin-sdk/PLUGIN_SDK_GUIDE.md",
 ]
 
@@ -57,6 +58,7 @@ REQUIRED_README_LINKS = {
         "BACKUP_RESTORE_GUIDE.md",
         "DEPLOYMENT_AND_RELEASE_GUIDE.md",
         "REPOSITORY_PROTECTION.md",
+        "UPGRADE_GUIDE.md",
     ],
     "plugin-sdk/README.md": [
         "PLUGIN_SDK_GUIDE.md",
