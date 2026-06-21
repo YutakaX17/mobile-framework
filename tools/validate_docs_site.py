@@ -23,6 +23,7 @@ REQUIRED_NAV_PATHS = [
 
 REQUIRED_DOCUMENT_PATHS = [
     "admin/ADMIN_USER_GUIDE.md",
+    "admin/THEME_BUILDER_GUIDE.md",
     "developer/BACKEND_MODULES.md",
     "developer/FRONTEND_MODULES.md",
     "developer/GETTING_STARTED.md",
@@ -33,6 +34,7 @@ REQUIRED_DOCUMENT_PATHS = [
 REQUIRED_README_LINKS = {
     "admin/README.md": [
         "ADMIN_USER_GUIDE.md",
+        "THEME_BUILDER_GUIDE.md",
     ],
     "developer/README.md": [
         "BACKEND_MODULES.md",
