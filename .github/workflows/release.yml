@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version to validate
+        required: true
+        default: "0.1.0"
+
+permissions:
+  contents: read
+
+jobs:
+  release-manifest:
+    name: Release Manifest
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ github.event.inputs.version || '0.1.0' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate release manifest
+        run: python tools/generate_release_manifest.py --version "$RELEASE_VERSION" --output build/release/release-manifest.json
+
+      - name: Upload release manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest
+          path: build/release/release-manifest.json
+          if-no-files-found: error

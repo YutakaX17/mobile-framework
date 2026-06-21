@@ -1,0 +1,33 @@
+name: SBOM Generation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  sbom-generation:
+    name: SBOM Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate SPDX SBOM
+        run: python tools/generate_sbom.py --output build/sbom/mobile-framework.spdx.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-framework-spdx-sbom
+          path: build/sbom/mobile-framework.spdx.json
+          if-no-files-found: error

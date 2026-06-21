@@ -1,0 +1,28 @@
+name: Rust Lint And Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  rust-lint-test:
+    name: Rust Lint And Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Rust extension
+        run: python tools/validate_rust_ext.py --include-python-wrapper

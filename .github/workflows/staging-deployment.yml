@@ -1,0 +1,36 @@
+name: Staging Deployment
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging-deployment-plan:
+    name: Staging Deployment Plan
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate staging deployment plan
+        run: python tools/generate_staging_deployment_plan.py --output build/deploy/staging-plan.json
+
+      - name: Upload staging deployment plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-deployment-plan
+          path: build/deploy/staging-plan.json
+          if-no-files-found: error
