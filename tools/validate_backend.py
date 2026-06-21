@@ -32,6 +32,7 @@ def main() -> int:
             "apps.app_builder",
             "apps.workflow_builder",
             "apps.deployment_packages",
+            "apps.sync",
             "apps.audit",
             "tests",
             "--settings=config.settings.test",
