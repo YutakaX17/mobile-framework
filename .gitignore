@@ -1,6 +1,7 @@
 ﻿# OS and editors
 .DS_Store
 Thumbs.db
+.idea/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/usage.statistics.xml
