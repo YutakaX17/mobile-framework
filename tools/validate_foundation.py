@@ -36,6 +36,7 @@ REQUIRED_FILES = [
     "implementation-notes/README.md",
     "implementation-notes/12-project-status.md",
     "docs/admin/ADMIN_USER_GUIDE.md",
+    "docs/admin/APP_BUILDER_GUIDE.md",
     "docs/admin/FORM_BUILDER_GUIDE.md",
     "docs/admin/THEME_BUILDER_GUIDE.md",
     "docs/adr/ADR-0000-template.md",
@@ -381,6 +382,7 @@ def validate_docs_site() -> None:
     required_script_snippets = [
         "Docs site validation",
         "admin/ADMIN_USER_GUIDE.md",
+        "admin/APP_BUILDER_GUIDE.md",
         "admin/FORM_BUILDER_GUIDE.md",
         "admin/THEME_BUILDER_GUIDE.md",
         "developer/BACKEND_MODULES.md",
