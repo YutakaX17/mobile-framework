@@ -26,6 +26,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "admin/APP_BUILDER_GUIDE.md",
     "admin/FORM_BUILDER_GUIDE.md",
     "admin/THEME_BUILDER_GUIDE.md",
+    "admin/WORKFLOW_BUILDER_GUIDE.md",
     "developer/BACKEND_MODULES.md",
     "developer/FRONTEND_MODULES.md",
     "developer/GETTING_STARTED.md",
@@ -39,6 +40,7 @@ REQUIRED_README_LINKS = {
         "APP_BUILDER_GUIDE.md",
         "FORM_BUILDER_GUIDE.md",
         "THEME_BUILDER_GUIDE.md",
+        "WORKFLOW_BUILDER_GUIDE.md",
     ],
     "developer/README.md": [
         "BACKEND_MODULES.md",
