@@ -30,6 +30,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "developer/BACKEND_MODULES.md",
     "developer/FRONTEND_MODULES.md",
     "developer/GETTING_STARTED.md",
+    "operations/CHANGELOG_PROCESS.md",
     "mobile-runtime/RUNTIME_GUIDE.md",
     "operations/BACKUP_RESTORE_GUIDE.md",
     "operations/DEPLOYMENT_AND_RELEASE_GUIDE.md",
@@ -56,6 +57,7 @@ REQUIRED_README_LINKS = {
     ],
     "operations/README.md": [
         "BACKUP_RESTORE_GUIDE.md",
+        "CHANGELOG_PROCESS.md",
         "DEPLOYMENT_AND_RELEASE_GUIDE.md",
         "REPOSITORY_PROTECTION.md",
         "UPGRADE_GUIDE.md",

@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = [
     "README.md",
     "CONTRIBUTING.md",
+    "CHANGELOG.md",
     "LICENSE.md",
     ".editorconfig",
     ".gitignore",
@@ -44,6 +45,7 @@ REQUIRED_FILES = [
     "docs/developer/BACKEND_MODULES.md",
     "docs/developer/FRONTEND_MODULES.md",
     "docs/developer/GETTING_STARTED.md",
+    "docs/operations/CHANGELOG_PROCESS.md",
     "docs/mobile-runtime/RUNTIME_GUIDE.md",
     "docs/operations/BACKUP_RESTORE_GUIDE.md",
     "docs/operations/DEPLOYMENT_AND_RELEASE_GUIDE.md",
@@ -392,6 +394,7 @@ def validate_docs_site() -> None:
         "admin/WORKFLOW_BUILDER_GUIDE.md",
         "developer/BACKEND_MODULES.md",
         "developer/FRONTEND_MODULES.md",
+        "operations/CHANGELOG_PROCESS.md",
         "mobile-runtime/RUNTIME_GUIDE.md",
         "operations/BACKUP_RESTORE_GUIDE.md",
         "operations/DEPLOYMENT_AND_RELEASE_GUIDE.md",
