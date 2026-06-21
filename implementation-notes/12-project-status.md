@@ -60,7 +60,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, form renderer, offline outbox, sync engine, and mobile test coverage baselines are complete.
 - `[x]` EPIC-11 Workflow Builder: workflow schema, definition model, state-machine validator, task model, task assignment model, workflow trigger model, visual editor, simulator, task inbox, execution log, and test coverage validation baselines are complete.
 - `[x]` EPIC-12 CI/CD, Security, And Release: Python, Rust, frontend lint/test/build, mobile Gradle test, contract test, Playwright E2E, dependency scan, CodeQL, secret scanning, Docker build, SBOM generation, image signing, staging deployment, and release workflow baselines are complete.
-- `[~]` EPIC-13 Documentation And Maintenance: docs site baseline, developer getting started guide, backend module guide, frontend module guide, mobile runtime guide, plugin SDK guide, admin user guide, and theme builder guide are complete; remaining documentation and maintenance guides are pending.
+- `[~]` EPIC-13 Documentation And Maintenance: docs site baseline, developer getting started guide, backend module guide, frontend module guide, mobile runtime guide, plugin SDK guide, admin user guide, theme builder guide, and form builder guide are complete; remaining documentation and maintenance guides are pending.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -203,6 +203,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#299` completed: plugin SDK guide added.
 - `[x]` Task `#301` completed: admin user guide added.
 - `[x]` Task `#303` completed: theme builder guide added.
+- `[x]` Task `#305` completed: form builder guide added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
