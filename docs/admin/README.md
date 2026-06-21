@@ -8,6 +8,7 @@ This area documents the administrator-facing web builder and operations shell.
 - [App builder guide](APP_BUILDER_GUIDE.md)
 - [Form builder guide](FORM_BUILDER_GUIDE.md)
 - [Theme builder guide](THEME_BUILDER_GUIDE.md)
+- [Workflow builder guide](WORKFLOW_BUILDER_GUIDE.md)
 
 ## Current Baseline
 
