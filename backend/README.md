@@ -18,12 +18,12 @@ The backend includes a minimal Django project:
 - `apps/core.management.commands.seed_demo_mvp`: idempotent local MVP seed command for one demo tenant, admin user, RBAC, release channels, built-in Field Ops plugin registration, valid builder revisions, seed audit events, and one active dev deployment package.
 - `apps/tenants`: initial tenant model baseline.
 - `apps/identity`: initial role, permission, and tenant-scoped user assignment baseline.
-- `apps/modules`: initial module registry, manifest validation, dependency validation, and compatibility validation baseline.
+- `apps/modules`: initial module registry, manifest validation, dependency validation, compatibility validation baseline, and tenant-protected module/plugin status API.
 - `apps/configurations`: initial tenant-scoped configuration definition and revision registry baseline.
-- `apps/app_builder`: initial tenant-scoped app definition, revision baseline, shared app schema validation, and read-only API baseline.
+- `apps/app_builder`: initial tenant-scoped app definition, revision baseline, shared app schema validation, read API baseline, draft editing action, and publish action.
 - `apps/themes`: initial tenant-scoped theme model, revision baseline, shared theme schema validation, read-only API baseline, draft editing action baseline, publish action baseline, and rollback action baseline.
-- `apps/form_builder`: initial tenant-scoped form definition, revision baseline, shared form schema validation, read-only API baseline, and submission endpoint baseline.
-- `apps/deployment_packages`: initial tenant-scoped package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and deployment audit event baseline.
+- `apps/form_builder`: initial tenant-scoped form definition, revision baseline, shared form schema validation, read API baseline, draft editing action, publish action, and submission endpoint baseline.
+- `apps/deployment_packages`: initial tenant-scoped package model, compiler, signing, hash verification, release channel, activation, rollback, admin package list/detail/compile/activate API, mobile manifest endpoint, package download endpoint, and deployment audit event baseline.
 - `apps/audit`: initial tenant-scoped and platform-level audit event model baseline.
 - `rust_ext`: initial PyO3/maturin scaffold for bounded native helpers.
 
@@ -114,18 +114,33 @@ The backend uses Django session authentication for the MVP admin browser flow. T
 
 Tenant-scoped builder APIs now prefer the `X-Tenant-Slug` header. The `?tenant=demo` query parameter remains as a temporary development fallback until the frontend and mobile paths are fully migrated. Session cookies are intentionally for the admin browser flow; mobile-facing auth will be narrowed separately as the sync/runtime milestones mature.
 
+## Practical MVP Builder APIs
+
+The practical MVP backend path now has tenant-scoped, permission-checked APIs for the Field Ops vertical slice:
+
+- `GET /api/modules/` and `GET /api/modules/field_ops/` expose built-in plugin status, manifest details, permissions, surfaces, templates, and compatibility.
+- `GET`/`PUT /api/themes/field_ops/` creates a validated draft theme revision; `POST /api/themes/field_ops/revisions/<revision>/publish/` publishes it.
+- `GET`/`PUT /api/forms/patient_intake/` creates a validated draft form revision; `POST /api/forms/patient_intake/revisions/<revision>/publish/` publishes it.
+- `GET`/`PUT /api/apps/field_ops_app/` creates a validated draft app revision; `POST /api/apps/field_ops_app/revisions/<revision>/publish/` publishes it.
+- `GET /api/deployment-packages/` lists tenant packages.
+- `POST /api/deployment-packages/compile/` compiles a signed package from the published app, theme, referenced forms, and enabled modules.
+- `POST /api/deployment-packages/<package_id>/activate/` activates an immutable signed package and archives the prior active package for the same tenant/app/channel.
+- `GET /api/mobile/packages/manifest/?app_id=field_ops_app&channel=dev` and `GET /api/mobile/packages/<package_id>/download/` remain the runtime package fetch path.
+
+All admin builder/package/module endpoints require an authenticated admin session, tenant context through `X-Tenant-Slug`, and the matching tenant permission. Contract validation runs before revision or package records are saved, and validation errors use the shared API error shape.
+
 ## Planned Areas
 
 - `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model, background job primitives. Initial service lifecycle, event bus, API error model, and job registry baselines exist.
 - `apps/tenants`: tenant model and isolation rules. Initial tenant model baseline exists.
 - `apps/identity`: users, roles, permissions, sessions, and MFA/OIDC hooks. Initial RBAC model baseline exists.
-- `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry, dependency validation, and compatibility validation baselines exist.
+- `apps/modules`: module manifests, dependency checks, compatibility checks. Initial module registry, dependency validation, compatibility validation, and admin status API baselines exist.
 - `apps/configurations`: tenant-scoped definitions, revisions, status workflow, and schema validation. Initial configuration registry baseline exists.
-- `apps/app_builder`: app definitions, navigation, screens, actions, publish states. Initial app model, revision, and read-only API baselines exist.
-- `apps/form_builder`: form definitions, fields, validation, submissions. Initial form model, revision, read-only API, and submission endpoint baselines exist.
+- `apps/app_builder`: app definitions, navigation, screens, actions, publish states. Initial app model, revision, read/update, and publish API baselines exist.
+- `apps/form_builder`: form definitions, fields, validation, submissions. Initial form model, revision, read/update, publish, and submission endpoint baselines exist.
 - `apps/workflow_builder`: workflow definitions, state machines, tasks, simulation. Initial workflow definition model baseline exists.
 - `apps/themes`: design tokens, theme validation, preview, publishing. Initial theme model, revision, and read-only API baselines exist.
-- `apps/deployment_packages`: immutable package compilation, signing, channels, rollback. Initial package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and deployment audit event baselines exist.
+- `apps/deployment_packages`: immutable package compilation, signing, channels, rollback. Initial package model, compiler, signing, hash verification, release channel, activation, rollback, admin compile/activate API, mobile manifest endpoint, package download endpoint, and deployment audit event baselines exist.
 - `apps/sync`: mobile sync protocol, outbox handling, conflict handling.
 - `apps/audit`: mutation logs, config revisions, admin and sync audit events. Initial audit event model baseline exists.
 - `rust_ext`: bounded PyO3/maturin helpers. Initial scaffold exists; helper implementations remain pending.

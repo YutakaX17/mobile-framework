@@ -108,7 +108,7 @@ class FormApiTests(TestCase):
         self.client = Client()
         self.tenant = Tenant.objects.create(slug="demo", name="Demo Tenant")
         self.user = get_user_model().objects.create_user(username="form-builder")
-        self.grant_permissions(self.user, self.tenant, ["builder.form.manage"])
+        self.grant_permissions(self.user, self.tenant, ["builder.form.manage", "builder.package.publish"])
         self.client.force_login(self.user)
         self.payload = load_valid_form()
         self.form = FormDefinition.from_payload(self.tenant, self.payload)
@@ -164,6 +164,47 @@ class FormApiTests(TestCase):
         self.assertEqual(payload["form"]["form_id"], "patient_intake")
         self.assertEqual(payload["form"]["current_revision"]["payload"]["form_id"], "patient_intake")
 
+    def test_update_form_creates_draft_revision(self):
+        updated_payload = deepcopy(self.payload)
+        updated_payload["name"] = "Patient Intake Draft"
+        updated_payload["description"] = "Updated form draft."
+        updated_payload["version"] = "0.2.0"
+
+        response = self.client.put(
+            "/api/forms/patient_intake/?tenant=demo",
+            data=json.dumps(updated_payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["form"]["name"], "Patient Intake Draft")
+        self.assertEqual(payload["form"]["current_revision"]["revision"], self.revision.revision)
+        self.assertEqual(payload["draft_revision"]["revision"], 2)
+        self.assertEqual(payload["draft_revision"]["status"], FormRevisionStatus.DRAFT)
+        self.assertEqual(payload["draft_revision"]["payload"]["version"], "0.2.0")
+
+        self.form.refresh_from_db()
+        self.revision.refresh_from_db()
+        draft_revision = self.form.revisions.get(revision=2)
+        self.assertEqual(self.form.current_revision_id, self.revision.id)
+        self.assertEqual(self.revision.status, FormRevisionStatus.PUBLISHED)
+        self.assertEqual(draft_revision.status, FormRevisionStatus.DRAFT)
+
+    def test_update_form_rejects_invalid_payload(self):
+        invalid_payload = deepcopy(self.payload)
+        invalid_payload.pop("fields")
+
+        response = self.client.put(
+            "/api/forms/patient_intake/?tenant=demo",
+            data=json.dumps(invalid_payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"]["code"], "validation_error")
+        self.assertEqual(self.form.revisions.count(), 1)
+
     def test_form_api_requires_tenant_query_parameter(self):
         response = self.client.get("/api/forms/")
 
@@ -178,6 +219,33 @@ class FormApiTests(TestCase):
 
     def test_form_detail_returns_not_found_for_missing_form(self):
         response = self.client.get("/api/forms/missing_form/", {"tenant": "demo"})
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "not_found")
+
+    def test_publish_revision_sets_current_revision(self):
+        next_revision = FormRevision.create_next(
+            self.form,
+            deepcopy(self.payload),
+            status=FormRevisionStatus.REVIEWED,
+        )
+
+        response = self.client.post(
+            f"/api/forms/patient_intake/revisions/{next_revision.revision}/publish/?tenant=demo",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["form"]["current_revision"]["revision"], next_revision.revision)
+        next_revision.refresh_from_db()
+        self.revision.refresh_from_db()
+        self.form.refresh_from_db()
+        self.assertEqual(next_revision.status, FormRevisionStatus.PUBLISHED)
+        self.assertEqual(self.revision.status, FormRevisionStatus.ARCHIVED)
+        self.assertEqual(self.form.current_revision_id, next_revision.id)
+
+    def test_publish_revision_returns_not_found_for_missing_revision(self):
+        response = self.client.post("/api/forms/patient_intake/revisions/99/publish/?tenant=demo")
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["error"]["code"], "not_found")

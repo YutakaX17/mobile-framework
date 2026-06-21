@@ -1,12 +1,40 @@
 from __future__ import annotations
 
+import json
+from json import JSONDecodeError
+
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest, JsonResponse
 
-from apps.core.api import method_not_allowed, require_tenant_context
-from apps.core.errors import ApiError, ApiErrorCode, api_error_response
+from apps.core.api import method_not_allowed, require_tenant_context, validation_error_response
+from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 
 from .models import AppDefinition, AppRevision
-from .services import publish_app_revision
+from .services import create_app_draft_revision, publish_app_revision
+
+
+def _json_payload_from_request(request: HttpRequest) -> dict | JsonResponse:
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except (JSONDecodeError, UnicodeDecodeError):
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.VALIDATION_ERROR,
+                message="Request body must be valid JSON.",
+                details=[ApiErrorDetail(field="body", message="Provide a valid JSON object.")],
+                status_code=400,
+            )
+        )
+    if not isinstance(payload, dict):
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.VALIDATION_ERROR,
+                message="Request body must be a JSON object.",
+                details=[ApiErrorDetail(field="body", message="Provide a JSON object.")],
+                status_code=400,
+            )
+        )
+    return payload
 
 
 def _screen_count(revision: AppRevision | None) -> int:
@@ -74,8 +102,8 @@ def app_list(request: HttpRequest) -> JsonResponse:
 
 
 def app_detail(request: HttpRequest, app_id: str) -> JsonResponse:
-    if request.method != "GET":
-        return method_not_allowed("GET")
+    if request.method not in {"GET", "PUT"}:
+        return method_not_allowed("GET or PUT")
 
     context = require_tenant_context(request, permission="builder.app.manage")
     if isinstance(context, JsonResponse):
@@ -90,6 +118,28 @@ def app_detail(request: HttpRequest, app_id: str) -> JsonResponse:
                 message=f"App `{app_id}` was not found.",
                 status_code=404,
             )
+        )
+
+    if request.method == "PUT":
+        payload = _json_payload_from_request(request)
+        if isinstance(payload, JsonResponse):
+            return payload
+
+        user = getattr(request, "user", None)
+        created_by = user if getattr(user, "is_authenticated", False) else None
+        try:
+            draft_revision = create_app_draft_revision(app, payload, created_by=created_by)
+        except ValidationError as exc:
+            return validation_error_response("App payload is invalid.", exc)
+
+        app.refresh_from_db()
+        data = _serialize_app_summary(app)
+        data["current_revision"] = _serialize_revision(app.current_revision, include_payload=True)
+        return JsonResponse(
+            {
+                "app": data,
+                "draft_revision": _serialize_revision(draft_revision, include_payload=True),
+            }
         )
 
     data = _serialize_app_summary(app)

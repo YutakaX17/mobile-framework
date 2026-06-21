@@ -2,10 +2,13 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import Client, TestCase
 
+from apps.identity.models import PlatformPermission, PlatformRole, RolePermission, UserRoleAssignment
 from apps.modules.models import ModuleRegistration, ModuleRegistrationStatus
+from apps.tenants.models import Tenant
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -238,3 +241,67 @@ class ModuleRegistrationTests(TestCase):
 
         with self.assertRaises(ValidationError):
             ModuleRegistration.from_manifest(manifest).save()
+
+
+class ModuleApiTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.tenant = Tenant.objects.create(slug="demo", name="Demo Tenant")
+        self.other_tenant = Tenant.objects.create(slug="other", name="Other Tenant")
+        self.user = get_user_model().objects.create_user(username="module-builder")
+        self.grant_permissions(self.user, self.tenant, ["builder.app.manage"])
+        self.client.force_login(self.user)
+        ModuleRegistration.from_manifest(load_valid_manifest()).save()
+        field_ops = ModuleRegistration.from_manifest(load_field_ops_manifest())
+        field_ops.status = ModuleRegistrationStatus.ENABLED
+        field_ops.save()
+
+    def grant_permissions(self, user, tenant, permission_codes: list[str]) -> PlatformRole:
+        role = PlatformRole.objects.create(tenant=tenant, slug=f"role-{user.username}", name="Module Builder")
+        for code in permission_codes:
+            permission, _created = PlatformPermission.objects.get_or_create(code=code, defaults={"name": code})
+            RolePermission.objects.create(role=role, permission=permission)
+        UserRoleAssignment.objects.create(tenant=tenant, user=user, role=role)
+        return role
+
+    def test_module_api_requires_authentication(self):
+        response = Client().get("/api/modules/", HTTP_X_TENANT_SLUG="demo")
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["error"]["code"], "authentication_required")
+
+    def test_module_api_rejects_wrong_tenant(self):
+        response = self.client.get("/api/modules/", HTTP_X_TENANT_SLUG="other")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"]["code"], "permission_denied")
+
+    def test_module_api_rejects_missing_permission(self):
+        user = get_user_model().objects.create_user(username="module-viewer")
+        self.grant_permissions(user, self.tenant, ["core.view_dashboard"])
+        client = Client()
+        client.force_login(user)
+
+        response = client.get("/api/modules/", HTTP_X_TENANT_SLUG="demo")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"]["code"], "permission_denied")
+
+    def test_module_list_returns_plugin_status(self):
+        response = self.client.get("/api/modules/", HTTP_X_TENANT_SLUG="demo")
+
+        self.assertEqual(response.status_code, 200)
+        modules = response.json()["modules"]
+        self.assertEqual([module["module_id"] for module in modules], ["core", "field_ops"])
+        field_ops = modules[1]
+        self.assertEqual(field_ops["status"], ModuleRegistrationStatus.ENABLED)
+        self.assertTrue(field_ops["compatibility"]["is_compatible"])
+        self.assertEqual(field_ops["templates"]["forms"][0]["form_id"], "patient_intake")
+
+    def test_module_detail_returns_manifest(self):
+        response = self.client.get("/api/modules/field_ops/", HTTP_X_TENANT_SLUG="demo")
+
+        self.assertEqual(response.status_code, 200)
+        module = response.json()["module"]
+        self.assertEqual(module["module_id"], "field_ops")
+        self.assertEqual(module["manifest"]["surfaces"]["mobile"]["sync_handlers"], ["field_ops_outbox"])

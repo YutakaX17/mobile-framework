@@ -173,6 +173,48 @@ class AppApiTests(TestCase):
         self.assertEqual(payload["app"]["app_id"], "field_ops_app")
         self.assertEqual(payload["app"]["current_revision"]["payload"]["app_id"], "field_ops_app")
 
+    def test_update_app_creates_draft_revision(self):
+        updated_payload = deepcopy(self.payload)
+        updated_payload["name"] = "Field Operations Draft"
+        updated_payload["description"] = "Updated app draft."
+        updated_payload["version"] = "0.2.0"
+        updated_payload["navigation"][0]["label"] = "Intake Draft"
+
+        response = self.client.put(
+            "/api/apps/field_ops_app/?tenant=demo",
+            data=json.dumps(updated_payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["app"]["name"], "Field Operations Draft")
+        self.assertEqual(payload["app"]["current_revision"]["revision"], self.revision.revision)
+        self.assertEqual(payload["draft_revision"]["revision"], 2)
+        self.assertEqual(payload["draft_revision"]["status"], AppRevisionStatus.DRAFT)
+        self.assertEqual(payload["draft_revision"]["payload"]["version"], "0.2.0")
+
+        self.app.refresh_from_db()
+        self.revision.refresh_from_db()
+        draft_revision = self.app.revisions.get(revision=2)
+        self.assertEqual(self.app.current_revision_id, self.revision.id)
+        self.assertEqual(self.revision.status, AppRevisionStatus.PUBLISHED)
+        self.assertEqual(draft_revision.status, AppRevisionStatus.DRAFT)
+
+    def test_update_app_rejects_invalid_payload(self):
+        invalid_payload = deepcopy(self.payload)
+        invalid_payload.pop("screens")
+
+        response = self.client.put(
+            "/api/apps/field_ops_app/?tenant=demo",
+            data=json.dumps(invalid_payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"]["code"], "validation_error")
+        self.assertEqual(self.app.revisions.count(), 1)
+
     def test_app_api_requires_tenant_query_parameter(self):
         response = self.client.get("/api/apps/")
 

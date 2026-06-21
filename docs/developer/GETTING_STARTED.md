@@ -112,6 +112,16 @@ python backend/manage.py seed_demo_mvp
 
 Then use `GET /api/auth/csrf/`, `POST /api/auth/login/`, and the `X-Tenant-Slug: demo` header for tenant-scoped builder APIs. The browser admin flow uses Django sessions and CSRF; token/mobile auth is intentionally deferred to the mobile runtime and sync milestones.
 
+For the practical MVP builder API path, the seeded admin can:
+
+- Load the Field Ops plugin with `GET /api/modules/field_ops/`.
+- Edit and publish theme, form, and app revisions through `/api/themes/`, `/api/forms/`, and `/api/apps/`.
+- Compile a dev package with `POST /api/deployment-packages/compile/`.
+- Activate it with `POST /api/deployment-packages/<package_id>/activate/`.
+- Fetch the runtime manifest and package through `/api/mobile/packages/manifest/` and `/api/mobile/packages/<package_id>/download/`.
+
+The backend integration test in `backend/tests/test_integration.py` exercises this seed -> login -> plugin -> edit/publish -> compile/activate -> manifest/download path.
+
 Mobile runtime changes:
 
 ```powershell
