@@ -18,6 +18,8 @@ describe("auth session", () => {
   });
 
   it("transitions between anonymous and authenticated states", () => {
+    expect(authReducer(anonymousAuthState, { type: "load" }).status).toBe("loading");
+
     const signedIn = authReducer(anonymousAuthState, {
       type: "sign-in",
       user: createDevelopmentAuthUser("builder@example.test")
@@ -28,6 +30,9 @@ describe("auth session", () => {
       expect(signedIn.user.email).toBe("builder@example.test");
     }
     expect(authReducer(signedIn, { type: "sign-out" })).toEqual(anonymousAuthState);
+
+    const errored = authReducer(anonymousAuthState, { type: "error", message: "Failed" });
+    expect(errored).toMatchObject({ error: "Failed", status: "error", user: undefined });
   });
 
   it("builds login redirects for protected routes", () => {

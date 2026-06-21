@@ -15,11 +15,17 @@ Initial admin navigation is defined in `src/app/routes.tsx` and currently regist
 
 ## API Client
 
-The initial typed API client lives in `src/api/adminApiClient.ts`. It defaults to `/api` and can be pointed at another backend by setting `VITE_ADMIN_API_BASE_URL`.
+The typed API client lives in `src/api/adminApiClient.ts`. It defaults to `/api`, sends same-origin session credentials, and can be pointed at another backend by setting `VITE_ADMIN_API_BASE_URL`.
+
+For local development, Vite proxies `/api` to Django at `http://127.0.0.1:8000`. Start the backend separately before using the live admin workflow:
+
+```powershell
+python backend/manage.py runserver 127.0.0.1:8000
+```
 
 ## Auth Shell
 
-The initial auth shell lives in `src/auth` and protects admin routes behind a development login view. It is intentionally local state only until backend auth endpoints are added.
+The auth shell lives in `src/auth` and protects admin routes behind Django session authentication. The login view uses `GET /api/auth/csrf/`, `POST /api/auth/login/`, `GET /api/auth/session/`, and `GET /api/auth/tenants/` to load the current user and demo tenant context. Use the seeded local account `demo-admin` / `demo-admin-password` after running `seed_demo_mvp`.
 
 ## Module Registry
 

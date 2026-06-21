@@ -2,29 +2,65 @@ export type AdminAuthUser = {
   displayName: string;
   email: string;
   roles: string[];
+  tenant?: AdminAuthTenant;
+  tenants?: AdminAuthTenant[];
+  username?: string;
+};
+
+export type AdminAuthTenant = {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
 };
 
 export type AuthState =
   | {
+      error: undefined;
+      status: "loading";
+      user: undefined;
+    }
+  | {
+      error: undefined;
       status: "anonymous";
       user: undefined;
     }
   | {
+      error: undefined;
       status: "authenticated";
       user: AdminAuthUser;
+    }
+  | {
+      error: string;
+      status: "error";
+      user: undefined;
     };
 
 export type AuthAction =
+  | {
+      type: "load";
+    }
   | {
       type: "sign-in";
       user: AdminAuthUser;
     }
   | {
       type: "sign-out";
+    }
+  | {
+      message: string;
+      type: "error";
     };
 
 export const anonymousAuthState: AuthState = {
+  error: undefined,
   status: "anonymous",
+  user: undefined
+};
+
+export const loadingAuthState: AuthState = {
+  error: undefined,
+  status: "loading",
   user: undefined
 };
 
@@ -36,13 +72,22 @@ export const defaultAdminUser: AdminAuthUser = {
 
 export function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
+    case "load":
+      return loadingAuthState;
     case "sign-in":
       return {
+        error: undefined,
         status: "authenticated",
         user: action.user
       };
     case "sign-out":
       return anonymousAuthState;
+    case "error":
+      return {
+        error: action.message,
+        status: "error",
+        user: undefined
+      };
     default:
       return state;
   }

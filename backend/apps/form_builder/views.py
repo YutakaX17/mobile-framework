@@ -5,43 +5,18 @@ from json import JSONDecodeError
 
 from django.http import HttpRequest, JsonResponse
 
+from apps.core.api import method_not_allowed, require_tenant_context, resolve_tenant_from_request
 from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 from apps.tenants.models import Tenant
 
 from .models import FormDefinition, FormRevision, FormRevisionStatus, FormSubmission
 
 
-def _method_not_allowed(allowed_method: str) -> JsonResponse:
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=f"Only {allowed_method} requests are supported.",
-            status_code=405,
-        )
-    )
-
-
 def _tenant_from_request(request: HttpRequest) -> Tenant | JsonResponse:
-    tenant_slug = request.GET.get("tenant", "").strip()
-    if not tenant_slug:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.VALIDATION_ERROR,
-                message="A tenant query parameter is required.",
-                details=[ApiErrorDetail(field="tenant", message="Provide a tenant slug.")],
-                status_code=400,
-            )
-        )
-    try:
-        return Tenant.objects.get(slug=tenant_slug)
-    except Tenant.DoesNotExist:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.NOT_FOUND,
-                message=f"Tenant `{tenant_slug}` was not found.",
-                status_code=404,
-            )
-        )
+    context = resolve_tenant_from_request(request)
+    if isinstance(context, JsonResponse):
+        return context
+    return context.tenant
 
 
 def _field_count(revision: FormRevision | None) -> int:
@@ -127,15 +102,15 @@ def _answers_from_payload(payload: dict) -> dict | JsonResponse:
 
 def form_list(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.form.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     forms = (
         FormDefinition.objects.select_related("current_revision")
-        .filter(tenant=tenant)
+        .filter(tenant=context.tenant)
         .order_by("form_id")
     )
     return JsonResponse({"forms": [_serialize_form_summary(form) for form in forms]})
@@ -143,14 +118,14 @@ def form_list(request: HttpRequest) -> JsonResponse:
 
 def form_detail(request: HttpRequest, form_id: str) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.form.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     try:
-        form = FormDefinition.objects.select_related("current_revision").get(tenant=tenant, form_id=form_id)
+        form = FormDefinition.objects.select_related("current_revision").get(tenant=context.tenant, form_id=form_id)
     except FormDefinition.DoesNotExist:
         return api_error_response(
             ApiError(
@@ -167,7 +142,7 @@ def form_detail(request: HttpRequest, form_id: str) -> JsonResponse:
 
 def form_submit(request: HttpRequest, form_id: str) -> JsonResponse:
     if request.method != "POST":
-        return _method_not_allowed("POST")
+        return method_not_allowed("POST")
 
     tenant = _tenant_from_request(request)
     if isinstance(tenant, JsonResponse):

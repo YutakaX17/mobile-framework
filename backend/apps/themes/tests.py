@@ -2,9 +2,11 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import Client, TestCase
 
+from apps.identity.models import PlatformPermission, PlatformRole, RolePermission, UserRoleAssignment
 from apps.tenants.models import Tenant
 from apps.themes.models import Theme, ThemeRevision, ThemeRevisionStatus
 
@@ -105,6 +107,10 @@ class ThemeApiTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.tenant = Tenant.objects.create(slug="demo", name="Demo Tenant")
+        self.other_tenant = Tenant.objects.create(slug="other", name="Other Tenant")
+        self.user = get_user_model().objects.create_user(username="theme-builder")
+        self.grant_permissions(self.user, self.tenant, ["builder.theme.manage", "builder.package.publish"])
+        self.client.force_login(self.user)
         self.payload = load_valid_theme()
         self.theme = Theme.from_payload(self.tenant, self.payload)
         self.theme.save()
@@ -115,6 +121,37 @@ class ThemeApiTests(TestCase):
         )
         self.theme.current_revision = self.revision
         self.theme.save()
+
+    def grant_permissions(self, user, tenant, permission_codes: list[str]) -> PlatformRole:
+        role = PlatformRole.objects.create(tenant=tenant, slug=f"role-{user.username}", name="Theme Builder")
+        for code in permission_codes:
+            permission, _created = PlatformPermission.objects.get_or_create(code=code, defaults={"name": code})
+            RolePermission.objects.create(role=role, permission=permission)
+        UserRoleAssignment.objects.create(tenant=tenant, user=user, role=role)
+        return role
+
+    def test_theme_api_requires_authentication(self):
+        response = Client().get("/api/themes/", HTTP_X_TENANT_SLUG="demo")
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["error"]["code"], "authentication_required")
+
+    def test_theme_api_rejects_wrong_tenant(self):
+        response = self.client.get("/api/themes/", HTTP_X_TENANT_SLUG="other")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"]["code"], "permission_denied")
+
+    def test_theme_api_rejects_missing_permission(self):
+        user = get_user_model().objects.create_user(username="viewer")
+        self.grant_permissions(user, self.tenant, ["core.view_dashboard"])
+        client = Client()
+        client.force_login(user)
+
+        response = client.get("/api/themes/", HTTP_X_TENANT_SLUG="demo")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"]["code"], "permission_denied")
 
     def test_theme_list_returns_tenant_theme_summaries(self):
         response = self.client.get("/api/themes/", {"tenant": "demo"})

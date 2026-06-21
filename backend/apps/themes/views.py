@@ -5,73 +5,21 @@ import json
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest, JsonResponse
 
+from apps.core.api import method_not_allowed, require_tenant_context, validation_error_response
 from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
-from apps.tenants.models import Tenant
 
 from .models import Theme, ThemeRevision
 from .services import create_theme_draft_revision, publish_theme_revision, rollback_theme_revision
-
-
-def _method_not_allowed(allowed_method: str) -> JsonResponse:
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=f"Only {allowed_method} requests are supported.",
-            status_code=405,
-        )
-    )
-
-
-def _validation_error_response(message: str, error: ValidationError | None = None) -> JsonResponse:
-    details: list[ApiErrorDetail] = []
-    if error is not None:
-        if hasattr(error, "message_dict"):
-            for field, messages in error.message_dict.items():
-                details.extend(ApiErrorDetail(field=field, message=str(item)) for item in messages)
-        else:
-            details.extend(ApiErrorDetail(message=str(item)) for item in error.messages)
-
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=message,
-            details=details,
-            status_code=400,
-        )
-    )
-
-
-def _tenant_from_request(request: HttpRequest) -> Tenant | JsonResponse:
-    tenant_slug = request.GET.get("tenant", "").strip()
-    if not tenant_slug:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.VALIDATION_ERROR,
-                message="A tenant query parameter is required.",
-                details=[ApiErrorDetail(field="tenant", message="Provide a tenant slug.")],
-                status_code=400,
-            )
-        )
-    try:
-        return Tenant.objects.get(slug=tenant_slug)
-    except Tenant.DoesNotExist:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.NOT_FOUND,
-                message=f"Tenant `{tenant_slug}` was not found.",
-                status_code=404,
-            )
-        )
 
 
 def _json_payload_from_request(request: HttpRequest) -> dict | JsonResponse:
     try:
         payload = json.loads(request.body.decode("utf-8") or "{}")
     except json.JSONDecodeError:
-        return _validation_error_response("Request body must be valid JSON.")
+        return validation_error_response("Request body must be valid JSON.")
 
     if not isinstance(payload, dict):
-        return _validation_error_response("Request body must be a JSON object.")
+        return validation_error_response("Request body must be a JSON object.")
 
     return payload
 
@@ -106,15 +54,15 @@ def _serialize_theme_summary(theme: Theme) -> dict:
 
 def theme_list(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.theme.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     themes = (
         Theme.objects.select_related("current_revision")
-        .filter(tenant=tenant)
+        .filter(tenant=context.tenant)
         .order_by("theme_id")
     )
     return JsonResponse({"themes": [_serialize_theme_summary(theme) for theme in themes]})
@@ -122,14 +70,14 @@ def theme_list(request: HttpRequest) -> JsonResponse:
 
 def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
     if request.method not in {"GET", "PUT"}:
-        return _method_not_allowed("GET or PUT")
+        return method_not_allowed("GET or PUT")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.theme.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     try:
-        theme = Theme.objects.select_related("current_revision").get(tenant=tenant, theme_id=theme_id)
+        theme = Theme.objects.select_related("current_revision").get(tenant=context.tenant, theme_id=theme_id)
     except Theme.DoesNotExist:
         return api_error_response(
             ApiError(
@@ -149,7 +97,7 @@ def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
         try:
             draft_revision = create_theme_draft_revision(theme, payload, created_by=created_by)
         except ValidationError as exc:
-            return _validation_error_response("Theme payload is invalid.", exc)
+            return validation_error_response("Theme payload is invalid.", exc)
 
         theme.refresh_from_db()
         data = _serialize_theme_summary(theme)
@@ -166,14 +114,14 @@ def theme_detail(request: HttpRequest, theme_id: str) -> JsonResponse:
 
 def theme_revision_publish(request: HttpRequest, theme_id: str, revision: int) -> JsonResponse:
     if request.method != "POST":
-        return _method_not_allowed("POST")
+        return method_not_allowed("POST")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.package.publish")
+    if isinstance(context, JsonResponse):
+        return context
 
     try:
-        theme = Theme.objects.select_related("current_revision").get(tenant=tenant, theme_id=theme_id)
+        theme = Theme.objects.select_related("current_revision").get(tenant=context.tenant, theme_id=theme_id)
     except Theme.DoesNotExist:
         return api_error_response(
             ApiError(
@@ -203,14 +151,14 @@ def theme_revision_publish(request: HttpRequest, theme_id: str, revision: int) -
 
 def theme_revision_rollback(request: HttpRequest, theme_id: str, revision: int) -> JsonResponse:
     if request.method != "POST":
-        return _method_not_allowed("POST")
+        return method_not_allowed("POST")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.package.publish")
+    if isinstance(context, JsonResponse):
+        return context
 
     try:
-        theme = Theme.objects.select_related("current_revision").get(tenant=tenant, theme_id=theme_id)
+        theme = Theme.objects.select_related("current_revision").get(tenant=context.tenant, theme_id=theme_id)
     except Theme.DoesNotExist:
         return api_error_response(
             ApiError(

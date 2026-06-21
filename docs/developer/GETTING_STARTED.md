@@ -104,6 +104,14 @@ The seeded local credentials are `demo-admin` / `demo-admin-password` unless `DE
 
 The seed also registers the built-in `field_ops` plugin/module and includes its manifest in the active demo package.
 
+For MVP backend session auth during local development:
+
+```powershell
+python backend/manage.py seed_demo_mvp
+```
+
+Then use `GET /api/auth/csrf/`, `POST /api/auth/login/`, and the `X-Tenant-Slug: demo` header for tenant-scoped builder APIs. The browser admin flow uses Django sessions and CSRF; token/mobile auth is intentionally deferred to the mobile runtime and sync milestones.
+
 Mobile runtime changes:
 
 ```powershell

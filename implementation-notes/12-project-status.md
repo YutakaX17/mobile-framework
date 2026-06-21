@@ -41,7 +41,7 @@ Remote GitHub tracking for the practical user-friendly MVP vertical slice is now
 
 - `[~]` Epic `#320`: Practical end-to-end MVP vertical slice.
 - `[x]` Task `#321` / PR `#329` / remote milestone `Practical MVP M1 Local Runnable Demo Seed`: idempotent local seed for tenant, admin, RBAC, channels, built-in Field Ops plugin registration, theme, form, app, seed audit events, and active dev package.
-- `[ ]` Task `#322` / remote milestone `Practical MVP M2 Real Backend Auth And Tenant Context`.
+- `[x]` Task `#322` / PR `#330` / remote milestone `Practical MVP M2 Real Backend Auth And Tenant Context`: backend session auth endpoints, frontend backend-backed login, tenant resolver, and current builder permission checks are validated locally. Future package/plugin/sync admin endpoints must add permission checks in their implementation milestones.
 - `[ ]` Task `#323` / remote milestone `Practical MVP M3 Practical Builder APIs`.
 - `[ ]` Task `#324` / remote milestone `Practical MVP M4 Frontend Real Workflow`.
 - `[ ]` Task `#325` / remote milestone `Practical MVP M5 Sync Backend`.
@@ -71,6 +71,7 @@ Working rule: before coding each practical MVP milestone, confirm the remote iss
 ## Active Work
 
 - `[x]` Practical MVP M1 / `#321` / PR `#329`: `seed_demo_mvp` includes built-in Field Ops plugin registration, package inclusion, seed audit events, repeat-run tests, backend README, and developer getting started updates; validation passes locally.
+- `[x]` Practical MVP M2 / `#322` / PR `#330`: backend Django session auth, CSRF bootstrap, tenant assignment APIs, frontend backend-backed login, Vite `/api` proxy, `X-Tenant-Slug` resolver, and current builder permission checks are validated locally. Package/plugin/sync admin permission checks remain required as those endpoints are introduced in later milestones.
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
 - `[x]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow baselines are complete.
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
