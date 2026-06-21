@@ -3,13 +3,15 @@ from __future__ import annotations
 import json
 from json import JSONDecodeError
 
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest, JsonResponse
 
-from apps.core.api import method_not_allowed, require_tenant_context, resolve_tenant_from_request
+from apps.core.api import method_not_allowed, require_tenant_context, resolve_tenant_from_request, validation_error_response
 from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
 from apps.tenants.models import Tenant
 
 from .models import FormDefinition, FormRevision, FormRevisionStatus, FormSubmission
+from .services import create_form_draft_revision, publish_form_revision
 
 
 def _tenant_from_request(request: HttpRequest) -> Tenant | JsonResponse:
@@ -117,8 +119,8 @@ def form_list(request: HttpRequest) -> JsonResponse:
 
 
 def form_detail(request: HttpRequest, form_id: str) -> JsonResponse:
-    if request.method != "GET":
-        return method_not_allowed("GET")
+    if request.method not in {"GET", "PUT"}:
+        return method_not_allowed("GET or PUT")
 
     context = require_tenant_context(request, permission="builder.form.manage")
     if isinstance(context, JsonResponse):
@@ -135,6 +137,65 @@ def form_detail(request: HttpRequest, form_id: str) -> JsonResponse:
             )
         )
 
+    if request.method == "PUT":
+        payload = _json_payload_from_request(request)
+        if isinstance(payload, JsonResponse):
+            return payload
+
+        user = getattr(request, "user", None)
+        created_by = user if getattr(user, "is_authenticated", False) else None
+        try:
+            draft_revision = create_form_draft_revision(form, payload, created_by=created_by)
+        except ValidationError as exc:
+            return validation_error_response("Form payload is invalid.", exc)
+
+        form.refresh_from_db()
+        data = _serialize_form_summary(form)
+        data["current_revision"] = _serialize_revision(form.current_revision, include_payload=True)
+        return JsonResponse(
+            {
+                "draft_revision": _serialize_revision(draft_revision, include_payload=True),
+                "form": data,
+            }
+        )
+
+    data = _serialize_form_summary(form)
+    data["current_revision"] = _serialize_revision(form.current_revision, include_payload=True)
+    return JsonResponse({"form": data})
+
+
+def form_revision_publish(request: HttpRequest, form_id: str, revision: int) -> JsonResponse:
+    if request.method != "POST":
+        return method_not_allowed("POST")
+
+    context = require_tenant_context(request, permission="builder.package.publish")
+    if isinstance(context, JsonResponse):
+        return context
+
+    try:
+        form = FormDefinition.objects.select_related("current_revision").get(tenant=context.tenant, form_id=form_id)
+    except FormDefinition.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"Form `{form_id}` was not found.",
+                status_code=404,
+            )
+        )
+
+    try:
+        revision_obj = form.revisions.get(revision=revision)
+    except FormRevision.DoesNotExist:
+        return api_error_response(
+            ApiError(
+                code=ApiErrorCode.NOT_FOUND,
+                message=f"Form revision `{revision}` was not found.",
+                status_code=404,
+            )
+        )
+
+    publish_form_revision(form, revision_obj)
+    form.refresh_from_db()
     data = _serialize_form_summary(form)
     data["current_revision"] = _serialize_revision(form.current_revision, include_payload=True)
     return JsonResponse({"form": data})
