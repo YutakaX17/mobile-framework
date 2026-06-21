@@ -4,6 +4,7 @@ Operational documentation covers deployment, security posture, release controls,
 
 ## Documents
 
+- [Deployment and release guide](DEPLOYMENT_AND_RELEASE_GUIDE.md)
 - [Repository protection checklist](REPOSITORY_PROTECTION.md)
 
 Additional operational docs should be added as backend, infrastructure, and release automation are implemented.
