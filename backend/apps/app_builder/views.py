@@ -2,44 +2,11 @@ from __future__ import annotations
 
 from django.http import HttpRequest, JsonResponse
 
-from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
-from apps.tenants.models import Tenant
+from apps.core.api import method_not_allowed, require_tenant_context
+from apps.core.errors import ApiError, ApiErrorCode, api_error_response
 
 from .models import AppDefinition, AppRevision
 from .services import publish_app_revision
-
-
-def _method_not_allowed(allowed_method: str) -> JsonResponse:
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=f"Only {allowed_method} requests are supported.",
-            status_code=405,
-        )
-    )
-
-
-def _tenant_from_request(request: HttpRequest) -> Tenant | JsonResponse:
-    tenant_slug = request.GET.get("tenant", "").strip()
-    if not tenant_slug:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.VALIDATION_ERROR,
-                message="A tenant query parameter is required.",
-                details=[ApiErrorDetail(field="tenant", message="Provide a tenant slug.")],
-                status_code=400,
-            )
-        )
-    try:
-        return Tenant.objects.get(slug=tenant_slug)
-    except Tenant.DoesNotExist:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.NOT_FOUND,
-                message=f"Tenant `{tenant_slug}` was not found.",
-                status_code=404,
-            )
-        )
 
 
 def _screen_count(revision: AppRevision | None) -> int:
@@ -92,15 +59,15 @@ def _serialize_app_summary(app: AppDefinition) -> dict:
 
 def app_list(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.app.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     apps = (
         AppDefinition.objects.select_related("current_revision")
-        .filter(tenant=tenant)
+        .filter(tenant=context.tenant)
         .order_by("app_id")
     )
     return JsonResponse({"apps": [_serialize_app_summary(app) for app in apps]})
@@ -108,14 +75,14 @@ def app_list(request: HttpRequest) -> JsonResponse:
 
 def app_detail(request: HttpRequest, app_id: str) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.app.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     try:
-        app = AppDefinition.objects.select_related("current_revision").get(tenant=tenant, app_id=app_id)
+        app = AppDefinition.objects.select_related("current_revision").get(tenant=context.tenant, app_id=app_id)
     except AppDefinition.DoesNotExist:
         return api_error_response(
             ApiError(
@@ -132,14 +99,14 @@ def app_detail(request: HttpRequest, app_id: str) -> JsonResponse:
 
 def app_revision_publish(request: HttpRequest, app_id: str, revision: int) -> JsonResponse:
     if request.method != "POST":
-        return _method_not_allowed("POST")
+        return method_not_allowed("POST")
 
-    tenant = _tenant_from_request(request)
-    if isinstance(tenant, JsonResponse):
-        return tenant
+    context = require_tenant_context(request, permission="builder.app.manage")
+    if isinstance(context, JsonResponse):
+        return context
 
     try:
-        app = AppDefinition.objects.select_related("current_revision").get(tenant=tenant, app_id=app_id)
+        app = AppDefinition.objects.select_related("current_revision").get(tenant=context.tenant, app_id=app_id)
     except AppDefinition.DoesNotExist:
         return api_error_response(
             ApiError(

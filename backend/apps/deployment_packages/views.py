@@ -3,76 +3,19 @@ from __future__ import annotations
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest, JsonResponse
 
-from apps.core.errors import ApiError, ApiErrorCode, ApiErrorDetail, api_error_response
+from apps.core.api import method_not_allowed, required_query_param, resolve_tenant_from_request, validation_error_response
+from apps.core.errors import ApiError, ApiErrorCode, api_error_response
 from apps.tenants.models import Tenant
 
 from .models import DeploymentPackage, DeploymentPackageStatus
 from .services import active_deployment_package, validate_release_channel_name
 
 
-def _method_not_allowed(allowed_method: str) -> JsonResponse:
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=f"Only {allowed_method} requests are supported.",
-            status_code=405,
-        )
-    )
-
-
 def _tenant_from_request(request: HttpRequest) -> Tenant | JsonResponse:
-    tenant_slug = request.GET.get("tenant", "").strip()
-    if not tenant_slug:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.VALIDATION_ERROR,
-                message="A tenant query parameter is required.",
-                details=[ApiErrorDetail(field="tenant", message="Provide a tenant slug.")],
-                status_code=400,
-            )
-        )
-    try:
-        return Tenant.objects.get(slug=tenant_slug)
-    except Tenant.DoesNotExist:
-        return api_error_response(
-            ApiError(
-                code=ApiErrorCode.NOT_FOUND,
-                message=f"Tenant `{tenant_slug}` was not found.",
-                status_code=404,
-            )
-        )
-
-
-def _required_query_param(request: HttpRequest, name: str) -> str | JsonResponse:
-    value = request.GET.get(name, "").strip()
-    if value:
-        return value
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=f"A {name} query parameter is required.",
-            details=[ApiErrorDetail(field=name, message=f"Provide a {name} value.")],
-            status_code=400,
-        )
-    )
-
-
-def _validation_error_response(message: str, error: ValidationError) -> JsonResponse:
-    details: list[ApiErrorDetail] = []
-    if hasattr(error, "message_dict"):
-        for field, messages in error.message_dict.items():
-            details.extend(ApiErrorDetail(field=field, message=str(item)) for item in messages)
-    else:
-        details.extend(ApiErrorDetail(message=str(item)) for item in error.messages)
-
-    return api_error_response(
-        ApiError(
-            code=ApiErrorCode.VALIDATION_ERROR,
-            message=message,
-            details=details,
-            status_code=400,
-        )
-    )
+    context = resolve_tenant_from_request(request)
+    if isinstance(context, JsonResponse):
+        return context
+    return context.tenant
 
 
 def _serialize_package_manifest(package: DeploymentPackage) -> dict:
@@ -94,13 +37,13 @@ def _serialize_package_manifest(package: DeploymentPackage) -> dict:
 
 def active_package_manifest(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
     tenant = _tenant_from_request(request)
     if isinstance(tenant, JsonResponse):
         return tenant
 
-    app_id = _required_query_param(request, "app_id")
+    app_id = required_query_param(request, "app_id")
     if isinstance(app_id, JsonResponse):
         return app_id
 
@@ -108,7 +51,7 @@ def active_package_manifest(request: HttpRequest) -> JsonResponse:
     try:
         validate_release_channel_name(channel)
     except ValidationError as exc:
-        return _validation_error_response("Release channel is invalid.", exc)
+        return validation_error_response("Release channel is invalid.", exc)
 
     package = active_deployment_package(tenant=tenant, app_id=app_id, channel=channel)
     if package is None:
@@ -125,7 +68,7 @@ def active_package_manifest(request: HttpRequest) -> JsonResponse:
 
 def package_download(request: HttpRequest, package_id: str) -> JsonResponse:
     if request.method != "GET":
-        return _method_not_allowed("GET")
+        return method_not_allowed("GET")
 
     tenant = _tenant_from_request(request)
     if isinstance(tenant, JsonResponse):

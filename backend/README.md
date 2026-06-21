@@ -101,6 +101,19 @@ python backend/manage.py seed_demo_mvp
 
 The default credentials and HMAC signing key are for local development only. They are not production key-management guidance.
 
+## MVP Admin Authentication
+
+The backend uses Django session authentication for the MVP admin browser flow. This is the simplest secure local option because the Vite admin app can proxy `/api` to Django and behave as same-origin:
+
+- Fetch `GET /api/auth/csrf/` before login to set the CSRF cookie.
+- Submit `POST /api/auth/login/` with JSON `username` and `password` plus the CSRF header.
+- Use `GET /api/auth/session/` to load the current user.
+- Use `GET /api/auth/tenants/` to load tenant assignments and role permissions.
+- Use `GET /api/auth/tenant/` with `X-Tenant-Slug: demo` to resolve tenant context.
+- Submit `POST /api/auth/logout/` to end the session.
+
+Tenant-scoped builder APIs now prefer the `X-Tenant-Slug` header. The `?tenant=demo` query parameter remains as a temporary development fallback until the frontend and mobile paths are fully migrated. Session cookies are intentionally for the admin browser flow; mobile-facing auth will be narrowed separately as the sync/runtime milestones mature.
+
 ## Planned Areas
 
 - `apps/core`: shared kernel, health checks, event bus, service lifecycle, error model, background job primitives. Initial service lifecycle, event bus, API error model, and job registry baselines exist.
