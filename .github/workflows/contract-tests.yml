@@ -1,0 +1,35 @@
+name: Contract Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  contract-tests:
+    name: Contract Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install contract dependencies
+        run: python -m pip install -r contracts/requirements.txt
+
+      - name: Check generated TypeScript contract types
+        run: python contracts/generate_types.py --target typescript --check
+
+      - name: Check generated Python contract types
+        run: python contracts/generate_types.py --target python --check
+
+      - name: Check generated Kotlin contract types
+        run: python contracts/generate_types.py --target kotlin --check
+
+      - name: Validate contracts
+        run: python contracts/validate_contracts.py

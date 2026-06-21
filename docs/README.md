@@ -2,6 +2,16 @@
 
 Project documentation lives here after implementation begins. Planning notes remain in `implementation-notes/`.
 
+## Site Navigation
+
+The lightweight docs site baseline is defined in `docs/site.json`. It records the top-level navigation targets and is validated locally with:
+
+```powershell
+python tools/validate_docs_site.py
+```
+
+The manifest is intentionally dependency-free until the project needs a rendered docs site generator.
+
 ## Areas
 
 - `product`: MVP scope, product boundaries, and glossary.

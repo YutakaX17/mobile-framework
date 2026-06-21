@@ -49,8 +49,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-09 Deployment Packages.
 - `[x]` EPIC-10 Mobile Runtime.
 - `[x]` EPIC-11 Workflow Builder.
-- `[ ]` EPIC-12 CI/CD, Security, And Release.
-- `[ ]` EPIC-13 Documentation And Maintenance.
+- `[x]` EPIC-12 CI/CD, Security, And Release.
+- `[~]` EPIC-13 Documentation And Maintenance.
 
 ## Active Work
 
@@ -59,6 +59,8 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
 - `[x]` EPIC-10 Mobile Runtime: KMP project scaffold, shared Compose module, networking contract, secure token storage, serialization, local store, package downloader, verifier, theme mapper, navigation renderer, screen renderer, widget registry, form renderer, offline outbox, sync engine, and mobile test coverage baselines are complete.
 - `[x]` EPIC-11 Workflow Builder: workflow schema, definition model, state-machine validator, task model, task assignment model, workflow trigger model, visual editor, simulator, task inbox, execution log, and test coverage validation baselines are complete.
+- `[x]` EPIC-12 CI/CD, Security, And Release: Python, Rust, frontend lint/test/build, mobile Gradle test, contract test, Playwright E2E, dependency scan, CodeQL, secret scanning, Docker build, SBOM generation, image signing, staging deployment, and release workflow baselines are complete.
+- `[x]` EPIC-13 Documentation And Maintenance: docs site baseline, developer getting started guide, backend module guide, frontend module guide, mobile runtime guide, plugin SDK guide, admin user guide, theme builder guide, form builder guide, app builder guide, workflow builder guide, deployment and release guide, backup and restore guide, upgrade guide, and changelog process are complete.
 - `[x]` EPIC-06 Theme Builder: theme backend model, read-only API, list page, token detail, contrast checker, live preview, asset reference, publish workflow, rollback workflow, and editing workflow baselines are complete.
 
 ## Completed Work
@@ -178,6 +180,36 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 - `[x]` Task `#257` completed: workflow execution log baseline added.
 - `[x]` Task `#259` completed: workflow builder test coverage validation added.
 - `[x]` EPIC-11 Workflow Builder completed: workflow schemas, backend task/workflow models, graph validation, admin editor, simulator, task inbox, execution logs, and CI-backed validation are in place.
+- `[x]` Task `#261` completed: Python lint/test workflow baseline added.
+- `[x]` Task `#263` completed: Rust lint/test workflow baseline added.
+- `[x]` Task `#265` completed: frontend lint/test/build workflow baseline added.
+- `[x]` Task `#267` completed: mobile Gradle test workflow baseline added.
+- `[x]` Task `#269` completed: contract test workflow baseline added.
+- `[x]` Task `#271` completed: Playwright E2E workflow baseline added.
+- `[x]` Task `#273` completed: dependency scan workflow baseline added.
+- `[x]` Task `#275` completed: CodeQL workflow baseline added.
+- `[x]` Task `#277` completed: secret scanning workflow baseline added.
+- `[x]` Task `#279` completed: Docker build workflow baseline added.
+- `[x]` Task `#281` completed: SBOM generation workflow baseline added.
+- `[x]` Task `#283` completed: image signing workflow baseline added.
+- `[x]` Task `#285` completed: staging deployment workflow baseline added.
+- `[x]` Task `#287` completed: release workflow baseline added.
+- `[x]` EPIC-12 CI/CD, Security, And Release completed: validation, test, security, container, SBOM, signing, staging deployment, and release dry-run workflow baselines are in place.
+- `[x]` Task `#289` completed: docs site baseline added.
+- `[x]` Task `#291` completed: developer getting started guide added.
+- `[x]` Task `#293` completed: backend module guide added.
+- `[x]` Task `#295` completed: frontend module guide added.
+- `[x]` Task `#297` completed: mobile runtime guide added.
+- `[x]` Task `#299` completed: plugin SDK guide added.
+- `[x]` Task `#301` completed: admin user guide added.
+- `[x]` Task `#303` completed: theme builder guide added.
+- `[x]` Task `#305` completed: form builder guide added.
+- `[x]` Task `#307` completed: app builder guide added.
+- `[x]` Task `#309` completed: workflow builder guide added.
+- `[x]` Task `#311` completed: deployment and release guide added.
+- `[x]` Task `#313` completed: backup and restore guide added.
+- `[x]` Task `#315` completed: upgrade guide added.
+- `[x]` Task `#317` completed: changelog process added.
 - `[x]` Task `#19` completed: placeholder CI replaced with foundation validation workflow.
 - `[x]` Task `#15` completed: MVP scope and glossary documented.
 - `[x]` Task `#16` completed: initial ADR set reviewed and finalized.
