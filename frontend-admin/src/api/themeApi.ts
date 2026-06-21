@@ -86,6 +86,10 @@ type ThemeUpdateResponse = {
   theme: ThemeDetail;
 };
 
+type ThemePublishResponse = {
+  theme: ThemeDetail;
+};
+
 export async function fetchThemeSummaries(
   client: AdminApiClient = adminApiClient,
   tenant = "demo"
@@ -132,6 +136,25 @@ export async function updateThemeDraft(
   }
 
   return result.data;
+}
+
+export async function publishThemeRevision(
+  themeId: string,
+  revision: number,
+  client: AdminApiClient = adminApiClient,
+  tenant = "demo"
+): Promise<ThemeDetail> {
+  const result = await client.post<ThemePublishResponse, Record<string, never>>(
+    `/themes/${encodeURIComponent(themeId)}/revisions/${revision}/publish/`,
+    {},
+    { query: { tenant } }
+  );
+
+  if (!result.data || !isRecord(result.data.theme)) {
+    throw new Error("Theme publish response did not include a theme object.");
+  }
+
+  return result.data.theme;
 }
 
 export function countThemesByStatus(themes: ThemeSummary[], status: ThemeRevisionStatus): number {

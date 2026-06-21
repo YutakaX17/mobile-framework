@@ -199,6 +199,11 @@ type AppDetailResponse = {
   app: AppDetail;
 };
 
+type AppUpdateResponse = {
+  app: AppDetail;
+  draft_revision: AppRevisionSummary;
+};
+
 type AppPublishResponse = {
   app: AppDetail;
 };
@@ -230,6 +235,25 @@ export async function fetchAppDetail(
   }
 
   return result.data.app;
+}
+
+export async function updateAppDraft(
+  appId: string,
+  payload: AppPayload,
+  client: AdminApiClient = adminApiClient,
+  tenant = "demo"
+): Promise<AppUpdateResponse> {
+  const result = await client.put<AppUpdateResponse, AppPayload>(
+    `/apps/${encodeURIComponent(appId)}/`,
+    payload,
+    { query: { tenant } }
+  );
+
+  if (!result.data || !isRecord(result.data.app) || !isRecord(result.data.draft_revision)) {
+    throw new Error("App update response did not include app and draft revision objects.");
+  }
+
+  return result.data;
 }
 
 export async function publishAppRevision(

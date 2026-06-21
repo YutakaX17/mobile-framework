@@ -121,6 +121,15 @@ type FormDetailResponse = {
   form: FormDetail;
 };
 
+type FormUpdateResponse = {
+  draft_revision: FormRevisionSummary;
+  form: FormDetail;
+};
+
+type FormPublishResponse = {
+  form: FormDetail;
+};
+
 export async function fetchFormSummaries(
   client: AdminApiClient = adminApiClient,
   tenant = "demo"
@@ -145,6 +154,44 @@ export async function fetchFormDetail(
 
   if (!result.data || !isRecord(result.data.form)) {
     throw new Error("Form detail response did not include a form object.");
+  }
+
+  return result.data.form;
+}
+
+export async function updateFormDraft(
+  formId: string,
+  payload: FormPayload,
+  client: AdminApiClient = adminApiClient,
+  tenant = "demo"
+): Promise<FormUpdateResponse> {
+  const result = await client.put<FormUpdateResponse, FormPayload>(
+    `/forms/${encodeURIComponent(formId)}/`,
+    payload,
+    { query: { tenant } }
+  );
+
+  if (!result.data || !isRecord(result.data.form) || !isRecord(result.data.draft_revision)) {
+    throw new Error("Form update response did not include form and draft revision objects.");
+  }
+
+  return result.data;
+}
+
+export async function publishFormRevision(
+  formId: string,
+  revision: number,
+  client: AdminApiClient = adminApiClient,
+  tenant = "demo"
+): Promise<FormDetail> {
+  const result = await client.post<FormPublishResponse, Record<string, never>>(
+    `/forms/${encodeURIComponent(formId)}/revisions/${revision}/publish/`,
+    {},
+    { query: { tenant } }
+  );
+
+  if (!result.data || !isRecord(result.data.form)) {
+    throw new Error("Form publish response did not include a form object.");
   }
 
   return result.data.form;

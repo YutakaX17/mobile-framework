@@ -11,6 +11,7 @@ import { DashboardView } from "./views/DashboardView";
 import { FormDesignerView } from "./views/FormDesignerView";
 import { FormListView } from "./views/FormListView";
 import { PlaceholderView } from "./views/PlaceholderView";
+import { ModuleStatusView, PackageReleaseView, SetupWizardView } from "./views/PracticalMvpViews";
 import { ThemeDetailView } from "./views/ThemeDetailView";
 import { ThemeListView } from "./views/ThemeListView";
 import { UnauthorizedView } from "./views/UnauthorizedView";
@@ -124,6 +125,18 @@ function getRouteView(route: AdminRoute): ReactNode {
 
   if (route.path === "/themes") {
     return <ThemeListView />;
+  }
+
+  if (route.path === "/setup") {
+    return <SetupWizardView />;
+  }
+
+  if (route.path === "/modules") {
+    return <ModuleStatusView />;
+  }
+
+  if (route.path === "/deployments") {
+    return <PackageReleaseView />;
   }
 
   if (route.path === "/workflows") {

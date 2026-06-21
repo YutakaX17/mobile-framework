@@ -33,6 +33,17 @@ export const adminModuleContributions: AdminModuleContribution[] = [
     summary: "Operational control surface"
   },
   {
+    area: "core",
+    capabilities: ["apps:manage", "forms:manage", "themes:manage", "deployments:manage"],
+    icon: "setup",
+    id: "setup",
+    label: "Setup",
+    order: 15,
+    routePath: "/setup",
+    section: "MVP setup",
+    summary: "Guided Field Ops launch"
+  },
+  {
     area: "builder",
     capabilities: ["apps:manage"],
     icon: "apps",
@@ -75,6 +86,17 @@ export const adminModuleContributions: AdminModuleContribution[] = [
     routePath: "/workflows",
     section: "Workflow builder",
     summary: "Approval and automation workspace"
+  },
+  {
+    area: "operations",
+    capabilities: ["apps:manage"],
+    icon: "modules",
+    id: "modules",
+    label: "Modules",
+    order: 55,
+    routePath: "/modules",
+    section: "Plugin status",
+    summary: "Installed module compatibility"
   },
   {
     area: "operations",

@@ -445,6 +445,9 @@ input:focus-visible,
 .form-designer-view,
 .app-designer-view,
 .app-list-view,
+.module-status-view,
+.package-release-view,
+.setup-workflow-view,
 .workflow-editor-view,
 .theme-list-view {
   display: grid;
@@ -466,6 +469,7 @@ input:focus-visible,
 
 .app-list,
 .form-list,
+.module-grid,
 .theme-list {
   display: grid;
   gap: 12px;
@@ -473,6 +477,7 @@ input:focus-visible,
 
 .app-card,
 .form-card,
+.module-card,
 .theme-card {
   align-items: start;
   background: var(--mf-color-surface);
@@ -486,6 +491,7 @@ input:focus-visible,
 
 .app-card h3,
 .form-card h3,
+.module-card h3,
 .theme-card h3 {
   margin: 0 0 8px;
 }
@@ -498,9 +504,50 @@ input:focus-visible,
 
 .app-card p:last-child,
 .form-card p:last-child,
+.module-card p:last-child,
 .theme-card p:last-child {
   color: var(--mf-color-text-muted);
   margin-bottom: 0;
+}
+
+.wizard-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+}
+
+.wizard-step,
+.mobile-instructions,
+.release-panel {
+  background: var(--mf-color-surface);
+  border: 1px solid var(--mf-color-border);
+  border-radius: var(--mf-radius-md);
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.wizard-step h3,
+.wizard-step p,
+.release-panel h3,
+.module-card p {
+  margin: 0;
+}
+
+.wizard-step .status {
+  justify-self: start;
+}
+
+.module-card {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.module-card .property-list {
+  grid-column: 1 / -1;
+}
+
+.release-panel {
+  max-width: 980px;
 }
 
 .theme-meta {
@@ -1125,6 +1172,10 @@ input:focus-visible,
     grid-template-columns: 1fr;
   }
 
+  .wizard-grid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
   .app-designer-grid,
   .workflow-editor-grid,
   .form-designer-grid {
@@ -1149,7 +1200,8 @@ input:focus-visible,
   }
 
   .nav-list,
-  .metrics-grid {
+  .metrics-grid,
+  .wizard-grid {
     grid-template-columns: 1fr;
   }
 }
