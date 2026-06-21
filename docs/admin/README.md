@@ -5,6 +5,7 @@ This area documents the administrator-facing web builder and operations shell.
 ## Documents
 
 - [Admin user guide](ADMIN_USER_GUIDE.md)
+- [Form builder guide](FORM_BUILDER_GUIDE.md)
 - [Theme builder guide](THEME_BUILDER_GUIDE.md)
 
 ## Current Baseline
