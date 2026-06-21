@@ -8,6 +8,7 @@ This project follows the category structure from Keep a Changelog and uses Seman
 
 ### Added
 
+- Practical MVP mobile sync backend for device registration, offline outbox batch receipts, duplicate client submission handling, rejection reasons, audit events, and sync status inspection.
 - Practical MVP admin setup wizard, module status page, and package release page for the Field Ops flow.
 - Documentation site baseline and EPIC-13 documentation guides.
 

@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "apps.app_builder",
     "apps.workflow_builder",
     "apps.deployment_packages",
+    "apps.sync",
     "apps.audit",
 ]
 
