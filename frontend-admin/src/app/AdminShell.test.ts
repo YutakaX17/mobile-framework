@@ -24,10 +24,12 @@ describe("admin shell model", () => {
   it("defines the initial admin route map", () => {
     expect(adminRoutes.map((route) => route.path)).toEqual([
       "/dashboard",
+      "/setup",
       "/apps",
       "/forms",
       "/themes",
       "/workflows",
+      "/modules",
       "/deployments"
     ]);
     expect(findAdminRoute("/forms")?.label).toBe("Forms");
@@ -52,6 +54,12 @@ describe("admin shell model", () => {
 
   it("routes workflows to a dedicated workspace", () => {
     expect(findAdminRoute("/workflows")?.summary).toBe("Approval and automation workspace");
+  });
+
+  it("routes the practical MVP surfaces", () => {
+    expect(findAdminRoute("/setup")?.summary).toBe("Guided Field Ops launch");
+    expect(findAdminRoute("/modules")?.summary).toBe("Installed module compatibility");
+    expect(findAdminRoute("/deployments")?.summary).toBe("Package release workspace");
   });
 
   it("defines shell actions and user menu labels", () => {

@@ -13,10 +13,12 @@ describe("admin module registry", () => {
   it("keeps the initial admin modules in navigation order", () => {
     expect(getOrderedAdminModules().map((module) => module.routePath)).toEqual([
       "/dashboard",
+      "/setup",
       "/apps",
       "/forms",
       "/themes",
       "/workflows",
+      "/modules",
       "/deployments"
     ]);
   });
@@ -60,11 +62,13 @@ describe("admin module registry", () => {
 
     expect(registerAdminModule(adminModuleContributions, contribution).map((module) => module.id)).toEqual([
       "dashboard",
+      "setup",
       "apps",
       "reports",
       "forms",
       "themes",
       "workflows",
+      "modules",
       "deployments"
     ]);
   });
