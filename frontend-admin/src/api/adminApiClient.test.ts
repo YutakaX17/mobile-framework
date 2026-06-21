@@ -46,6 +46,7 @@ describe("admin api client", () => {
       "/admin-api/modules",
       expect.objectContaining({
         body: JSON.stringify({ name: "forms" }),
+        credentials: "same-origin",
         method: "POST"
       })
     );

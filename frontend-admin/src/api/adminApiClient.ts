@@ -68,6 +68,7 @@ export function createAdminApiClient(config: AdminApiClientConfig = {}): AdminAp
   ): Promise<ApiResult<TData>> {
     const headers = mergeHeaders(defaultHeaders, options.headers);
     const init: RequestInit = {
+      credentials: "same-origin",
       headers,
       method: options.method ?? "GET",
       signal: options.signal

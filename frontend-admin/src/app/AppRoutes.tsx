@@ -18,6 +18,10 @@ function ProtectedAdminShell() {
   const { state } = useAuthSession();
   const location = useLocation();
 
+  if (state.status === "loading") {
+    return <main className="login-shell">Loading session</main>;
+  }
+
   if (state.status !== "authenticated") {
     return <Navigate to={getLoginRedirectPath(location.pathname, location.search)} replace />;
   }

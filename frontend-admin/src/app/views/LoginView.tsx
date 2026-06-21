@@ -9,12 +9,19 @@ export function LoginView() {
   const { signIn, state } = useAuthSession();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [email, setEmail] = useState(state.user?.email ?? "admin@example.test");
+  const [error, setError] = useState("");
+  const [password, setPassword] = useState("demo-admin-password");
+  const [username, setUsername] = useState(state.user?.username ?? "demo-admin");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    signIn(email);
-    navigate(getPostLoginPath(searchParams.get("returnTo")), { replace: true });
+    setError("");
+    try {
+      await signIn(username, password);
+      navigate(getPostLoginPath(searchParams.get("returnTo")), { replace: true });
+    } catch {
+      setError("Sign in failed. Check your username and password.");
+    }
   }
 
   return (
@@ -29,18 +36,30 @@ export function LoginView() {
         <p className="eyebrow">Admin access</p>
         <h1 id="login-title">Sign in to continue</h1>
         <form className="login-form" onSubmit={handleSubmit}>
-          <label htmlFor="admin-email">Email</label>
+          <label htmlFor="admin-username">Username</label>
           <input
-            id="admin-email"
-            name="email"
-            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="username"
+            id="admin-username"
+            name="username"
+            onChange={(event) => setUsername(event.target.value)}
             required
-            type="email"
-            value={email}
+            type="text"
+            value={username}
           />
+          <label htmlFor="admin-password">Password</label>
+          <input
+            autoComplete="current-password"
+            id="admin-password"
+            name="password"
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            type="password"
+            value={password}
+          />
+          {error || state.status === "error" ? <p className="form-error">{error || state.error}</p> : null}
           <button className="primary-action" type="submit">
             <AdminIcon name="login" />
-            Continue
+            {state.status === "loading" ? "Signing in" : "Continue"}
           </button>
         </form>
       </section>
