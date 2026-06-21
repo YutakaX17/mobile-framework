@@ -31,6 +31,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "developer/FRONTEND_MODULES.md",
     "developer/GETTING_STARTED.md",
     "mobile-runtime/RUNTIME_GUIDE.md",
+    "operations/BACKUP_RESTORE_GUIDE.md",
     "operations/DEPLOYMENT_AND_RELEASE_GUIDE.md",
     "plugin-sdk/PLUGIN_SDK_GUIDE.md",
 ]
@@ -53,6 +54,7 @@ REQUIRED_README_LINKS = {
         "RUNTIME_GUIDE.md",
     ],
     "operations/README.md": [
+        "BACKUP_RESTORE_GUIDE.md",
         "DEPLOYMENT_AND_RELEASE_GUIDE.md",
         "REPOSITORY_PROTECTION.md",
     ],
