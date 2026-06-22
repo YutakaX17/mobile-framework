@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
+from config.settings import dev as dev_settings
 from config.settings.database import build_postgres_database_config
 from config.settings.worker import build_worker_config
 
@@ -89,3 +90,9 @@ class WorkerSettingsTests(SimpleTestCase):
     def test_worker_settings_require_at_least_one_queue(self):
         with self.assertRaises(ImproperlyConfigured):
             build_worker_config(env={"WORKER_QUEUES": " , "})
+
+
+class DevelopmentSettingsTests(SimpleTestCase):
+    def test_development_settings_trust_vite_admin_origins(self):
+        self.assertIn("http://localhost:5173", dev_settings.CSRF_TRUSTED_ORIGINS)
+        self.assertIn("http://127.0.0.1:5173", dev_settings.CSRF_TRUSTED_ORIGINS)
