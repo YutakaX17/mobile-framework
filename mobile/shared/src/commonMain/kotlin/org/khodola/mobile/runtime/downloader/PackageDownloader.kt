@@ -7,6 +7,8 @@ import org.khodola.mobile.runtime.network.PackageManifestMetadata
 import org.khodola.mobile.runtime.network.PackageManifestRequest
 import org.khodola.mobile.runtime.storage.LocalPackageRecord
 import org.khodola.mobile.runtime.storage.MobilePackageLocalStore
+import org.khodola.mobile.runtime.verifier.MobilePackageVerifier
+import org.khodola.mobile.runtime.verifier.PackageVerificationRequest
 
 enum class PackageDownloaderSource {
     ActiveCache,
@@ -32,6 +34,7 @@ interface MobilePackageDownloader {
 class DefaultMobilePackageDownloader(
     private val networkClient: MobileRuntimeNetworkClient,
     private val localStore: MobilePackageLocalStore,
+    private val packageVerifier: MobilePackageVerifier? = null,
 ) : MobilePackageDownloader {
     override suspend fun ensureActivePackage(
         tenantSlug: String,
@@ -81,6 +84,7 @@ class DefaultMobilePackageDownloader(
             ),
         )
         requireMatchingDownload(manifest, download)
+        verifyDownload(download)
 
         localStore.savePackage(
             tenantSlug = tenantSlug,
@@ -97,6 +101,19 @@ class DefaultMobilePackageDownloader(
             packageRecord = activated,
             source = PackageDownloaderSource.Network,
         )
+    }
+
+    private fun verifyDownload(download: PackageDownloadResult) {
+        val verifier = packageVerifier ?: return
+        val verification = verifier.verifyPackage(
+            PackageVerificationRequest(
+                manifest = download.manifest,
+                payloadJson = download.payloadJson,
+            ),
+        )
+        require(verification.isValid) {
+            "Downloaded package ${download.manifest.packageId} failed verification: ${verification.failures}"
+        }
     }
 }
 

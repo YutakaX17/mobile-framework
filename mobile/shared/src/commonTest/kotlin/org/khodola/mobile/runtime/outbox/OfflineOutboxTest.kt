@@ -4,6 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlinx.serialization.json.JsonPrimitive
+import org.khodola.mobile.runtime.storage.InMemoryRuntimeKeyValueStore
 
 class OfflineOutboxTest {
     @Test
@@ -60,6 +61,22 @@ class OfflineOutboxTest {
         assertEquals(OutboxRecordState.Synced, synced.state)
         assertEquals(null, synced.lastError)
         assertEquals(listOf("local-0001"), store.pendingBatch(limit = 10).map { record -> record.localId })
+    }
+
+    @Test
+    fun keyValueStorePersistsOutboxRecordsAcrossInstances() {
+        val keyValueStore = InMemoryRuntimeKeyValueStore()
+        val firstStore = KeyValueOfflineOutboxStore(keyValueStore)
+        firstStore.enqueueSubmission(submission("local-0001"), 100)
+        firstStore.markFailed("local-0001", error = "network unavailable", updatedAtEpochMillis = 200)
+
+        val secondStore = KeyValueOfflineOutboxStore(keyValueStore)
+        val record = secondStore.getRecord("local-0001")
+
+        assertEquals(OutboxRecordState.Failed, record?.state)
+        assertEquals(1, record?.attemptCount)
+        assertEquals("network unavailable", record?.lastError)
+        assertEquals(listOf("local-0001"), secondStore.pendingBatch(limit = 10).map { it.localId })
     }
 
     @Test

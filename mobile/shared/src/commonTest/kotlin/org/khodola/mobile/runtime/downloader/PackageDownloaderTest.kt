@@ -10,6 +10,10 @@ import org.khodola.mobile.runtime.network.PackageDownloadResult
 import org.khodola.mobile.runtime.network.PackageManifestMetadata
 import org.khodola.mobile.runtime.network.PackageManifestRequest
 import org.khodola.mobile.runtime.storage.InMemoryPackageLocalStore
+import org.khodola.mobile.runtime.verifier.MobilePackageVerifier
+import org.khodola.mobile.runtime.verifier.PackageVerificationFailure
+import org.khodola.mobile.runtime.verifier.PackageVerificationRequest
+import org.khodola.mobile.runtime.verifier.PackageVerificationResult
 
 class PackageDownloaderTest {
     @Test
@@ -84,6 +88,37 @@ class PackageDownloaderTest {
             fail("Expected mismatched download manifest to be rejected")
         } catch (_: IllegalArgumentException) {
         }
+    }
+
+    @Test
+    fun unverifiedDownloadDoesNotActivatePackage() = runSuspendTest {
+        val manifest = packageManifest("pkg_v1")
+        val network = FakeNetworkClient(manifest)
+        val store = InMemoryPackageLocalStore()
+        val downloader = DefaultMobilePackageDownloader(
+            networkClient = network,
+            localStore = store,
+            packageVerifier = RejectingVerifier,
+        )
+
+        try {
+            downloader.ensureActivePackage("acme", "field-ops", "dev", nowEpochMillis = 100)
+            fail("Expected unverified package to be rejected")
+        } catch (_: IllegalArgumentException) {
+        }
+
+        assertEquals(null, store.getPackage("acme", "pkg_v1"))
+        assertEquals(null, store.getActivePackage("acme", "field-ops", "dev"))
+    }
+
+    private object RejectingVerifier : MobilePackageVerifier {
+        override fun verifyPackage(request: PackageVerificationRequest): PackageVerificationResult =
+            PackageVerificationResult(
+                isValid = false,
+                failures = setOf(PackageVerificationFailure.SignatureRejected),
+                expectedHash = request.manifest.hash,
+                actualHash = request.manifest.hash,
+            )
     }
 
     private class FakeNetworkClient(

@@ -76,6 +76,20 @@ class PackageLocalStoreTest {
     }
 
     @Test
+    fun keyValueStorePersistsPackagesAcrossInstances() {
+        val keyValueStore = InMemoryRuntimeKeyValueStore()
+        val firstStore = KeyValuePackageLocalStore(keyValueStore)
+        firstStore.savePackage("acme", packageDownload("pkg_v1"), 100)
+        firstStore.activatePackage("acme", "pkg_v1", 200)
+
+        val secondStore = KeyValuePackageLocalStore(keyValueStore)
+
+        assertEquals("pkg_v1", secondStore.getPackage("acme", "pkg_v1")?.packageId)
+        assertEquals("pkg_v1", secondStore.getActivePackage("acme", "field-ops", "dev")?.packageId)
+        assertEquals(200, secondStore.getActivePackage("acme", "field-ops", "dev")?.activeAtEpochMillis)
+    }
+
+    @Test
     fun rejectsActivatingMissingPackage() {
         val store = InMemoryPackageLocalStore()
 
