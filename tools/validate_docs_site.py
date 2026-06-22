@@ -34,6 +34,7 @@ REQUIRED_DOCUMENT_PATHS = [
     "mobile-runtime/RUNTIME_GUIDE.md",
     "operations/BACKUP_RESTORE_GUIDE.md",
     "operations/DEPLOYMENT_AND_RELEASE_GUIDE.md",
+    "operations/PRACTICAL_MVP_SMOKE_TEST.md",
     "operations/UPGRADE_GUIDE.md",
     "plugin-sdk/PLUGIN_SDK_GUIDE.md",
 ]
@@ -59,6 +60,7 @@ REQUIRED_README_LINKS = {
         "BACKUP_RESTORE_GUIDE.md",
         "CHANGELOG_PROCESS.md",
         "DEPLOYMENT_AND_RELEASE_GUIDE.md",
+        "PRACTICAL_MVP_SMOKE_TEST.md",
         "REPOSITORY_PROTECTION.md",
         "UPGRADE_GUIDE.md",
     ],

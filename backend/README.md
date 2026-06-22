@@ -52,7 +52,8 @@ Equivalent direct commands:
 ```powershell
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.form_builder apps.app_builder apps.deployment_packages apps.audit tests --settings=config.settings.test
+python backend/manage.py test apps.core apps.tenants apps.identity apps.modules apps.configurations apps.themes apps.form_builder apps.app_builder apps.deployment_packages apps.sync apps.audit tests --settings=config.settings.test
+python tools/validate_practical_mvp_smoke.py
 ```
 
 Local development uses SQLite by default. To point development settings at the Compose PostgreSQL service, start the service and set:
@@ -128,6 +129,16 @@ The practical MVP backend path now has tenant-scoped, permission-checked APIs fo
 - `GET /api/mobile/packages/manifest/?app_id=field_ops_app&channel=dev` and `GET /api/mobile/packages/<package_id>/download/` remain the runtime package fetch path.
 
 All admin builder/package/module endpoints require an authenticated admin session, tenant context through `X-Tenant-Slug`, and the matching tenant permission. Contract validation runs before revision or package records are saved, and validation errors use the shared API error shape.
+
+## Practical MVP Smoke Path
+
+The focused end-to-end MVP smoke gate runs from the repository root:
+
+```powershell
+python tools/validate_practical_mvp_smoke.py
+```
+
+It covers demo seeding, admin login, Field Ops plugin status, draft publish, dev package compile/activate, mobile manifest and package download, sync device registration, outbox submission, sync status, stored form submission, and sync audit evidence. The manual workstation path is documented in `docs/operations/PRACTICAL_MVP_SMOKE_TEST.md`.
 
 ## Planned Areas
 
