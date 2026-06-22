@@ -189,7 +189,7 @@ class Command(BaseCommand):
         if not user.is_superuser:
             user.is_superuser = True
             updates.append("is_superuser")
-        if created or not user.has_usable_password():
+        if created or not user.check_password(password):
             user.set_password(password)
             updates.append("password")
         if updates:
