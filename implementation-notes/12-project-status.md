@@ -39,7 +39,7 @@ GitHub Issues and the GitHub Project board should be the source of truth after t
 
 Remote GitHub tracking for the practical user-friendly MVP vertical slice is now separate from the baseline foundation milestones:
 
-- `[~]` Epic `#320`: Practical end-to-end MVP vertical slice.
+- `[x]` Epic `#320`: Practical end-to-end MVP vertical slice.
 - `[x]` Task `#321` / PR `#329` / closed remote milestone `Practical MVP M1 Local Runnable Demo Seed`: idempotent local seed for tenant, admin, RBAC, channels, built-in Field Ops plugin registration, theme, form, app, seed audit events, and active dev package.
 - `[x]` Task `#322` / PR `#330` / closed remote milestone `Practical MVP M2 Real Backend Auth And Tenant Context`: backend session auth endpoints, frontend backend-backed login, tenant resolver, and current builder permission checks are validated locally. Future package/plugin/sync admin endpoints must add permission checks in their implementation milestones.
 - `[x]` Task `#323` / PR `#331` / closed remote milestone `Practical MVP M3 Practical Builder APIs`: practical backend builder APIs now cover plugin/module status, validated form/app draft editing and publish, admin deployment package list/detail/compile/activate, and full backend integration through mobile manifest/download.
@@ -47,7 +47,7 @@ Remote GitHub tracking for the practical user-friendly MVP vertical slice is now
 - `[x]` Task `#325` / PR `#333` / closed remote milestone `Practical MVP M5 Sync Backend`: mobile sync device registration, outbox batch receipts, idempotent duplicate handling, rejection reasons, audit events, and sync status inspection are merged.
 - `[x]` Task `#326` / PR `#334` / closed remote milestone `Practical MVP M6 Mobile Practical Runtime`: transport-backed mobile package/sync client, key-value-backed package/token/outbox persistence, verified activation gating, practical render session, unsupported plugin/widget/action states, offline queueing, and sync receipt handling are merged.
 - `[x]` Task `#327` / PR `#335` / closed remote milestone `Practical MVP M7 Release Tags And Assets`: semantic release tag workflow, prerelease GitHub publication, stable release gate, deterministic release assets, release asset validation, and release docs are merged.
-- `[~]` Task `#328` / PR `#336` / remote milestone `Practical MVP M8 End-To-End Smoke Test`: backend-backed smoke validation and manual operations guide are implemented locally. PR pending.
+- `[x]` Task `#328` / PR `#336` / closed remote milestone `Practical MVP M8 End-To-End Smoke Test`: backend-backed smoke validation, manual operations guide, CI checks, issue closure, and milestone closure are complete.
 
 Working rule: before coding each practical MVP milestone, confirm the remote issue/milestone exists, check for open PRs or issues that already cover the scope, and mirror progress here after local validation.
 
@@ -77,7 +77,7 @@ Working rule: before coding each practical MVP milestone, confirm the remote iss
 - `[x]` Practical MVP M5 / `#325` / PR `#333`: mobile sync backend models, migration, tenant-scoped device registration, outbox receipt endpoint, duplicate client submission handling, rejection reasons, sync audit events, status endpoint, and focused backend coverage are merged.
 - `[x]` Practical MVP M6 / `#326` / PR `#334`: mobile practical runtime now has a transport-backed package/sync client, key-value-backed package/token/outbox persistence, verified package activation gating, render-state orchestration, unsupported plugin/widget/action failure states, offline submission queueing, and sync receipt handling. Merged and milestone closed.
 - `[x]` Practical MVP M7 / `#327` / PR `#335`: release workflow now resolves semantic versions from dispatches and `v*` tags, builds release evidence, validates release assets, publishes prereleases, and blocks stable publishing until the practical smoke gate exists. Merged and milestone closed.
-- `[~]` Practical MVP M8 / `#328` / PR `#336`: CI-backed smoke validation now covers demo seed, admin publish, package delivery, runtime-style outbox sync, stored submission, sync status, and audit evidence. PR pending.
+- `[x]` Practical MVP M8 / `#328` / PR `#336`: CI-backed smoke validation now covers demo seed, admin publish, package delivery, runtime-style outbox sync, stored submission, sync status, and audit evidence. Merged and milestone closed.
 - `[x]` EPIC-07 Form Builder: form backend model, read-only API, list page, designer toolbox, canvas, properties, conditional logic, validation rule, preview, submission endpoint, and mobile contract baselines are complete.
 - `[x]` EPIC-08 App And Screen Builder: app definition model/API, app list page, screen builder canvas, component registry, component property editor, navigation model/schema, screen model/schema, action binding, permission binding, mobile preview, app validation, and publish draft flow baselines are complete.
 - `[x]` EPIC-09 Deployment Packages: package model, compiler, signing, hash verification, release channel, activation, rollback, mobile manifest endpoint, package download endpoint, and audit event baselines are complete.
