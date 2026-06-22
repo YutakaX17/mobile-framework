@@ -29,7 +29,7 @@ jobs:
         run: python tools/generate_staging_deployment_plan.py --output build/deploy/staging-plan.json
 
       - name: Upload staging deployment plan
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: staging-deployment-plan
           path: build/deploy/staging-plan.json
