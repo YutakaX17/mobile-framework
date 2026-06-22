@@ -121,6 +121,18 @@ class SeedDemoMvpCommandTests(TestCase):
             1,
         )
 
+    def test_seed_demo_mvp_restores_documented_admin_password(self):
+        get_user_model().objects.create_user(
+            username="demo-admin",
+            email="demo-admin@example.com",
+            password="old-local-password",
+        )
+
+        self.run_seed()
+
+        admin = get_user_model().objects.get(username="demo-admin")
+        self.assertTrue(admin.check_password("demo-admin-password"))
+
 
 class RecordingService(BaseService[str, str]):
     def __init__(self):
