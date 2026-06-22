@@ -4,7 +4,7 @@ This guide describes the current deployment and release baseline. It focuses on 
 
 ## Current Baseline
 
-Deployment and release automation is implemented as a dry-run baseline with schema-validated deployment packages and workflow-generated release artifacts.
+Deployment and release automation is implemented as a practical MVP baseline with schema-validated deployment packages, dry-run staging plans, deterministic release asset bundles, and tag-driven GitHub prereleases.
 
 Current capabilities:
 
@@ -18,9 +18,10 @@ Current capabilities:
 - mobile package download endpoint;
 - deployment audit events;
 - dry-run staging deployment plan;
-- dry-run release manifest.
+- release manifest and asset bundle;
+- prerelease GitHub releases from `v*` tags.
 
-Real production deployment still requires environment credentials, approval gates, and operational runbooks to be configured outside this baseline.
+Real production deployment still requires environment credentials, approval gates, practical end-to-end smoke evidence, and operational runbooks to be configured outside this baseline.
 
 ## Deployment Packages
 
@@ -160,9 +161,19 @@ The generated plan includes:
 
 Current staging services are the backend and frontend-admin containers. The backend depends on Postgres and Redis. The frontend-admin service depends on the backend.
 
-## Release Manifest
+## Release Tags, Manifest, And Assets
 
-The release workflow generates a dry-run release manifest artifact.
+The release workflow validates release evidence on pull requests and `main`, and can publish GitHub releases from semantic version tags.
+
+Supported release triggers:
+
+- Pull requests and `main` pushes run the release checks without publishing.
+- `workflow_dispatch` accepts a semantic version and an optional publish flag.
+- Tags matching `v*` publish a GitHub release automatically when the version is a prerelease.
+
+Tag names must use semantic versioning with a leading `v`, for example `v0.1.0-rc.1`. The release manifest itself stores the version without the leading `v`.
+
+Stable release publishing is intentionally gated. A stable tag such as `v0.1.0` will fail publication until repository variable `ALLOW_STABLE_RELEASE` is set to `true`, which should only happen after the practical end-to-end MVP smoke gate is complete.
 
 The manifest generator requires a semantic release version and validates that release prerequisites exist, including CI workflows, Dockerfiles, SBOM tooling, staging deployment tooling, and the compatibility matrix.
 
@@ -180,7 +191,27 @@ The manifest records:
 - required artifacts;
 - release steps.
 
-Required artifacts include the SPDX SBOM, backend image signing bundle, frontend-admin image signing bundle, and staging deployment plan.
+Required evidence includes the SPDX SBOM, backend image digest and signing evidence, frontend-admin image digest and signing evidence, staging deployment plan, contract schema bundle, generated contract types, OpenAPI/schema artifact, built-in Field Ops module manifest, deterministic demo deployment package, and release notes draft.
+
+The release asset bundle uploaded as `practical-mvp-release-assets` contains:
+
+- `release-manifest.json`;
+- `mobile-framework.spdx.json`;
+- `staging-plan.json`;
+- `backend.digest`;
+- `frontend-admin.digest`;
+- `backend.sigstore.json`;
+- `frontend-admin.sigstore.json`;
+- `contract-schema-bundle.zip`;
+- `generated-contract-types.zip`;
+- `openapi-schema-artifact.zip`;
+- `field-ops-module-manifest.json`;
+- `demo-active-deployment-package.json`;
+- `schema-index.json`;
+- `release-notes.md`;
+- `asset-index.json`.
+
+Platform releases are different from tenant deployment packages. A platform release tags backend, admin frontend, mobile runtime contracts, schemas, and operational evidence. A tenant deployment package is an immutable app configuration payload activated on a release channel such as `dev` or `production`. Plugin/module releases are currently represented by schema-validated module manifests inside deployment packages and the platform asset bundle.
 
 ## Promotion Checklist
 
@@ -195,7 +226,8 @@ Before promoting a package or release beyond the dry-run baseline:
 7. Confirm staging secrets and environment credentials are configured.
 8. Confirm image signing and SBOM artifacts are retained.
 9. Confirm mobile runtime compatibility covers the target devices.
-10. Confirm rollback target packages are available before production promotion.
+10. Confirm practical end-to-end MVP smoke evidence exists for the release candidate.
+11. Confirm rollback target packages are available before production promotion.
 
 ## Troubleshooting
 
@@ -253,5 +285,8 @@ Release or staging script changes should also run:
 
 ```powershell
 python tools/generate_staging_deployment_plan.py
-python tools/generate_release_manifest.py --version 0.1.0
+python tools/generate_release_manifest.py --version 0.1.0-rc.1
+python tools/generate_sbom.py --output build/sbom/mobile-framework.spdx.json
+python tools/generate_release_assets.py --version 0.1.0-rc.1 --release-manifest build/release/release-manifest.json --sbom build/sbom/mobile-framework.spdx.json --staging-plan build/deploy/staging-plan.json --output-dir build/release/assets
+python tools/validate_release_assets.py
 ```

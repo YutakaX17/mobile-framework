@@ -128,9 +128,19 @@ def build_manifest(version: str) -> dict[str, Any]:
         "required_checks": REQUIRED_WORKFLOWS,
         "required_artifacts": [
             {
+                "name": "release-manifest.json",
+                "workflow": "Release",
+                "path": "build/release/assets/release-manifest.json",
+            },
+            {
                 "name": "mobile-framework-spdx-sbom",
                 "workflow": "SBOM Generation",
                 "path": "build/sbom/mobile-framework.spdx.json",
+            },
+            {
+                "name": "mobile-framework.spdx.json",
+                "workflow": "Release",
+                "path": "build/release/assets/mobile-framework.spdx.json",
             },
             {
                 "name": "backend-image-signing-bundle",
@@ -138,14 +148,69 @@ def build_manifest(version: str) -> dict[str, Any]:
                 "path": "build/image-signing/backend.sigstore.json",
             },
             {
+                "name": "backend.digest",
+                "workflow": "Release",
+                "path": "build/release/assets/backend.digest",
+            },
+            {
                 "name": "frontend-admin-image-signing-bundle",
                 "workflow": "Image Signing",
                 "path": "build/image-signing/frontend-admin.sigstore.json",
             },
             {
+                "name": "frontend-admin.digest",
+                "workflow": "Release",
+                "path": "build/release/assets/frontend-admin.digest",
+            },
+            {
                 "name": "staging-deployment-plan",
                 "workflow": "Staging Deployment",
                 "path": "build/deploy/staging-plan.json",
+            },
+            {
+                "name": "staging-plan.json",
+                "workflow": "Release",
+                "path": "build/release/assets/staging-plan.json",
+            },
+            {
+                "name": "contract-schema-bundle.zip",
+                "workflow": "Release",
+                "path": "build/release/assets/contract-schema-bundle.zip",
+            },
+            {
+                "name": "generated-contract-types.zip",
+                "workflow": "Release",
+                "path": "build/release/assets/generated-contract-types.zip",
+            },
+            {
+                "name": "openapi-schema-artifact.zip",
+                "workflow": "Release",
+                "path": "build/release/assets/openapi-schema-artifact.zip",
+            },
+            {
+                "name": "schema-index.json",
+                "workflow": "Release",
+                "path": "build/release/assets/schema-index.json",
+            },
+            {
+                "name": "field-ops-module-manifest.json",
+                "workflow": "Release",
+                "path": "build/release/assets/field-ops-module-manifest.json",
+            },
+            {
+                "name": "demo-active-deployment-package.json",
+                "workflow": "Release",
+                "path": "build/release/assets/demo-active-deployment-package.json",
+            },
+            {
+                "name": "release-notes.md",
+                "workflow": "Release",
+                "path": "build/release/assets/release-notes.md",
+            },
+            {
+                "name": "asset-index.json",
+                "workflow": "Release",
+                "path": "build/release/assets/asset-index.json",
             },
         ],
         "release_steps": [
@@ -155,7 +220,9 @@ def build_manifest(version: str) -> dict[str, Any]:
             "Generate SPDX SBOM artifact",
             "Sign image digest artifacts with OIDC keyless signing",
             "Generate staging deployment plan artifact",
-            "Create GitHub release only after publishing credentials and approval gates are configured",
+            "Bundle contracts, generated types, Field Ops plugin manifest, and demo package assets",
+            "Create prerelease GitHub releases automatically for tag builds",
+            "Keep stable release publishing disabled until the practical E2E MVP smoke test gate is complete",
         ],
     }
 

@@ -9,6 +9,7 @@ The matrix starts small because the project is not implemented yet. It should be
 | Platform version | Schema version | Mobile runtime min | Mobile runtime max | Plugin API | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `0.1.x` | `v1` | `0.1.0` | `0.1.x` | `0` | Foundation and contract development. Not production-ready. |
+| `0.1.0-rc.x` | `v1` | `0.1.0` | `0.1.x` | `0` | Practical MVP release candidates with tag-driven release assets. Stable promotion remains gated by the end-to-end smoke test. |
 
 ## Version Meanings
 
@@ -41,6 +42,14 @@ The matrix starts small because the project is not implemented yet. It should be
 | `staging` | Release candidate packages. | Must match the published matrix row for the candidate version. |
 | `production` | User-facing packages. | Must match a released matrix row and pass package validation. |
 
+## Platform Release Expectations
+
+| Release kind | Version example | Expected evidence |
+| --- | --- | --- |
+| Pull request validation | `0.1.0-rc.1` | Release workflow checks and `practical-mvp-release-assets` artifact, without GitHub release publication. |
+| Prerelease tag | `v0.1.0-rc.1` | Published GitHub prerelease with manifest, SBOM, staging plan, schema bundle, generated types, Field Ops module manifest, demo package, image digests, signing evidence, and release notes. |
+| Stable tag | `v0.1.0` | Blocked until `ALLOW_STABLE_RELEASE=true` and practical end-to-end smoke evidence exists. |
+
 ## Update Triggers
 
 Update this matrix when:
@@ -55,7 +64,6 @@ Update this matrix when:
 
 ## Current Open Decisions
 
-- Exact semantic versioning process for pre-1.0 releases.
 - Exact generated type tooling for Python, TypeScript, and Kotlin.
 - Whether mobile package APIs remain REST-only or later add persisted GraphQL for specific reads.
 - Public schema registry domain, if one is needed.
