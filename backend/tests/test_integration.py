@@ -16,7 +16,9 @@ from apps.configurations.models import (
 )
 from apps.core.events import DomainEvent, EventBus
 from apps.core.services import BaseService, ServiceContext, ServiceResult
+from apps.form_builder.models import FormSubmission
 from apps.modules.models import ModuleRegistration
+from apps.sync.models import OutboxBatch, SubmissionSyncResult, SyncDevice, SyncSubmissionStatus
 from apps.tenants.models import Tenant
 
 
@@ -155,7 +157,7 @@ class PracticalMvpBuilderIntegrationTests(TestCase):
             **self.api_headers(),
         )
 
-    def test_seed_login_plugin_builder_compile_activate_and_mobile_fetch_path(self):
+    def test_practical_mvp_smoke_path_from_admin_publish_to_mobile_sync(self):
         login_response = self.client.post(
             "/api/auth/login/",
             data=json.dumps({"username": "demo-admin", "password": "demo-admin-password"}),
@@ -266,3 +268,83 @@ class PracticalMvpBuilderIntegrationTests(TestCase):
         self.assertEqual(downloaded["manifest"]["hash"], manifest["hash"])
         self.assertEqual(downloaded["package"]["modules"][1]["module_id"], "field_ops")
         self.assertEqual(downloaded["package"]["forms"][0]["version"], "0.1.1")
+
+        register_device_response = self.client.post(
+            "/api/mobile/sync/devices/",
+            data=json.dumps(
+                {
+                    "app_version": downloaded["package"]["app_version"],
+                    "device_id": "field-tablet-smoke-1",
+                    "platform": "android",
+                    "runtime_version": "0.1.0",
+                }
+            ),
+            content_type="application/json",
+            **self.api_headers(),
+        )
+        self.assertEqual(register_device_response.status_code, 201)
+        self.assertEqual(register_device_response.json()["device"]["status"], "active")
+
+        outbox_response = self.client.post(
+            "/api/mobile/sync/outbox/",
+            data=json.dumps(
+                {
+                    "app_version": downloaded["package"]["app_version"],
+                    "batch_id": "smoke-batch-001",
+                    "device_id": "field-tablet-smoke-1",
+                    "platform": "android",
+                    "runtime_version": "0.1.0",
+                    "submissions": [
+                        {
+                            "answers": {
+                                "patient_name": "Amina Nkosi",
+                                "age": 34,
+                                "triage_priority": "routine",
+                            },
+                            "client_submission_id": "smoke-submission-001",
+                            "form_id": "patient_intake",
+                        }
+                    ],
+                }
+            ),
+            content_type="application/json",
+            **self.api_headers(),
+        )
+        self.assertEqual(outbox_response.status_code, 202)
+        outbox_body = outbox_response.json()
+        self.assertEqual(outbox_body["batch"]["status"], "accepted")
+        self.assertEqual(outbox_body["session"]["accepted_count"], 1)
+        self.assertEqual(outbox_body["receipts"][0]["status"], SyncSubmissionStatus.ACCEPTED)
+
+        status_response = self.client.get(
+            "/api/mobile/sync/status/",
+            {"device_id": "field-tablet-smoke-1"},
+            **self.api_headers(),
+        )
+        self.assertEqual(status_response.status_code, 200)
+        status = status_response.json()
+        self.assertEqual(status["devices"][0]["device_id"], "field-tablet-smoke-1")
+        self.assertEqual(status["batches"][0]["batch_id"], "smoke-batch-001")
+        self.assertEqual(status["batches"][0]["results"][0]["client_submission_id"], "smoke-submission-001")
+        self.assertEqual(status["batches"][0]["results"][0]["status"], SyncSubmissionStatus.ACCEPTED)
+
+        self.assertEqual(SyncDevice.objects.filter(tenant__slug="demo", device_id="field-tablet-smoke-1").count(), 1)
+        self.assertEqual(OutboxBatch.objects.filter(tenant__slug="demo", batch_id="smoke-batch-001").count(), 1)
+        self.assertEqual(
+            SubmissionSyncResult.objects.filter(
+                tenant__slug="demo",
+                client_submission_id="smoke-submission-001",
+            ).count(),
+            1,
+        )
+        submission = FormSubmission.objects.get(tenant__slug="demo", form__form_id="patient_intake")
+        self.assertEqual(submission.answers["patient_name"], "Amina Nkosi")
+        self.assertEqual(
+            AuditEvent.objects.filter(
+                tenant__slug="demo",
+                event_type=AuditEventType.SYNC,
+                action="sync-submission-accepted",
+                metadata__client_submission_id="smoke-submission-001",
+            ).count(),
+            1,
+        )
