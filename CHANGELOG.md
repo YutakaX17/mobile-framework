@@ -8,6 +8,7 @@ This project follows the category structure from Keep a Changelog and uses Seman
 
 ### Added
 
+- Practical MVP release tag and asset workflow with semantic version validation, prerelease GitHub publication, stable release gating, SBOM/staging/contract/demo asset bundles, and release asset validation.
 - Practical MVP mobile runtime session flow with transport-backed package/sync client, key-value-backed package/token/outbox persistence, verified package activation gating, render-state summaries, safe unsupported plugin/widget/action states, and outbox sync receipt handling.
 - Practical MVP mobile sync backend for device registration, offline outbox batch receipts, duplicate client submission handling, rejection reasons, audit events, and sync status inspection.
 - Practical MVP admin setup wizard, module status page, and package release page for the Field Ops flow.

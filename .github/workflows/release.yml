@@ -5,37 +5,187 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       version:
-        description: Release version to validate
+        description: Semantic version to validate or release without the leading v
         required: true
-        default: "0.1.0"
+        default: "0.1.0-rc.1"
+      publish_release:
+        description: Publish a GitHub release for this workflow_dispatch run
+        required: true
+        type: boolean
+        default: false
 
 permissions:
-  contents: read
+  contents: write
+  id-token: write
 
 jobs:
   release-manifest:
     name: Release Manifest
     runs-on: ubuntu-latest
     env:
-      RELEASE_VERSION: ${{ github.event.inputs.version || '0.1.0' }}
+      ALLOW_STABLE_RELEASE: ${{ vars.ALLOW_STABLE_RELEASE || 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve release version and mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          publish_release="false"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            publish_release="true"
+          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            version="${{ inputs.version }}"
+            publish_release="${{ inputs.publish_release }}"
+          else
+            version="0.1.0-rc.1"
+          fi
+
+          if [[ ! "${version}" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semantic version: ${version}" >&2
+            exit 1
+          fi
+
+          prerelease="false"
+          if [[ "${version}" == *-* ]]; then
+            prerelease="true"
+          fi
+
+          if [[ "${publish_release}" == "true" && "${prerelease}" != "true" && "${ALLOW_STABLE_RELEASE}" != "true" ]]; then
+            echo "Stable release publishing is disabled until the practical E2E MVP smoke gate is complete." >&2
+            exit 1
+          fi
+
+          {
+            echo "RELEASE_VERSION=${version}"
+            echo "RELEASE_TAG=v${version}"
+            echo "PUBLISH_RELEASE=${publish_release}"
+            echo "PRERELEASE=${prerelease}"
+          } >> "$GITHUB_ENV"
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Install Python validation dependencies
+        run: |
+          python -m pip install -r contracts/requirements.txt
+          python -m pip install -r backend/requirements.txt
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: frontend-admin/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend-admin
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend-admin
+        run: npx playwright install --with-deps chromium
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK platform
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.5.0"
+
+      - name: Validate foundation, contracts, backend, frontend, and mobile runtime
+        run: |
+          python tools/validate_foundation.py
+          python contracts/validate_contracts.py
+          python tools/validate_backend.py
+          python tools/validate_frontend_admin.py
+          python tools/validate_mobile.py
+          python tools/validate_mobile_tests.py
+
+      - name: Run mobile Gradle tests
+        working-directory: mobile
+        run: gradle :shared:desktopTest :composeApp:desktopTest --stacktrace
+
       - name: Generate release manifest
         run: python tools/generate_release_manifest.py --version "$RELEASE_VERSION" --output build/release/release-manifest.json
 
-      - name: Upload release manifest
+      - name: Generate SPDX SBOM
+        run: python tools/generate_sbom.py --output build/sbom/mobile-framework.spdx.json
+
+      - name: Generate staging deployment plan
+        run: python tools/generate_staging_deployment_plan.py --output build/deploy/staging-plan.json
+
+      - name: Build backend and frontend images
+        run: |
+          docker build --tag mobile-framework-backend:release backend
+          docker build --tag mobile-framework-frontend-admin:release frontend-admin
+
+      - name: Write image digest files
+        run: |
+          mkdir -p build/release/assets
+          docker image inspect --format '{{.Id}}' mobile-framework-backend:release > build/release/assets/backend.digest
+          docker image inspect --format '{{.Id}}' mobile-framework-frontend-admin:release > build/release/assets/frontend-admin.digest
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image digest files
+        run: |
+          cosign sign-blob --yes --bundle build/release/assets/backend.sigstore.json build/release/assets/backend.digest
+          cosign sign-blob --yes --bundle build/release/assets/frontend-admin.sigstore.json build/release/assets/frontend-admin.digest
+
+      - name: Generate deterministic release assets
+        run: |
+          python tools/generate_release_assets.py \
+            --version "$RELEASE_VERSION" \
+            --release-manifest build/release/release-manifest.json \
+            --sbom build/sbom/mobile-framework.spdx.json \
+            --staging-plan build/deploy/staging-plan.json \
+            --output-dir build/release/assets
+
+      - name: Validate release assets
+        run: python tools/validate_release_assets.py
+
+      - name: Upload release asset artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-manifest
-          path: build/release/release-manifest.json
+          name: practical-mvp-release-assets
+          path: build/release/assets
           if-no-files-found: error
+
+      - name: Create GitHub release
+        if: env.PUBLISH_RELEASE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            gh release create "$RELEASE_TAG"
+            build/release/assets/*
+            --title "Mobile Framework ${RELEASE_TAG}"
+            --notes-file build/release/assets/release-notes.md
+          )
+          if [[ "$PRERELEASE" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          "${args[@]}"

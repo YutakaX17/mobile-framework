@@ -87,11 +87,13 @@ REQUIRED_FILES = [
     "backend/.dockerignore",
     "backend/Dockerfile",
     "tools/generate_release_manifest.py",
+    "tools/generate_release_assets.py",
     "tools/generate_sbom.py",
     "tools/generate_staging_deployment_plan.py",
     "tools/validate_backend.py",
     "tools/validate_docs_site.py",
     "tools/validate_python.py",
+    "tools/validate_release_assets.py",
     "tools/validate_secret_scan.py",
     "tools/validate_workflow_builder.py",
     "infra/compose/docker-compose.yml",
@@ -489,14 +491,22 @@ def validate_staging_deployment_workflow() -> None:
 def validate_release_workflow() -> None:
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8-sig")
     script = (ROOT / "tools" / "generate_release_manifest.py").read_text(encoding="utf-8-sig")
+    assets_script = (ROOT / "tools" / "generate_release_assets.py").read_text(encoding="utf-8-sig")
+    validator = (ROOT / "tools" / "validate_release_assets.py").read_text(encoding="utf-8-sig")
     required_workflow_snippets = [
         "name: Release",
+        "tags:",
+        "v*",
         "workflow_dispatch:",
         "version:",
-        "RELEASE_VERSION:",
+        "publish_release:",
+        "ALLOW_STABLE_RELEASE",
         "python tools/generate_release_manifest.py --version",
+        "python tools/generate_release_assets.py",
+        "python tools/validate_release_assets.py",
         "actions/upload-artifact@v4",
-        "release-manifest",
+        "practical-mvp-release-assets",
+        "gh release create",
     ]
     required_script_snippets = [
         "release-manifest.v1",
@@ -508,6 +518,29 @@ def validate_release_workflow() -> None:
         "mobile-framework-spdx-sbom",
         "backend-image-signing-bundle",
         "frontend-admin-image-signing-bundle",
+        "contract-schema-bundle.zip",
+        "generated-contract-types.zip",
+        "openapi-schema-artifact.zip",
+        "schema-index.json",
+        "field-ops-module-manifest.json",
+        "demo-active-deployment-package.json",
+        "asset-index.json",
+    ]
+    required_assets_script_snippets = [
+        "release-assets.v1",
+        "contract-schema-bundle.zip",
+        "generated-contract-types.zip",
+        "openapi-schema-artifact.zip",
+        "schema-index.json",
+        "field-ops-module-manifest.json",
+        "demo-active-deployment-package.json",
+        "asset-index.json",
+    ]
+    required_validator_snippets = [
+        "Release asset validation passed.",
+        "build_assets",
+        "build_manifest",
+        "ALLOW_STABLE_RELEASE",
     ]
     for snippet in required_workflow_snippets:
         if snippet not in workflow:
@@ -515,6 +548,12 @@ def validate_release_workflow() -> None:
     for snippet in required_script_snippets:
         if snippet not in script:
             fail(f"generate_release_manifest.py is missing: {snippet}")
+    for snippet in required_assets_script_snippets:
+        if snippet not in assets_script:
+            fail(f"generate_release_assets.py is missing: {snippet}")
+    for snippet in required_validator_snippets:
+        if snippet not in validator:
+            fail(f"validate_release_assets.py is missing: {snippet}")
 
 
 def main() -> int:
