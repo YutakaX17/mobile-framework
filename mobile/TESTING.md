@@ -1,6 +1,6 @@
 # Mobile Runtime Testing
 
-Mobile runtime coverage currently uses Kotlin Multiplatform common tests plus lightweight repository validation.
+Mobile runtime coverage uses Kotlin Multiplatform common tests plus lightweight repository validation.
 
 ## Coverage Baseline
 
@@ -28,3 +28,12 @@ python tools/validate_mobile_tests.py
 ```
 
 Full Gradle build and test execution is intentionally deferred to the mobile Gradle test workflow task.
+
+The practical MVP runtime coverage includes:
+
+- package verification gating before activation;
+- transport-backed package manifest/download and sync requests;
+- key-value-backed package, token, and outbox persistence;
+- package render model loading for navigation, screen, form, and theme;
+- unsupported plugin API, widget, and action failure states;
+- offline submission queueing and sync receipt handling for accepted, duplicate, and rejected results.

@@ -6,6 +6,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.khodola.mobile.runtime.storage.InMemoryRuntimeKeyValueStore
 
 class SecureTokenStoreTest {
     @Test
@@ -48,6 +49,36 @@ class SecureTokenStoreTest {
 
         assertEquals(1, store.clearAllTokens())
         assertNull(store.getTokens("northwind"))
+    }
+
+    @Test
+    fun keyValueStorePersistsTokensAcrossInstances() {
+        val keyValueStore = InMemoryRuntimeKeyValueStore()
+        val firstStore = KeyValueSecureTokenStore(keyValueStore)
+        firstStore.saveTokens("acme", MobileAuthTokens(accessToken = "access", refreshToken = "refresh"))
+
+        val secondStore = KeyValueSecureTokenStore(keyValueStore)
+
+        assertEquals("access", secondStore.getTokens("acme")?.accessToken)
+        assertEquals("refresh", secondStore.getTokens("acme")?.refreshToken)
+    }
+
+    @Test
+    fun authorizationProviderReturnsOnlyUsableTokenHeaders() {
+        val store = InMemorySecureTokenStore()
+        store.saveTokens(
+            "acme",
+            MobileAuthTokens(accessToken = "active-token", refreshToken = null, expiresAtEpochMillis = 300),
+        )
+        store.saveTokens(
+            "expired",
+            MobileAuthTokens(accessToken = "expired-token", refreshToken = null, expiresAtEpochMillis = 200),
+        )
+        val provider = TokenStoreAuthorizationProvider(store, nowEpochMillis = 250)
+
+        assertEquals("Bearer active-token", provider.authorizationHeader("acme"))
+        assertEquals(null, provider.authorizationHeader("expired"))
+        assertEquals(null, provider.authorizationHeader("missing"))
     }
 
     @Test

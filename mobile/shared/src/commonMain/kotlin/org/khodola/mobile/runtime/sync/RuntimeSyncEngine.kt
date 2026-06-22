@@ -3,6 +3,10 @@ package org.khodola.mobile.runtime.sync
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import org.khodola.mobile.runtime.network.MobileRuntimeSyncClient
+import org.khodola.mobile.runtime.network.SyncOutboxRequest
+import org.khodola.mobile.runtime.network.SyncOutboxSubmission
+import org.khodola.mobile.runtime.network.SyncSubmissionReceipt
 import org.khodola.mobile.runtime.outbox.OfflineOutboxRecord
 import org.khodola.mobile.runtime.outbox.OfflineOutboxStore
 import org.khodola.mobile.runtime.serialization.MobileRuntimeJson
@@ -86,6 +90,113 @@ class DefaultRuntimeSyncEngine : RuntimeSyncEngine {
 
         return RuntimeSyncPlan(rule = rule, outboxRecords = records)
     }
+}
+
+data class MobileSyncContext(
+    val tenantSlug: String,
+    val deviceId: String,
+    val platform: String,
+    val appVersion: String,
+    val runtimeVersion: String,
+    val nowEpochMillis: Long,
+) {
+    init {
+        require(tenantSlug.isNotBlank()) { "tenantSlug is required" }
+        require(deviceId.isNotBlank()) { "deviceId is required" }
+        require(platform.isNotBlank()) { "platform is required" }
+        require(appVersion.isNotBlank()) { "appVersion is required" }
+        require(runtimeVersion.isNotBlank()) { "runtimeVersion is required" }
+    }
+}
+
+data class MobileOutboxSyncResult(
+    val batchId: String?,
+    val attemptedLocalIds: List<String>,
+    val syncedLocalIds: List<String>,
+    val failedLocalIds: List<String>,
+    val receipts: List<SyncSubmissionReceipt>,
+) {
+    val didSync: Boolean
+        get() = syncedLocalIds.isNotEmpty()
+}
+
+class MobileOutboxSynchronizer(
+    private val syncEngine: RuntimeSyncEngine,
+    private val outboxStore: OfflineOutboxStore,
+    private val syncClient: MobileRuntimeSyncClient,
+) {
+    suspend fun pushPending(rule: RuntimeSyncRule, context: MobileSyncContext): MobileOutboxSyncResult {
+        val plan = syncEngine.planPush(rule, outboxStore)
+        if (!plan.canPush) {
+            return MobileOutboxSyncResult(
+                batchId = null,
+                attemptedLocalIds = emptyList(),
+                syncedLocalIds = emptyList(),
+                failedLocalIds = emptyList(),
+                receipts = emptyList(),
+            )
+        }
+
+        val localIds = plan.outboxRecords.map { record -> record.localId }
+        outboxStore.markInFlight(localIds, context.nowEpochMillis)
+        val batchId = "${context.deviceId}-${context.nowEpochMillis}"
+
+        return try {
+            val result = syncClient.submitOutboxBatch(
+                SyncOutboxRequest(
+                    tenantSlug = context.tenantSlug,
+                    deviceId = context.deviceId,
+                    batchId = batchId,
+                    platform = context.platform,
+                    appVersion = context.appVersion,
+                    runtimeVersion = context.runtimeVersion,
+                    submissions = plan.outboxRecords.map { record -> record.toSyncSubmission() },
+                ),
+            )
+            val receiptsByLocalId = result.receipts.associateBy { receipt -> receipt.clientSubmissionId }
+            val synced = mutableListOf<String>()
+            val failed = mutableListOf<String>()
+            localIds.forEach { localId ->
+                val receipt = receiptsByLocalId[localId]
+                if (receipt?.isAccepted == true) {
+                    outboxStore.markSynced(localId, context.nowEpochMillis)
+                    synced += localId
+                } else {
+                    outboxStore.markFailed(
+                        localId,
+                        error = receipt?.message?.takeIf { message -> message.isNotBlank() } ?: "No sync receipt returned.",
+                        updatedAtEpochMillis = context.nowEpochMillis,
+                    )
+                    failed += localId
+                }
+            }
+            MobileOutboxSyncResult(
+                batchId = result.batch.batchId,
+                attemptedLocalIds = localIds,
+                syncedLocalIds = synced,
+                failedLocalIds = failed,
+                receipts = result.receipts,
+            )
+        } catch (exc: IllegalArgumentException) {
+            localIds.forEach { localId ->
+                outboxStore.markFailed(localId, exc.message ?: "Sync failed.", context.nowEpochMillis)
+            }
+            MobileOutboxSyncResult(
+                batchId = batchId,
+                attemptedLocalIds = localIds,
+                syncedLocalIds = emptyList(),
+                failedLocalIds = localIds,
+                receipts = emptyList(),
+            )
+        }
+    }
+
+    private fun OfflineOutboxRecord.toSyncSubmission(): SyncOutboxSubmission =
+        SyncOutboxSubmission(
+            clientSubmissionId = submission.localId,
+            formId = submission.formId,
+            answers = submission.answers,
+        )
 }
 
 fun decodeRuntimeSyncRulesFromPackagePayload(payloadJson: String): List<RuntimeSyncRule> =
