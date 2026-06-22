@@ -3,7 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from apps.identity.models import (
     PlatformPermission,
@@ -166,6 +166,23 @@ class IdentitySessionApiTests(TestCase):
             "/api/auth/login/",
             data=json.dumps({"username": "demo-admin", "password": "demo-admin-password"}),
             content_type="application/json",
+            HTTP_X_CSRFTOKEN=token,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["user"]["username"], "demo-admin")
+
+    @override_settings(CSRF_TRUSTED_ORIGINS=["http://localhost:5173"])
+    def test_csrf_cookie_allows_session_login_from_vite_dev_origin(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_response = csrf_client.get("/api/auth/csrf/")
+        token = csrf_response.cookies["csrftoken"].value
+
+        response = csrf_client.post(
+            "/api/auth/login/",
+            data=json.dumps({"username": "demo-admin", "password": "demo-admin-password"}),
+            content_type="application/json",
+            HTTP_ORIGIN="http://localhost:5173",
             HTTP_X_CSRFTOKEN=token,
         )
 
